@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "MetaBrowser Agent",
+  "version": "0.1.0",
+  "description": "Side panel for metacodes agent sessions controlling this browser, with approvals and an audit feed.",
+  "permissions": ["sidePanel", "tabs"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": {"service_worker": "background.js"},
+  "action": {"default_title": "MetaBrowser Agent"},
+  "side_panel": {"default_path": "sidepanel.html"}
+}

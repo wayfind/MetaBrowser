@@ -1,0 +1,8 @@
+# Upstream (CloakHQ/CloakBrowser) files the fork is allowed to modify, with a hard size budget.
+# Everything else must live under metabrowser/ (see docs/FORK_SYNC.md). fork-guard enforces this list.
+#
+# <path>                    <max changed lines>  <why>
+.gitattributes              5                    merge drivers for fork-owned files (append-only, end of file)
+.github/README.md           -1                   fork landing page; upstream has none (GitHub shows it before README.md)
+.github/workflows/metabrowser.yml   -1           fork CI (new file)
+.github/workflows/upstream-sync.yml -1           daily upstream merge PR (new file)

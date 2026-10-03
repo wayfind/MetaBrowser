@@ -1,0 +1,27 @@
+{
+  "schema_version": 3,
+  "profiles": ["agent-dag"],
+  "node_types": [
+    {"name": "site", "id": 100, "parents": ["node"]},
+    {"name": "site_module", "id": 101, "parents": ["node"]},
+    {"name": "site_page", "id": 102, "parents": ["node"]},
+    {"name": "ui_action", "id": 103, "parents": ["node"]},
+    {"name": "data_entity", "id": 104, "parents": ["node"]},
+    {"name": "site_risk", "id": 105, "parents": ["node"]},
+    {"name": "capability", "id": 106, "parents": ["node"]},
+    {"name": "recipe", "id": 107, "parents": ["node"]},
+    {"name": "trajectory", "id": 108, "parents": ["node"]}
+  ],
+  "relation_types": [
+    {"name": "has_module", "id": 100, "class": "ref", "src_types": ["site"], "dst_types": ["site_module"]},
+    {"name": "has_page", "id": 101, "class": "ref", "src_types": ["site", "site_module"], "dst_types": ["site_page"]},
+    {"name": "exposes_action", "id": 102, "class": "ref", "src_types": ["site_page"], "dst_types": ["ui_action"]},
+    {"name": "navigates_to", "id": 103, "class": "ref", "src_types": ["site_page", "ui_action"], "dst_types": ["site_page"]},
+    {"name": "reads_entity", "id": 104, "class": "ref", "src_types": ["site_page", "ui_action", "capability"], "dst_types": ["data_entity"]},
+    {"name": "writes_entity", "id": 105, "class": "ref", "src_types": ["ui_action", "capability"], "dst_types": ["data_entity"]},
+    {"name": "has_risk", "id": 106, "class": "ref", "src_types": ["site", "site_page", "ui_action", "data_entity", "capability"], "dst_types": ["site_risk"]},
+    {"name": "provides", "id": 107, "class": "ref", "src_types": ["site"], "dst_types": ["capability"]},
+    {"name": "implements", "id": 108, "class": "prov", "src_types": ["recipe"], "dst_types": ["capability"]},
+    {"name": "learned_from", "id": 109, "class": "prov", "src_types": ["recipe", "site_page", "ui_action"], "dst_types": ["trajectory"]}
+  ]
+}

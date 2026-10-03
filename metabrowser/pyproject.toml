@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# MetaBrowser overlay: lives beside the upstream CloakBrowser package and only
+# depends on its public API, so upstream merges never touch this file.
+[project]
+name = "metabrowser"
+version = "0.1.0"
+description = "Agent-grade browser runtime on CloakBrowser: layered tools, MCP, site packs, auditable traces, metacodes integration."
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "cloakbrowser>=0.5.11",
+    "playwright>=1.40",
+    "aiohttp>=3.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+metabrowser = "metabrowser.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/metabrowser"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"extension" = "metabrowser/_extension"
+"sites" = "metabrowser/_sites"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["src"]

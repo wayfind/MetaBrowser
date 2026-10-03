@@ -1,0 +1,33 @@
+{
+  "id": "example_shop",
+  "name": "Example Shop Admin",
+  "version": "0.1.0",
+  "description": "Reference site pack: a merchant back-office (orders, refunds). Point it at a tenant with METABROWSER_SITE_EXAMPLE_SHOP_URL.",
+  "base_url": "https://shop.example.com",
+  "login": {
+    "check_url": "{base_url}/admin/",
+    "logged_out_url": "/login",
+    "logged_in_selector": "[data-testid=account-menu]"
+  },
+  "modules": [
+    {"id": "orders", "name": "订单 Orders", "summary": "List, search and inspect orders; issue refunds"}
+  ],
+  "entities": [
+    {"id": "order", "fields": ["id", "customer", "total", "status", "date"], "pii": ["customer"], "risks": ["pii_customer"]},
+    {"id": "refund", "fields": ["order_id", "amount", "reason"], "risks": ["refund_money"]}
+  ],
+  "pages": [
+    {"id": "dashboard", "module": "orders", "url": "{base_url}/admin/", "links": ["orders_list"]},
+    {"id": "orders_list", "module": "orders", "url": "{base_url}/admin/orders/", "entities": ["order"],
+     "actions": [
+       {"id": "search_orders", "kind": "form", "risk": "read"},
+       {"id": "next_page", "kind": "pagination", "navigates_to": "orders_list"},
+       {"id": "refund_order", "kind": "button", "writes": ["refund"], "risks": ["refund_money"]}
+     ]}
+  ],
+  "risks": [
+    {"id": "refund_money", "level": "irreversible", "match_text": "refund|退款", "url_glob": "*/admin/orders*",
+     "reason": "refunds move money and cannot be undone"},
+    {"id": "pii_customer", "level": "read", "reason": "customer names are personal data; keep exports in the outputs folder"}
+  ]
+}

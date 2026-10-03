@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>MetaBrowser Agent</title>
+<link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header>
+    <nav id="sessions" role="tablist" aria-label="Agent sessions"></nav>
+    <button id="new-session" title="New session" aria-label="New session">＋</button>
+    <span id="status" class="status">connecting…</span>
+  </header>
+  <div id="banner" hidden></div>
+  <section id="approvals" aria-live="assertive"></section>
+  <main id="log" aria-live="polite"></main>
+  <details id="activity">
+    <summary>Browser activity <span id="activity-count">0</span></summary>
+    <ol id="activity-list"></ol>
+  </details>
+  <form id="composer">
+    <textarea id="input" rows="3" placeholder="让 agent 在浏览器里做点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
+    <div class="row">
+      <button type="button" id="stop">Stop</button>
+      <button type="submit" id="send">Send</button>
+    </div>
+  </form>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

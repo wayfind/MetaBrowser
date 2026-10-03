@@ -1,3 +1,7 @@
 
 # Use bd merge for beads JSONL files
 .beads/issues.jsonl merge=beads
+
+# MetaBrowser fork seams (see metabrowser/seams.txt): append-only lists merge as a union, fork-owned files win.
+.gitattributes merge=union
+.github/README.md merge=ours
