@@ -1,0 +1,21 @@
+{
+  "name": "orders_list",
+  "description": "Return orders (id, customer, total, status, date), optionally filtered by a search query. Follows pagination up to max 1 page per call.",
+  "risk": "read",
+  "reads": ["order"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {"type": "string", "description": "Customer name or order id; empty for all"}
+    }
+  },
+  "steps": [
+    {"do": "goto", "url": "{base_url}/admin/orders/"},
+    {"do": "assert", "selector": "[data-testid=account-menu]", "message": "not logged in; call auth_ensure_login"},
+    {"do": "fill", "target": [{"role": "searchbox", "name": "search"}, {"placeholder": "search"}, {"css": "input[name=q]"}], "value": "{query}"},
+    {"do": "press", "key": "Enter", "target": {"css": "input[name=q]"}},
+    {"do": "wait", "selector": "table.orders"},
+    {"do": "extract_table", "selector": "table.orders", "as": "orders"}
+  ],
+  "returns": "orders"
+}

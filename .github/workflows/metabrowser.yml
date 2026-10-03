@@ -1,0 +1,40 @@
+name: MetaBrowser
+
+# Fork-only workflow (overlay): tests the metabrowser/ package and guards that
+# no upstream CloakBrowser file was modified. Upstream's ci.yml is untouched.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          pip install -e . -e "./metabrowser[dev]"
+          python -m playwright install --with-deps chromium
+      - name: Test
+        working-directory: metabrowser
+        run: pytest -v
+
+  fork-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/CloakHQ/CloakBrowser.git
+          git fetch upstream main
+      - name: Overlay only
+        run: python3 metabrowser/scripts/fork_guard.py upstream/main

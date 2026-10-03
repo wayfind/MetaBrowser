@@ -1,0 +1,45 @@
+name: Upstream sync
+
+# Daily: merge CloakHQ/CloakBrowser main into a branch and open a PR, so the
+# MetaBrowser tests and fork-guard run against every upstream change.
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Merge upstream
+        id: merge
+        run: |
+          git config user.name "metabrowser-bot"
+          git config user.email "metabrowser-bot@users.noreply.github.com"
+          git remote add upstream https://github.com/CloakHQ/CloakBrowser.git
+          git fetch upstream main --tags
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "up to date"; echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          branch="upstream-sync/$(git rev-parse --short upstream/main)"
+          git checkout -b "$branch"
+          git merge --no-edit -m "chore(upstream): merge CloakBrowser $(git rev-parse --short upstream/main)" upstream/main
+          git push -f origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Open PR
+        if: steps.merge.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr view "${{ steps.merge.outputs.branch }}" >/dev/null 2>&1 || gh pr create \
+            --head "${{ steps.merge.outputs.branch }}" --base main \
+            --title "chore(upstream): sync CloakBrowser" \
+            --body "Automated merge of CloakHQ/CloakBrowser main. MetaBrowser tests and fork-guard run on this PR."

@@ -1,0 +1,18 @@
+{
+  "name": "order_detail",
+  "description": "Open one order and return its detail text.",
+  "risk": "read",
+  "reads": ["order"],
+  "input_schema": {
+    "type": "object",
+    "properties": {"order_id": {"type": "string"}},
+    "required": ["order_id"]
+  },
+  "steps": [
+    {"do": "goto", "url": "{base_url}/admin/orders/"},
+    {"do": "click", "target": [{"role": "link", "name": "^{order_id}$"}, {"text": "{order_id}"}]},
+    {"do": "wait", "selector": "#order-detail"},
+    {"do": "extract_text", "selector": "#order-detail", "as": "detail"}
+  ],
+  "returns": "detail"
+}
