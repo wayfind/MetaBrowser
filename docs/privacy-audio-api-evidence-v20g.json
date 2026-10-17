@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "20f78ed2b7f1971b065c8a267c2e736c15d32b08dcceaf5e303d721d2fbe861d",
+  "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+  "members": [
+    {
+      "member_id": "06f97cd39d1295caca408c45411c8e939c68cb9bd46888e217bb66cbacfff4a3",
+      "owner": "AudioBuffer",
+      "name": "getChannelData",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_buffer.idl",
+      "declaration_sha256": "9e38bbd0a49bdcffca4bf03c94ee4a07815c5a1f8096edb674505ab78815b5c7",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "3a18b25a8903f6ff8b7410a23bd9961f02f90192a120849e195c74ebacbd47c3",
+      "owner": "AudioBuffer",
+      "name": "copyFromChannel",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_buffer.idl",
+      "declaration_sha256": "9e38bbd0a49bdcffca4bf03c94ee4a07815c5a1f8096edb674505ab78815b5c7",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "3cb88dc4e117e60380466796eb961e4521e7e4c8519a6a038ea0526a9bb8a1d1",
+      "owner": "AudioBuffer",
+      "name": "duration",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_buffer.idl",
+      "declaration_sha256": "9e38bbd0a49bdcffca4bf03c94ee4a07815c5a1f8096edb674505ab78815b5c7",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "5227959b13f9f820eedf15f0500c185eb0e6ac4e7847862c3a37e7b173cff0dd",
+      "owner": "AudioBuffer",
+      "name": "sampleRate",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_buffer.idl",
+      "declaration_sha256": "9e38bbd0a49bdcffca4bf03c94ee4a07815c5a1f8096edb674505ab78815b5c7",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "ffca52266869ef5a1b59509fdf9f1f622119c734876fb86851dc92582af9dcbf",
+      "owner": "AudioBuffer",
+      "name": "numberOfChannels",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_buffer.idl",
+      "declaration_sha256": "9e38bbd0a49bdcffca4bf03c94ee4a07815c5a1f8096edb674505ab78815b5c7",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "e696a387ff1c746ef7c7f2378b65da5e2b899c68434b92e375dcf7e867acc582",
+      "owner": "OfflineAudioContext",
+      "name": "startRendering",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/offline_audio_context.idl",
+      "declaration_sha256": "fb066ec4807867a3390f9999d4cabab2f14323e039dd9224d3308981b4061235",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "2e2637564a1a865f350d20616e966b9676d3179c07bbff4bba449bed635840ff",
+      "owner": "BaseAudioContext",
+      "name": "createBuffer",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "3066b77b476f002eeb0a80f304593adc8bb5c90ea9f388994257ee661eab7c49",
+      "owner": "BaseAudioContext",
+      "name": "createBufferSource",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "1470b7c3c1880fcebbc2b8e8d9322c94028b17dc74cdb8303fe55c11b4908555",
+      "owner": "BaseAudioContext",
+      "name": "createGain",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "16f3f9c395764401b409fb7c140a9eca379d8df6b6204c05c9c3c594e617483b",
+      "owner": "BaseAudioContext",
+      "name": "createConvolver",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "7e68501563d887975c3b6a5ef532ea62d5e2f65bbb5644a7bb2cde4dc3cabe4d",
+      "owner": "BaseAudioContext",
+      "name": "createOscillator",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    },
+    {
+      "member_id": "0f62ac4769dd3bbd631ce5854acfb8e2f4150a29a8ad0fd71282810252ff467b",
+      "owner": "BaseAudioContext",
+      "name": "createDynamicsCompressor",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-balanced-acceptance.json",
+          "sha256": "2f074fd9f3d7a28320c1888cd124a1a65666c1977b81664980f54f07300f0c33",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        },
+        {
+          "path": "out/evidence/audio-vector-v20g-linux-off-acceptance.json",
+          "sha256": "c9718de0524f2d03ad40161758d7a67b097dec05efaf4cc609f08d445f9310de",
+          "pointer": "/passed",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+          "scope": "Four sample rates, gain/mix/convolution/oscillator-compressor, stereo. FFT/device/realtime/worklet/resampling/HRTF/all inputs/performance and cross-architecture parity remain separate requirements."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Window only. Four rates, stereo, 2048-frame gain/mix/convolution/oscillator-compressor graphs. Repeat/event/promise/readback/copy and bounded analytic error assertions only. Not all values, exceptions, offsets/detachment, realms, realtime/worklet/device/HRTF/resampling, 100 starts, seven days or cross-platform parity."
+    }
+  ],
+  "mapped_member_count": 12,
+  "fully_verified_member_count": 0,
+  "full_scope_complete": false,
+  "scope": "Partial runtime mapping; catalog remains an unclassified potential-surface inventory."
+}

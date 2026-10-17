@@ -1,0 +1,13 @@
+.zig-cache/
+zig-out/
+out/
+downloads/
+/chromium/*
+!/chromium/metabrowser/
+!/chromium/identity/
+!/chromium/privacy/
+depot_tools/
+*.dSYM/
+.DS_Store
+__pycache__/
+*.pyc

@@ -1,0 +1,322 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "1c4627a5483a5b78d8c9854683af79bc2c15f20bc1955e5257092cd13334f2fb",
+  "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+  "members": [
+    {
+      "member_id": "4b4bffafbaaab6e7c0cea4cc6b5e519aff7497cc5e9b9ad5033e98510cc1ff93",
+      "owner": "AudioBuffer",
+      "name": "length",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_buffer.idl",
+      "declaration_sha256": "9e38bbd0a49bdcffca4bf03c94ee4a07815c5a1f8096edb674505ab78815b5c7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "18289e34c4a7666a546810907bd0f5cee4c6465ef3a324d0f4ce46f5e8bbe01d",
+      "owner": "BaseAudioContext",
+      "name": "createAnalyser",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "28733deab8ea6db85924db549c480326cb694150dedfd44f25b51a7db98622f5",
+      "owner": "BaseAudioContext",
+      "name": "createPeriodicWave",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "2335826f18908701616ab13cf1468da85280bc598b1af8eee7f3baa55690dcd7",
+      "owner": "AnalyserNode",
+      "name": "fftSize",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "96602e70ade7634096916d57a7934ae22f024a21ae661119ff0566467bfa7007",
+      "owner": "AnalyserNode",
+      "name": "frequencyBinCount",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "1b738c56beb38aacdf80092c126bf9d59f4c073f3b1a8203a0f5458b8823ba6b",
+      "owner": "AnalyserNode",
+      "name": "smoothingTimeConstant",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "7aad7749b8b84a0a8db66fa8f4d80b1916d1aff586088b102f51af4ca6ce1c30",
+      "owner": "AnalyserNode",
+      "name": "minDecibels",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "0653a8c541b8fb9358fcffc4c47cb4dc3c38720a79dfea95001ec6748ea4b4de",
+      "owner": "AnalyserNode",
+      "name": "maxDecibels",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "868985244c76fc8e6d64f0f19582ab8396f9fc72eb956f142380b7a61e16c17f",
+      "owner": "AnalyserNode",
+      "name": "getFloatFrequencyData",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "af38bf2fe119ca923be79ada89a1941317240e74edcd169a9f9630a981e97d04",
+      "owner": "AnalyserNode",
+      "name": "getFloatTimeDomainData",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "3ea3cfb73f061c9cadcd38c3394d3be47fa3c57aeec702cf8714410c8fb45c8d",
+      "owner": "AnalyserNode",
+      "name": "getByteFrequencyData",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/analyser_node.idl",
+      "declaration_sha256": "2dcc439df81e0e1aa458c31250136f262f6c8c6cf95f27bbbdb63a692a6eb405",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    },
+    {
+      "member_id": "d2ca94c38ea10a0740fb3162568ea46c484852422f70f4b9f44b8b57a6e0abc2",
+      "owner": "OscillatorNode",
+      "name": "setPeriodicWave",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/oscillator_node.idl",
+      "declaration_sha256": "1012403d6d3cebc8455e92448b5b033ce54a414533038af9156e813a7ff3ba41",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-balanced-acceptance.json",
+          "sha256": "5dd9d05cb44cf99b0daf2c0e7a53063cd7ff88eab87b125b3c8782367e99ab7f",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        },
+        {
+          "path": "out/evidence/audio-fft-v20e-linux-off-acceptance.json",
+          "sha256": "3fc67d7f139f7fae3360fcfbd938c26ffd422950207dc30b6e95418ea36535e9",
+          "pointer": "/passed",
+          "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+          "scope": "Window, finite rational inputs, stereo not included here. Direct DFT selected bins, 4096-tap sparse convolution and custom periodic wave; not all values, devices/realtime/worklet/resampling/HRTF/performance or full cross-architecture parity."
+        }
+      ],
+      "limits": "Window mono only. Eleven analyser FFT sizes, selected direct-DFT bins and setter failures, fixed sparse 4096-tap convolution and selected custom Fourier coefficients. Not all values/offsets/permissions/realms/realtime/worklets/resampling/HRTF/devices or full audio privacy/parity."
+    }
+  ],
+  "mapped_member_count": 12,
+  "fully_verified_member_count": 0,
+  "full_scope_complete": false
+}

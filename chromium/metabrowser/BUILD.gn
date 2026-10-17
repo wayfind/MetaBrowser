@@ -1,0 +1,63 @@
+source_set("background_service_policy") {
+  public = [ "background_service_policy.h" ]
+  public_deps = [ "//base" ]
+}
+source_set("account_entry") {
+  public = [ "account_entry.h" ]
+  public_deps = [ "//base" ]
+}
+source_set("privacy_context") {
+  public = [ "privacy_context.h" ]
+  public_deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//components/pref_registry",
+    "//components/prefs",
+    "//content/public/browser",
+    "//crypto",
+    "//third_party/blink/public/common",
+  ]
+}
+source_set("runtime_host") {
+  sources = [ "runtime_host.cc", "runtime_host.h" ]
+}
+source_set("design_tokens") {
+  public = [ "design_tokens.h" ]
+  public_deps = [ "//ui/views" ]
+}
+source_set("identity_profiles") {
+  sources = [ "identity_profiles.cc", "identity_profiles.h" ]
+  deps = [ "//components/metabrowser_identity:metadata", ":design_tokens", "//base", "//base/i18n:language_tag", "//ui/base", "//ui/views", "//third_party/icu" ]
+  frameworks = [ "CoreFoundation.framework" ]
+}
+source_set("side_panel_hook") {
+  sources = [ "side_panel_hook.cc", "side_panel_hook.h", "metacodes_plugin.h", "browser_tools.cc", "browser_tools.h", "browser_tool_catalog.inc", "agent_gateway.cc", "agent_gateway.h", "conversation_store.cc", "conversation_store.h", "conversation_view.cc", "conversation_view.h", "brand_mark.h" ]
+  deps = [
+    ":identity_profiles",
+    ":design_tokens",
+    ":account_entry",
+    "//chrome/app/vector_icons",
+    "//chrome/browser/ui/actions:actions_headers",
+    "//chrome/browser/ui/toolbar/pinned_toolbar:pinned_toolbar",
+    ":runtime_host",
+    "//ui/views",
+    "//ui/menus",
+    "//ui/shell_dialogs",
+    "//components/vector_icons",
+    "//base",
+    "//components/prefs",
+    "//components/signin/public/base",
+    "//crypto",
+    "//ui/events",
+    "//ui/accessibility",
+    "//ui/gfx/codec",
+    "//content/public/browser",
+    "//net",
+    "//url",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui/browser_window:browser_window",
+    "//chrome/browser/ui/side_panel:side_panel_views_dependent",
+    "//chrome/browser/ui/side_panel:side_panel",
+  ]
+}

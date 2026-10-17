@@ -1,0 +1,70 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>MetaBrowser inherited privacy context probe</title>
+<pre id="result">running</pre>
+<script>
+// Serve over loopback HTTP in an isolated test profile. Compare balanced with
+// --metabrowser-privacy=off. This observes real canvas output, not test internals.
+function sample() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 64;
+  const context = canvas.getContext('2d');
+  const gradient = context.createLinearGradient(0, 0, 128, 64);
+  gradient.addColorStop(0, '#2367ad'); gradient.addColorStop(1, '#e89432');
+  context.fillStyle = gradient; context.fillRect(0, 0, 128, 64);
+  context.fillStyle = '#527f3a'; context.fillRect(17, 9, 83, 37);
+  function hash(bytes) {
+    let value = 2166136261;
+    for (const byte of bytes) value = Math.imul(value ^ byte, 16777619) >>> 0;
+    return value.toString(16).padStart(8, '0');
+  }
+  const first = hash(context.getImageData(0, 0, 128, 64).data);
+  const second = hash(context.getImageData(0, 0, 128, 64).data);
+  const url = canvas.toDataURL();
+  return {first, second, dataURL: hash(new TextEncoder().encode(url)), stable: first === second};
+}
+window.privacyContextProbe = (async () => {
+  const rows = [{name: 'top', ...sample()}];
+  for (const name of ['initial-empty', 'about-blank', 'srcdoc', 'document-write']) {
+    const frame = document.createElement('iframe');
+    if (name === 'about-blank') frame.src = 'about:blank';
+    if (name === 'srcdoc') frame.srcdoc = '<!doctype html><title>same origin</title>';
+    if (name === 'about-blank' || name === 'srcdoc') {
+      const loaded = new Promise(resolve => frame.onload = resolve);
+      document.body.append(frame); await loaded;
+    } else {
+      document.body.append(frame);
+    }
+    if (name === 'document-write') {
+      frame.contentDocument.open();
+      frame.contentDocument.write('<!doctype html><title>written</title>');
+      frame.contentDocument.close();
+    }
+    rows.push({name, ...frame.contentWindow.eval('(' + sample.toString() + ')()')});
+    frame.remove();
+  }
+  for (const name of ['opaque-srcdoc-1', 'opaque-srcdoc-2']) {
+    const frame = document.createElement('iframe');
+    frame.sandbox = 'allow-scripts';
+    const payload = '(' + sample.toString() + ')()';
+    const received = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {window.removeEventListener('message', listener); reject(new Error(name + ' timed out'));}, 5000);
+      function listener(event) {
+        if (event.source !== frame.contentWindow || event.origin !== 'null' || event.data?.name !== name) return;
+        clearTimeout(timeout); window.removeEventListener('message', listener);
+        resolve(event.data);
+      }
+      window.addEventListener('message', listener);
+    });
+    frame.srcdoc = '<script>parent.postMessage({name:' + JSON.stringify(name) + ',...' + payload + '}, "*")<\/script>';
+    document.body.append(frame); rows.push(await received); frame.remove();
+  }
+  const sameOrigin = rows.slice(1, 5).every(row => row.first === rows[0].first);
+  const stable = rows.every(row => row.stable);
+  const report = {rows, sameOrigin, stable,
+    opaqueDistinct: rows[5].first !== rows[6].first,
+    opaqueNotParent: rows.slice(5).every(row => row.first !== rows[0].first)};
+  document.getElementById('result').textContent = JSON.stringify(report, null, 2);
+  return report;
+})();
+</script>

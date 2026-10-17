@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "dca4db62431311a386eeeec2c54ec8d39933f46147b0d152300cb78d9027d096",
+  "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe",
+  "members": [
+    {
+      "member_id": "ca38623f46cfbcea6ec2654d82c2967c5083cc7137d2b75e260616ea443b0a14",
+      "owner": "BaseAudioContext",
+      "name": "decodeAudioData",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-resampler-v20h-linux-balanced-acceptance.json",
+          "sha256": "5425d22f1db6280d6e77527406d94d15ec3d63ca9981d18ef15f4b0021d6eb62",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-resampler-v20h-linux-off-acceptance.json",
+          "sha256": "3ec004675d42def24386d89641345c4f4cf3488d916146eb88c2e7ffb66d3ab4",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "3b0bf7e76e271e8ca8bcf02b931e0cc7a489b8363bb883a9525a9b6ca1033147",
+      "owner": "BaseAudioContext",
+      "name": "sampleRate",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "bef18f9ea78952c5fe1bce55cfcf0b3440d7037c36d69eaf942ab3b72ca413f7",
+      "owner": "BaseAudioContext",
+      "name": "state",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/base_audio_context.idl",
+      "declaration_sha256": "ac09e7b293b00ac391628e30ed3a868f3a0bcc074b6f2e37ef30cabdc716392e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "abca1bd67910f37921b2b40d8f62c65e28a32bb616b2c5542dc80cc338f97e00",
+      "owner": "AudioContext",
+      "name": "createMediaElementSource",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_context.idl",
+      "declaration_sha256": "56eafd67b22f6c1770bb1c17cbafbea5e7e2784c2484ee2edf48faffdc7c38a9",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "11f544baeb1da7cdc616a9a272ac7882be84d49307522e8f4fccbdf26afa7ff2",
+      "owner": "AudioContext",
+      "name": "resume",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_context.idl",
+      "declaration_sha256": "56eafd67b22f6c1770bb1c17cbafbea5e7e2784c2484ee2edf48faffdc7c38a9",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "c129d37bf3b4b76641dc07f25b2d2f6536bc16b151a917b63c5d09c830ceacad",
+      "owner": "AudioContext",
+      "name": "close",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_context.idl",
+      "declaration_sha256": "56eafd67b22f6c1770bb1c17cbafbea5e7e2784c2484ee2edf48faffdc7c38a9",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "842669486d254891dc9cc63b523354c2fa69f33e4c10bad3da27f85445f865fc",
+      "owner": "HTMLMediaElement",
+      "name": "play",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "a48277813ea2dd4cf4b77179379dddd5c5e4a7d68311fe45cd733364e1442a44",
+      "owner": "HTMLMediaElement",
+      "name": "pause",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "4498c5643de9fadd88b9721d2632ead38e4d84bfbd3352a2893994654a60f2f1",
+      "owner": "HTMLMediaElement",
+      "name": "load",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "e3af024bb713c7f1ad79d268f17fc8ccd9a4d561824196e5dfa9870585cd06ec",
+      "owner": "HTMLMediaElement",
+      "name": "src",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "52c34618e55e41e6c79b1061ce7072126250fc9e4a4cfc62ad536f8c1f958448",
+      "owner": "HTMLMediaElement",
+      "name": "preload",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "3bc966c2023391d110fdc592b251f3e860af334aea18cc2fe412cbd0b2b3a0a3",
+      "owner": "HTMLMediaElement",
+      "name": "loop",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "9a47b7a34ebd9cab38744bde030c52c305d5ce0f100ff1948c492f6a32244ab3",
+      "owner": "HTMLMediaElement",
+      "name": "currentTime",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "a5b5369aaaaeddecd41007dea03b82244444907bdb68d6990aea2c70839e8fc8",
+      "owner": "HTMLMediaElement",
+      "name": "paused",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "d857c5d55ab3369c50be7f64c30f0313b0d974290507157f8effce0fdfaf0ba1",
+      "owner": "HTMLMediaElement",
+      "name": "readyState",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    },
+    {
+      "member_id": "bf2b361d62b2a3bd954cbb0f09993f5ce5dac82ed7339b943678a0b6ca740576",
+      "owner": "HTMLMediaElement",
+      "name": "error",
+      "declaration_source": "third_party/blink/renderer/core/html/media/html_media_element.idl",
+      "declaration_sha256": "5137d42f6f72ac9437ef162e1ccf4cac8ee0ecc4d6d0ee1e308520d044effde7",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-media-v20h-linux-balanced-acceptance.json",
+          "sha256": "e3bf2795fa61e29330cbc50c6415c9adacbe7616361df9b929b779e5eeac7c6b",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        },
+        {
+          "path": "out/evidence/audio-media-v20h-linux-off-acceptance.json",
+          "sha256": "dddafae48206dd23cec0fc3d626c029d19b7e249952b9f765560ab18cf985495",
+          "pointer": "/accepted",
+          "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe"
+        }
+      ],
+      "limits": "Window only: PCM16 WAV success/callback identity/detach/three malformed inputs and bounded 8-ratio decode matrix; realtime Blob WAV, explicit CDP user gesture, zero-gain graph output, captured tone frequency/amplitude and close promise. src/preload/loop setters only. load only invoked during cleanup. Not all codecs, callbacks, realms, policies, network sites, sink/device changes, microphones, WebRTC, SetRatio or full audio parity."
+    }
+  ],
+  "mapped_member_count": 16,
+  "fully_verified_member_count": 0,
+  "full_scope_complete": false
+}
