@@ -17,3 +17,5 @@ metabrowser                                                 # browser + side pan
 - Upstream CloakBrowser README (wrapper + binary): [README.md](../README.md)
 - Engine and Zig host migration: [metabrowser/docs/ENGINE_AND_ZIG.md](../metabrowser/docs/ENGINE_AND_ZIG.md)
 - Repository history remains an overlay fork: [metabrowser/docs/FORK_SYNC.md](../metabrowser/docs/FORK_SYNC.md)
+- Native Chromium browser (Views sidebar, in-process Zig/AgentCore, privacy work), merged at the repository root:
+  [README.native.md](../README.native.md) · handoff: [HANDOFF.md](../HANDOFF.md)

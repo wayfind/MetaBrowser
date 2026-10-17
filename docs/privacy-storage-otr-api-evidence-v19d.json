@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "33f2d72a3d607a2b06cdc7662fbf1b08d0ad0cb25b4018d2c21037d30c5c2991",
+  "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+  "members": [
+    {
+      "member_id": "7d44cfa830760c01db2fc78b5a326e09bbffbc7e542cc254d9467f596d198159",
+      "owner": "StorageManager",
+      "name": "estimate",
+      "declaration_source": "third_party/blink/renderer/modules/quota/storage_manager.idl",
+      "declaration_sha256": "fc002033607ed08f7ff4fe4063af29f63656a70a0733055dcdb4053ce6d036e3",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "d17d07a762dcbd8b81d1f5938ad4e840676803aed9a1edcdc7b57b46e8e92520",
+      "owner": "StorageManager",
+      "name": "getDirectory",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/storage_manager_file_system_access.idl",
+      "declaration_sha256": "3ef8a77749667e866e129471a85b5968f9585e2ae4ba38220cc23e1467622e30",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "c58a29b3916180354995b89ce4c98002311aa0afba5e5ef69879e51afe60e09b",
+      "owner": "StorageBucketManager",
+      "name": "open",
+      "declaration_source": "third_party/blink/renderer/modules/buckets/storage_bucket_manager.idl",
+      "declaration_sha256": "893dadf296c12bfb59f3b7098b7fb0215c47ce1508e0fe49117b1b64d1f468c5",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "3a8ab92740ef6d3edd59faa38ce1621edf7b5dcf7e61efee7e76a6e71aea0d5b",
+      "owner": "StorageBucket",
+      "name": "estimate",
+      "declaration_source": "third_party/blink/renderer/modules/buckets/storage_bucket.idl",
+      "declaration_sha256": "3a0a54cfff0c81b1b1480c84c3a746f8a95f1fdc0ca3c86c1253ec077702e424",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "84f9407b6223b018afa3db26b76cf4309de68675d4fc5540a1ca3877ecc1511e",
+      "owner": "StorageBucket",
+      "name": "indexedDB",
+      "declaration_source": "third_party/blink/renderer/modules/buckets/storage_bucket.idl",
+      "declaration_sha256": "3a0a54cfff0c81b1b1480c84c3a746f8a95f1fdc0ca3c86c1253ec077702e424",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "4f7c962a822f957b4dc845020bb4d6f3434bef759f574111b21038b8a5d7da52",
+      "owner": "IDBFactory",
+      "name": "open",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_factory.idl",
+      "declaration_sha256": "bb0ee5cf3d7c9089457bb887981e49dabd9880b1c9261386c060934f2eea218d",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "4cd4fa381a26281222fdfdfb223eee23937f0281b2e82939f81cf440bc922796",
+      "owner": "IDBDatabase",
+      "name": "createObjectStore",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_database.idl",
+      "declaration_sha256": "a43f99768a7bdbe95f4a1c5c6ed353b1198030d3d7057e96c926250e315c6bd2",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "0afe3523ae26f55db40b533f1c5e258c4527665f9c6be1d46e67a5e2945dd58d",
+      "owner": "IDBDatabase",
+      "name": "transaction",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_database.idl",
+      "declaration_sha256": "a43f99768a7bdbe95f4a1c5c6ed353b1198030d3d7057e96c926250e315c6bd2",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "458bbfac40bc79e380fe4119d302b2a72ecd5b1ea428cdde2becae90d1247a59",
+      "owner": "IDBDatabase",
+      "name": "close",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_database.idl",
+      "declaration_sha256": "a43f99768a7bdbe95f4a1c5c6ed353b1198030d3d7057e96c926250e315c6bd2",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "15eafab04a25b4581a31541edbf0a9fb95f1fe7c5b357d4239dae84fdc5608d2",
+      "owner": "IDBObjectStore",
+      "name": "get",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_object_store.idl",
+      "declaration_sha256": "7655ffb6b9fdc12781dc4aeac86f728fc2224c94f3105b93f4511fe2c5e620e4",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "664abcf4a10b782bd1f3b36057e1a4f35b41bb1ed5d38b7c7c4b87bc2de7c842",
+      "owner": "IDBObjectStore",
+      "name": "put",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_object_store.idl",
+      "declaration_sha256": "7655ffb6b9fdc12781dc4aeac86f728fc2224c94f3105b93f4511fe2c5e620e4",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "64eb927ea30715849cc304aa7a91da73286383c7d64a0c05d0ed658002dacbc3",
+      "owner": "IDBObjectStore",
+      "name": "delete",
+      "declaration_source": "third_party/blink/renderer/modules/indexeddb/idb_object_store.idl",
+      "declaration_sha256": "7655ffb6b9fdc12781dc4aeac86f728fc2224c94f3105b93f4511fe2c5e620e4",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "83f31f7080f0fd35581cebfe4816ea6a527395007227e4d4c37d5322f5027900",
+      "owner": "CacheStorage",
+      "name": "open",
+      "declaration_source": "third_party/blink/renderer/modules/cache_storage/cache_storage.idl",
+      "declaration_sha256": "821da7ffacbb992668872162b367bf1049614f2525850eb94553b30d039812a1",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "afab052ec560993795c7a6c7562b6e1ed1cbac51ed001b931f499e74993d756d",
+      "owner": "Cache",
+      "name": "match",
+      "declaration_source": "third_party/blink/renderer/modules/cache_storage/cache.idl",
+      "declaration_sha256": "bf3f7c026cd06dabfe3d3fc3111d236cbdca50a1e799d3df26118a114dc6cf86",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "5918dab4443f5983fd119ac8e021c695e2ebdc64635b17dbfcd476c7fc75870b",
+      "owner": "Cache",
+      "name": "put",
+      "declaration_source": "third_party/blink/renderer/modules/cache_storage/cache.idl",
+      "declaration_sha256": "bf3f7c026cd06dabfe3d3fc3111d236cbdca50a1e799d3df26118a114dc6cf86",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "124e00b087a17d74501914bdd1048cb3be0da21aabfd643e555074a214e21515",
+      "owner": "Cache",
+      "name": "delete",
+      "declaration_source": "third_party/blink/renderer/modules/cache_storage/cache.idl",
+      "declaration_sha256": "bf3f7c026cd06dabfe3d3fc3111d236cbdca50a1e799d3df26118a114dc6cf86",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "1862b72f4880a1974369274eea00b10f19f7ab78f7d91f717c8e3dfc3a143989",
+      "owner": "FileSystemDirectoryHandle",
+      "name": "getFileHandle",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_directory_handle.idl",
+      "declaration_sha256": "85bff0aafe4a762b3fbf41bbae4fe787682d8bb967b406e7666a14996efcc39d",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "34b65205d33d9ca4f6e738889043c09b83fb2ebe602cf30dfc9b1900f2ad56b0",
+      "owner": "FileSystemDirectoryHandle",
+      "name": "removeEntry",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_directory_handle.idl",
+      "declaration_sha256": "85bff0aafe4a762b3fbf41bbae4fe787682d8bb967b406e7666a14996efcc39d",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "93c9c64bc2a2dbbbb71060445e5163edcd4a6847c4922a04d85c0335a68ca5a9",
+      "owner": "FileSystemFileHandle",
+      "name": "createWritable",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_file_handle.idl",
+      "declaration_sha256": "8f1ebb66d6a0cdfdc28e93ae06193c59460773385eacd2e0b009839798ad1c50",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "bdb73a6cf2cfcbfc8badad598aea5df63256da29bf1ae50c0b72cb482c648051",
+      "owner": "FileSystemFileHandle",
+      "name": "getFile",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_file_handle.idl",
+      "declaration_sha256": "8f1ebb66d6a0cdfdc28e93ae06193c59460773385eacd2e0b009839798ad1c50",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    },
+    {
+      "member_id": "6df61b390d72291092fa08b6a4a98438c443ebb684a3033050a090cef1b5669c",
+      "owner": "FileSystemWritableFileStream",
+      "name": "write",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_writable_file_stream.idl",
+      "declaration_sha256": "66eea546ac88b1561805e6be787105d7a5d4ad33d66ca5f158369fb25ede48e4",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/storage-otr-v19d-balanced-acceptance.json",
+          "sha256": "46623066c4321b4c74dab37770f52e3413a4bce753d7baaef7631bd3974a234c",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        },
+        {
+          "path": "out/evidence/storage-otr-v19d-off-acceptance.json",
+          "sha256": "da3bfbb17596ca6c28898d67d5d562f211aa81098503d94e9231536c26d180e0",
+          "pointer": "/passed",
+          "framework_sha256": "c497ed997dc2efef8ed48fd166c4e3784c880d0b3e18af0478f21c156261c1f2",
+          "scope": "Window/iframe and Dedicated/Module/Nested/Shared/Service Worker read/write/delete with independent owning-window readback of IDB, CacheStorage, OPFS and bucket IDB; two sites/four contexts and five real incognito launches. Off-the-record storage is discarded between launches; not quota-pressure, permission transitions, concurrency, expiration or complete storage privacy."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only probe argument/value classes: window/iframe and five worker read/write/delete. Does not prove all overloads, device storage inference, permissions, pressure, concurrency or all failure paths."
+    }
+  ],
+  "worker_mutations_proven": true,
+  "incognito_storage_lifecycle_proven": true,
+  "partially_mapped_member_count": 21,
+  "verified_member_count": 0,
+  "full_privacy_coverage_proven": false,
+  "note": "A separate evidence overlay; the generated catalog remains immutable and unclassified."
+}

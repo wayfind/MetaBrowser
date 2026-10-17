@@ -27,12 +27,18 @@ def main() -> int:
         if parts and not parts[0].startswith("#"):
             budget[parts[0]] = int(parts[1])
     base = git("merge-base", ref, "HEAD")
+    # A "<dir>/ -1" entry marks a fork-owned directory: every file under it must be
+    # new in the fork, so upstream files never hide behind a directory entry.
+    owned_dirs = [path for path, limit in budget.items() if path.endswith("/") and limit == -1]
+    upstream_files = set(git("ls-tree", "-r", "--name-only", base).splitlines())
     problems = []
     for row in git("diff", "--numstat", base, "HEAD").splitlines():
         added, removed, path = row.split("\t", 2)
         if path.startswith("metabrowser/"):
             continue
         if path not in budget:
+            if path not in upstream_files and any(path.startswith(owned) for owned in owned_dirs):
+                continue
             problems.append(f"unregistered upstream change: {path} (+{added}/-{removed})")
             continue
         changed = (int(added) if added.isdigit() else 0) + (int(removed) if removed.isdigit() else 0)

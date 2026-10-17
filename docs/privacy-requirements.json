@@ -1,0 +1,1114 @@
+{
+  "schema_version": 1,
+  "objective": "达到全量匿名指纹覆盖，以及做完检测",
+  "status": "active",
+  "source": {
+    "path": "/Users/yuankun/Downloads/浏览器指纹匿名化清单.md",
+    "sha256": "96aee47e80ca4799cf26436e33ee79a59eb8fe80394d4d71639109a9c221e36f"
+  },
+  "requirements": [
+    {
+      "id": "SRC-0",
+      "requirement": "分级标准（Chromium 内核方案视角）",
+      "source_section": "0",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-0.5",
+      "requirement": "前置关卡：自编译内核 ≠ 官方 Chrome（编译产物差异对齐）",
+      "source_section": "0.5",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-1",
+      "requirement": "网络层指纹（内核方案下天然免费，重点是\"别破坏\"）",
+      "source_section": "1",
+      "status": "unverified",
+      "evidence": [
+        "out/evidence/privacy-v19k-network-residual-review.json",
+        "out/evidence/privacy-v19m-network-review.json",
+        "out/evidence/privacy-v19m-navigation-push-review.json"
+      ],
+      "notes": "Bounded startup traces quiet, including a new60s schema2 raw replay. Actual public Google/Gmail forms and synthetic cookie preservation pass; denied website push blocks subscription; granted native subscription and owned persisted permission/restart/key-hash continuity/unsubscribe pass. Initial30s timeout preserved as failure. No real account login, OS notification prompt or message delivery proved. Active states, mixed legacy profiles, all transports and P1-P14 remain unverified."
+    },
+    {
+      "id": "SRC-1.1",
+      "requirement": "TLS JA3/JA4 指纹 【L0 天然免费】",
+      "source_section": "1.1",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/privacy-v19m-storage-transport-review.json",
+        "out/evidence/privacy-v19n-error-fix-review.json",
+        "out/evidence/privacy-v20b-persona-review.json",
+        "out/evidence/privacy-v20d-audio-review.json",
+        "out/evidence/privacy-v20e-fft-review.json"
+      ],
+      "notes": "Real headed current-engine TLS1.3/h2 to owned loopback-mapped SNI endpoint; parsed raw ClientHello/HTTP2 settings/window, protected/off normalized equal. Ephemeral leaf SPKI exception, no system trust change or proxy. Not same-version official baseline, arbitrary site/network, HTTP3, decoded header order or full fingerprint parity."
+    },
+    {
+      "id": "SRC-1.2",
+      "requirement": "HTTP/2 SETTINGS 帧指纹 【L0 天然免费】",
+      "source_section": "1.2",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/privacy-v19m-storage-transport-review.json",
+        "out/evidence/privacy-v19n-error-fix-review.json",
+        "out/evidence/privacy-v20b-persona-review.json",
+        "out/evidence/privacy-v20d-audio-review.json",
+        "out/evidence/privacy-v20e-fft-review.json"
+      ],
+      "notes": "Real headed current-engine TLS1.3/h2 to owned loopback-mapped SNI endpoint; parsed raw ClientHello/HTTP2 settings/window, protected/off normalized equal. Ephemeral leaf SPKI exception, no system trust change or proxy. Not same-version official baseline, arbitrary site/network, HTTP3, decoded header order or full fingerprint parity."
+    },
+    {
+      "id": "SRC-1.3",
+      "requirement": "HTTP 请求头顺序 【L0 天然免费】",
+      "source_section": "1.3",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/privacy-v19n-seven-realms-http1-review.json",
+        "out/evidence/privacy-v20b-persona-review.json",
+        "out/evidence/privacy-v20d-audio-review.json",
+        "out/evidence/privacy-v20e-fft-review.json"
+      ],
+      "notes": "Current N real HTTPS HTTP1.1 ordered main-navigation request headers parsed from endpoint bytes, protected/off equal; favicon excluded from main-navigation comparison. Not official same-version parity, H2 HPACK order, HTTP3 or all request classes."
+    },
+    {
+      "id": "SRC-1.4",
+      "requirement": "Sec-CH-UA Client Hints 【L1】",
+      "source_section": "1.4",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/identity-version-v18b-native.private.json",
+        "out/evidence/identity-version-v18b-software.private.json",
+        "out/evidence/mac-identity-ui-acceptance-v18.json"
+      ],
+      "notes": "v18b native default-major/explicit-system high entropy version policy, five modes and native UI/HTTP/seven realms verified. Cross-platform architecture/platform templates and remaining entropy surfaces not complete."
+    },
+    {
+      "id": "SRC-2",
+      "requirement": "Canvas 指纹（像素级，引擎源码修改）",
+      "source_section": "2",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-2.1",
+      "requirement": "Canvas 2D 指纹 【L2】⚠",
+      "source_section": "2.1",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-2.2",
+      "requirement": "WebGL 指纹 【L2】",
+      "source_section": "2.2",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-2.3",
+      "requirement": "WebGL2 【L2】⚠",
+      "source_section": "2.3",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-3",
+      "requirement": "Audio 指纹（DSP 浮点，引擎源码修改）",
+      "source_section": "3",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/privacy-v20d-audio-review.json",
+        "docs/privacy-audio-api-evidence-v20d.json",
+        "out/evidence/privacy-v20e-fft-review.json",
+        "docs/privacy-audio-api-evidence-v20e.json",
+        "docs/privacy-fft-api-evidence-v20e.json",
+        "out/evidence/privacy-v20f-oscillator-review.json",
+        "out/evidence/privacy-v20g-compressor-review.json",
+        "out/evidence/privacy-v20h-resampler-review.json",
+        "out/evidence/privacy-v20h-cross-platform-review.json",
+        "out/evidence/privacy-v20h-original-signature-review.json",
+        "out/evidence/privacy-v20m-cross-biquad-matrix.json",
+        "out/evidence/privacy-v20m-cross-biquad-boundary.json"
+      ],
+      "notes": "Profile-selected scalar FFT/fdlibm with scoped planner math and backend-separated cache; 110 finite component cases/1049270 floats byte-identical MacARM/Linuxx86. Browser150FFT+96vector renders, independent references and negative controls passed. Full same-patched-Linux WebAudio pipeline, remaining oscillator/DSP/automation/resampling/HRTF/worklet/device/FP-mode/performance/100-restart/7-day checks remain open. Different-patch unmodified official diagnostic signature is still different; no full audio claim. Current F adds bounded scalar/fdlibm oscillator processing and 324 real graph renders, 60 FFT/64 DSP regressions. Whole audio and other surfaces remain incomplete; E cross-CPU FFT core is historical component evidence, not an F full-pipeline pass. G remaining compressor host sin/exp routed to fdlibm in diagnostic persona;450 renders/900 hashes and19 aligned negatives per capture;90FFT96vector current regression renders. Raw archives retained. Current IDL33partial/0fullyverified. Ratio-one startup corrected as test assumption; full audio parity remains unproven. H adds portable media resampler;720 decode cases/3.19M independently checked floats,48 muted actual playback cases, current90FFT96vector450compressor regression. Full cross-CPU pipeline, WebRTC, devices, SetRatio runtime and all codecs remain incomplete; Linux same-patch isolated headless build in progress.49partialAPI/0fullyverified."
+    },
+    {
+      "id": "SRC-3.1",
+      "requirement": "OfflineAudioContext 指纹 【L2】⚠",
+      "source_section": "3.1",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/privacy-v20d-audio-review.json",
+        "docs/privacy-audio-api-evidence-v20d.json",
+        "out/evidence/privacy-v20e-fft-review.json",
+        "docs/privacy-audio-api-evidence-v20e.json",
+        "docs/privacy-fft-api-evidence-v20e.json",
+        "out/evidence/privacy-v20f-oscillator-review.json",
+        "out/evidence/privacy-v20g-compressor-review.json",
+        "out/evidence/privacy-v20h-resampler-review.json",
+        "out/evidence/privacy-v20h-cross-platform-review.json",
+        "out/evidence/privacy-v20h-original-signature-review.json",
+        "out/evidence/privacy-v20m-cross-biquad-matrix.json",
+        "out/evidence/privacy-v20m-cross-biquad-boundary.json"
+      ],
+      "notes": "Profile-selected scalar FFT/fdlibm with scoped planner math and backend-separated cache; 110 finite component cases/1049270 floats byte-identical MacARM/Linuxx86. Browser150FFT+96vector renders, independent references and negative controls passed. Full same-patched-Linux WebAudio pipeline, remaining oscillator/DSP/automation/resampling/HRTF/worklet/device/FP-mode/performance/100-restart/7-day checks remain open. Different-patch unmodified official diagnostic signature is still different; no full audio claim. Current F adds bounded scalar/fdlibm oscillator processing and 324 real graph renders, 60 FFT/64 DSP regressions. Whole audio and other surfaces remain incomplete; E cross-CPU FFT core is historical component evidence, not an F full-pipeline pass. G remaining compressor host sin/exp routed to fdlibm in diagnostic persona;450 renders/900 hashes and19 aligned negatives per capture;90FFT96vector current regression renders. Raw archives retained. Current IDL33partial/0fullyverified. Ratio-one startup corrected as test assumption; full audio parity remains unproven. H adds portable media resampler;720 decode cases/3.19M independently checked floats,48 muted actual playback cases, current90FFT96vector450compressor regression. Full cross-CPU pipeline, WebRTC, devices, SetRatio runtime and all codecs remain incomplete; Linux same-patch isolated headless build in progress.49partialAPI/0fullyverified."
+    },
+    {
+      "id": "SRC-4",
+      "requirement": "Navigator 指纹（引擎内注入，值来自 profile）",
+      "source_section": "4",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-4.1",
+      "requirement": "navigator.userAgent 【L1】",
+      "source_section": "4.1",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "HTTP and five realms agree; declared-platform matrix not complete"
+    },
+    {
+      "id": "SRC-4.2",
+      "requirement": "navigator.webdriver 【L1】",
+      "source_section": "4.2",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-4.3",
+      "requirement": "UserAgentData 高熵 【L1】",
+      "source_section": "4.3",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/identity-version-v18b-native.private.json",
+        "out/evidence/identity-version-v18b-software.private.json",
+        "out/evidence/mac-identity-ui-acceptance-v18.json"
+      ],
+      "notes": "v18b native default-major/explicit-system high entropy version policy, five modes and native UI/HTTP/seven realms verified. Cross-platform architecture/platform templates and remaining entropy surfaces not complete."
+    },
+    {
+      "id": "SRC-4.4",
+      "requirement": "Platform / Language / Hardware / Touch 【L1】",
+      "source_section": "4.4",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/cpu-template-v19c-inconsistency.json",
+        "out/evidence/privacy-v19d-candidate-review.json"
+      ],
+      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete."
+    },
+    {
+      "id": "SRC-4.5",
+      "requirement": "Plugins / MimeTypes 【L1】",
+      "source_section": "4.5",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Plugin/MIME inventory collected; official-version comparison absent"
+    },
+    {
+      "id": "SRC-4.6",
+      "requirement": "原生函数 toString 反 hook 检测 【L1】⚠",
+      "source_section": "4.6",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Seven native getter bindings checked; complete modified API inventory pending"
+    },
+    {
+      "id": "SRC-5",
+      "requirement": "Screen / 显示环境 【L1】",
+      "source_section": "5",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-6",
+      "requirement": "DOM API 存在性矩阵 【L0 天然免费】",
+      "source_section": "6",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-6.1",
+      "requirement": "27 项 API 矩阵",
+      "source_section": "6.1",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "API inventory observed, platform/official comparison pending"
+    },
+    {
+      "id": "SRC-6.2",
+      "requirement": "globalThis 键数量 【L0】",
+      "source_section": "6.2",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Global key inventory observed, differences not classified"
+    },
+    {
+      "id": "SRC-7",
+      "requirement": "字体 / 引擎特征",
+      "source_section": "7",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-7.1",
+      "requirement": "字体度量指纹 【L2】⚠",
+      "source_section": "7.1",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-7.2",
+      "requirement": "JS 引擎特征 【L0 天然免费】",
+      "source_section": "7.2",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-7.3",
+      "requirement": "Math / CPU 精度指纹 【L3】⚠",
+      "source_section": "7.3",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Five realms agree; cross-architecture reference absent"
+    },
+    {
+      "id": "SRC-8",
+      "requirement": "存储 / 能力检测",
+      "source_section": "8",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-8.1",
+      "requirement": "存储 API 【L0】",
+      "source_section": "8.1",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/privacy-v19n-seven-realms-http1-review.json"
+      ],
+      "notes": "Quota/persistence observed; partition/lifecycle tests pending Current N seven-realm OPFS six payload classes:112cases322fullSHA, both controls30negative each; bounded normal/quota/cancel/inflightdelete only. Forceddisconnect/physicalfull/completeAPI remainunverified."
+    },
+    {
+      "id": "SRC-8.2",
+      "requirement": "Permissions 状态 【L1】⚠",
+      "source_section": "8.2",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Queries collected; full grant/revoke/hardware missing"
+    },
+    {
+      "id": "SRC-9",
+      "requirement": "阿里系特有（页面层 token，非内核职责）",
+      "source_section": "9",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-9.1",
+      "requirement": "cna cookie 【页面层，输入依赖 §2】⚠",
+      "source_section": "9.1",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-9.2",
+      "requirement": "umidToken 【页面层】⚠",
+      "source_section": "9.2",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-9.3",
+      "requirement": "x5sec 安全 token 【页面层 VM】⚠",
+      "source_section": "9.3",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-9.4",
+      "requirement": "getUA token 【页面层 VM】⚠",
+      "source_section": "9.4",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-9.5",
+      "requirement": "sufei_data 【页面层】⚠",
+      "source_section": "9.5",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-9.6",
+      "requirement": "aplus / goldlog 行为埋点 【页面层】⚠",
+      "source_section": "9.6",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-10",
+      "requirement": "小红书特有",
+      "source_section": "10",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-10.1",
+      "requirement": "b1 指纹 blob 【页面层 VM】⚠",
+      "source_section": "10.1",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-10.2",
+      "requirement": "t2 行为埋点 【页面层】⚠",
+      "source_section": "10.2",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-10.3",
+      "requirement": "VM 引导层检测 【L0 天然免费】",
+      "source_section": "10.3",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-11",
+      "requirement": "时区 / 地理一致性 【L1】",
+      "source_section": "11",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Existing timezone seven-realm tests; geo/IP consistency absent"
+    },
+    {
+      "id": "SRC-12",
+      "requirement": "WebRTC 本地 IP 泄露 【L1】⚠",
+      "source_section": "12",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+    },
+    {
+      "id": "SRC-13",
+      "requirement": "Battery / 其他传感器 【L1】",
+      "source_section": "13",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/identity-surfaces-v16.private.json"
+      ],
+      "notes": "Battery and network values observed; source confirms native passthrough"
+    },
+    {
+      "id": "BUILD",
+      "requirement": "Build/product/official-version baseline",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/hardware-privacy-v16-review-result.json"
+      ],
+      "notes": "Official Chrome155 vs engine154 not same-version parity"
+    },
+    {
+      "id": "GPU",
+      "requirement": "WebGPU canonical features, limits and actual rendering",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/hardware-privacy-v16-review-result.json"
+      ],
+      "notes": "v16 109 checks partial coverage; arbitrary models missing"
+    },
+    {
+      "id": "MEDIA",
+      "requirement": "All media handoffs and real authorization",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/hardware-privacy-v16-review-result.json"
+      ],
+      "notes": "v16 synthetic coverage; actual permission/device evidence missing"
+    },
+    {
+      "id": "DEVICE",
+      "requirement": "USB/HID/Bluetooth/serial/geolocation/WebAuthn/sensors",
+      "status": "unverified",
+      "evidence": []
+    },
+    {
+      "id": "STORAGE",
+      "requirement": "Partitions, persistence, quotas and lifecycle",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/quota-observations-v18b.json",
+        "out/evidence/quota-source-audit-v18b.json",
+        "out/evidence/storage-seven-realms-v19c-review.json",
+        "docs/privacy-storage-api-evidence.json",
+        "out/evidence/storage-worker-otr-v19d-review.json",
+        "docs/privacy-storage-worker-api-evidence-v19d.json",
+        "docs/privacy-storage-otr-api-evidence-v19d.json",
+        "out/evidence/worker-stop-v19d-failure-review.json",
+        "out/evidence/storage-concurrent-v19e-review.json",
+        "out/evidence/quota-pressure-v19e-review.json",
+        "out/evidence/storage-capacity-v19e-v19f-failure-review.json",
+        "out/evidence/storage-capacity-v19g-review.json",
+        "out/evidence/bucket-policy-v19h-review.json",
+        "docs/privacy-bucket-policy-api-evidence-v19h.json"
+      ],
+      "notes": "v19d bounded ordinary and native incognito lifecycle matrix: Window/iframe plus five real worker categories read/write/delete four stores; two sites/four contexts,20 normal exits,2580 checks,32 ordinary and33 OTR negative-evidence mutations. Native OTR target ID independently differs from original profile ID; private data absent after new browser launch. Still unverified: simultaneous regular/OTR separation, quota pressure/low-capacity, permissions, concurrency, bucket expiration/durability, all value classes and full API privacy. New simultaneous regular/DevTools-OTR regression contradicts complete lifecycle coverage: v19d balanced/off native crash on OTR disposal (WorkerWatcher moved service-node ownership before client disconnection). v19e fix staged; native rerun pending, no success claim. v19e actual native rerun fixes this disposal crash: balanced/off3096checks and25negative-evidence cases pass with byte-identical failing-off probes. Only DevTools-created OTR coexistence/disposal is proved; primary native OTR window-close and in-flight concurrency remain unverified. Native2GiB APFS sparse-volume test proves low-volume leak in v19e; partialv19f fixes workers/implicit bucket but frame and legacy binder still raw. v19g frame-binding fix in build; not yet passed. Ordinary fresh-origin2MiB pressure tests pass72 controls/48negative onv19e, not real-disk-full. v19g native rerun closes bounded low-volume public quota leak: same probes as failingv19e,48estimates per mode acrossWindow/iframe/fiveWorker categories/legacy APIs/implicit buckets,8explicit bucketcap checks per mode; actualAPFS imageunmounted. Controlled2MiB-pressure72store cases pass with full payloadSHA,16lowvolume+54pressure negative-evidence cases rejected. Actualdiskfull,liveprefbinding transitions,bucketargumentclasses/mutations/expiration andfullAPIremainunverified. v19h closes metadata-count capacity channel (v19g protected61 on2GiB). Native80case matrices on2/4GiB x balanced/off pass320cases: protected512 totalincludingdefault, controls61/116; six positive quota classes toMAX_SAFE_INTEGER, existingquota immutable onopen, cleanup/recovery.19negative types,72SHA-verified pressure controls,CPU15/GPU109 pass. NewCDP page-readiness race preserved/fixed; exact collection-source snapshots replayed. All worker stress,liveprefs,permissions,expiry/durability/diskfull/fullAPI stillopen."
+    },
+    {
+      "id": "CROSSOS",
+      "requirement": "Cross-platform/GPU profile consistency and rendering",
+      "status": "unverified",
+      "evidence": []
+    },
+    {
+      "id": "RESTART100",
+      "requirement": "100 real cold restarts with stable-field policy",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/cold-stability-v17c-acceptance.json",
+        "out/evidence/cold-stability-v18b-acceptance.json",
+        "out/evidence/cold-stability-v18b-source-snapshot.json",
+        "out/evidence/cold-stability-v20m-sdk-acceptance.json"
+      ],
+      "notes": "v20m complete SDK candidate actual100 native cold starts, clean exits, persistent key and declared stable Canvas/audio/WebGL fields independently replayed. Native profile only; all templates/combinations and seven days remain open."
+    },
+    {
+      "id": "SOAK7D",
+      "requirement": "Seven-day site/profile observations",
+      "status": "unverified",
+      "evidence": []
+    },
+    {
+      "id": "SDK",
+      "requirement": "MetaCodes/account/session regression and current-binary delivery",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/hardware-privacy-v16-review-result.json",
+        "out/evidence/privacy-v20m-packaged-sdk-second.private.json"
+      ],
+      "notes": "v20m isolated full bundle/SDK passes loopback native browser actions+approval, visual images, coding, MCP/Skill, attachments, cancellation, tabs/history/draft and SDK host contracts. First transient-AX fixture spin failure retained, fixed using bounded browser_wait. Real account/provider business scenarios and daily delivery remain unverified."
+    },
+    {
+      "id": "CANVAS-SEED-ENTROPY",
+      "requirement": "All seed bits affect HDR patterns; avoid low-bit-only profile classes",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/passive-v17c-review-result.json",
+        "out/evidence/hdr-collision-v17c-fix.json"
+      ],
+      "notes": "Original collision and drift fixed on actual current Mac build, with native seed-bit tests and cold starts. Residual/other build configurations and full surface matrix remain separate requirements."
+    },
+    {
+      "id": "CANVAS-RESTART",
+      "requirement": "8-bit and HDR content-derived perturbation stable across real DCHECK/release processes",
+      "status": "partial",
+      "evidence": [
+        "out/evidence/passive-v17c-review-result.json",
+        "out/evidence/hdr-collision-v17c-fix.json"
+      ],
+      "notes": "Original collision and drift fixed on actual current Mac build, with native seed-bit tests and cold starts. Residual/other build configurations and full surface matrix remain separate requirements."
+    },
+    {
+      "id": "FINGERPRINT-RESIDUALS",
+      "requirement": "Evaluate rounding/normalization/chosen-content recovery and residual alpha/font/rendering entropy",
+      "status": "unverified",
+      "evidence": [],
+      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed."
+    }
+  ],
+  "required_probe_ids": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P8",
+    "P9",
+    "P10",
+    "P11",
+    "P12",
+    "P13",
+    "P14"
+  ],
+  "probe_status": {
+    "P1": "partial",
+    "P2": "unverified",
+    "P3": "unverified",
+    "P4": "partial",
+    "P5": "partial",
+    "P6": "partial",
+    "P7": "partial",
+    "P8": "partial",
+    "P9": "partial",
+    "P10": "partial",
+    "P11": "partial",
+    "P12": "partial",
+    "P13": "partial",
+    "P14": "unverified"
+  },
+  "completion": {
+    "all_required_verified": false,
+    "universal_anonymity_claim": false
+  },
+  "plan": "docs/ANONYMITY_PLAN.md",
+  "source_reports": [
+    {
+      "path": "/Users/yuankun/Downloads/浏览器指纹匿名化清单.md",
+      "sha256": "96aee47e80ca4799cf26436e33ee79a59eb8fe80394d4d71639109a9c221e36f"
+    },
+    {
+      "path": "/Users/yuankun/Downloads/风控侦查报告.md",
+      "sha256": "c3ee70e4e2d594b0e6b036993929f0c1928ff3040fdb8bf690c70dad6cb2313d"
+    }
+  ],
+  "current_milestones": {
+    "engine": "v18b",
+    "framework_sha256": "4c6213f10bec9564cac68ef53c8a806251b24f82db378789c2deb8c5cc0356f2",
+    "installed": true,
+    "review": "out/evidence/identity-v18b-review-result.json",
+    "full_scope_complete": false
+  },
+  "candidate_milestones": {
+    "engine": "v20h",
+    "framework_sha256": "9e7ddb445b1b0a4b9516fedfb4b2ff7d9bb382bf52b1912a8647f6d83224ddbe",
+    "installed": false,
+    "build_package_source_chain_passed": true,
+    "authored_inputs": 35,
+    "app_transport_entries": 352,
+    "resampler_staged_files": 7,
+    "implementation": "Instance MathBackend in media::SincResampler and MultiChannelResampler; Blink AudioBus and media wrapper choose scalar persona backend; scalar accumulation explicitly disables contraction/reassociation; fdlibm kernel sin/cos incl SetRatio.",
+    "decode_current_cases": 720,
+    "decode_current_full_channel_hashes": 1440,
+    "decode_current_full_float_values_independently_checked": 3189852,
+    "decode_old_baseline_cases": 480,
+    "decode_pairs": 8,
+    "decode_input_frame_lengths": [
+      37,
+      96,
+      97,
+      257,
+      4097
+    ],
+    "decode_invalid_wav_cases_per_capture": 3,
+    "decode_aligned_negative_variants_per_capture": 19,
+    "diagnostic_off_old_new_resampled_channel_hashes_changed": 420,
+    "same_rate_control_channel_hashes_unchanged": 60,
+    "native_decode_fft_vector_compressor_complete_observations_old_new_equal": true,
+    "actual_media_playback_cases": 48,
+    "realtime_captured_float_values_independently_checked": 98304,
+    "media_closed_audio_contexts": 48,
+    "media_aligned_negative_variants_per_capture": 13,
+    "media_output_graph_muted": true,
+    "microphone_requested": false,
+    "fft_current_graph_renders": 90,
+    "vector_current_graph_renders": 96,
+    "compressor_current_graph_renders": 450,
+    "current_idl_members": 18489,
+    "partial_runtime_api_members": 49,
+    "fully_verified_api_members": 0,
+    "raw_capture_archives": 17,
+    "decode_media_archival_replays": 8,
+    "stager_drift_regression_old_accepts_new_rejects": true,
+    "stager_hardening_compiled_sources_and_framework_unchanged": true,
+    "obsolete_sdk_free_generated_backups_removed": 10,
+    "daily_app_replaced": false,
+    "paid_model_calls": 0,
+    "full_scope_complete": false,
+    "full_audio_pipeline_cross_cpu_proven": false,
+    "full_realtime_media_chain_proven": false,
+    "current_full_sdk_verified": false,
+    "cross_platform_template_user_selectable": false,
+    "remaining": "Same-patch Linux runtime comparisons; WebRTC and BufferSource distinct paths, SetRatio/device changes, additional codecs/network/CORS, default AudioContext/latency exposure, Biquad detune/Panner angle math candidates, HRTF/worklet/hardware; fonts/platform/GPU/profile/full SDK/UI/account/sites100starts7days andoriginal57/P1P14/A-L.",
+    "review": "out/evidence/privacy-v20h-resampler-review.json",
+    "linux_reference_state": "build-complete; actual finite offline fixtures passed",
+    "decode_independent_full_response_includes_short_boundary_samples": true,
+    "max_independent_full_response_error": 0.0001436094937353194,
+    "mac_additional_oscillator_renders": 108,
+    "linux_qa_supplement": "out/evidence/privacy-v20h-linux-runner-supplement.json",
+    "linux_engine_sha256": "d3ba6bb5b67485febf51ad3e85fff4b9be03f7547b9819edf7d01b38a89afc13",
+    "cross_cpu_fixture_buffers_identical": true,
+    "cross_cpu_compared_hashes": 918,
+    "cross_platform_review": "out/evidence/privacy-v20h-cross-platform-review.json",
+    "original_audio_signature_variants": 2,
+    "original_audio_signature_cross_hashes_equal": 6,
+    "original_audio_signature_read_paths": 4,
+    "original_audio_signature_review": "out/evidence/privacy-v20h-original-signature-review.json"
+  },
+  "previous_installed_milestone": {
+    "engine": "v18b",
+    "framework_sha256": "4c6213f10bec9564cac68ef53c8a806251b24f82db378789c2deb8c5cc0356f2",
+    "installed": true,
+    "review": "out/evidence/identity-v18b-review-result.json",
+    "native_cold_starts": 100,
+    "full_scope_completed": false
+  },
+  "previous_candidate_milestone": {
+    "engine": "v20g",
+    "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+    "installed": false,
+    "build_package_source_chain_passed": true,
+    "authored_inputs": 34,
+    "app_transport_entries": 352,
+    "source_stager_idempotence_and_compiled_hashes_passed": true,
+    "implementation": "Scalar persona remaining compressor sin/exp use fdlibm; native default unchanged. Does not change samples or replace graph output.",
+    "compressor_current_graph_renders": 450,
+    "compressor_current_full_channel_hashes": 900,
+    "compressor_old_baseline_graph_renders": 300,
+    "compressor_aligned_negative_variants_per_capture": 19,
+    "compressor_rates": [
+      8000,
+      44100,
+      96000
+    ],
+    "compressor_presets": [
+      "bypass",
+      "default",
+      "hard",
+      "slow",
+      "automated"
+    ],
+    "compressor_signals": [
+      "silence",
+      "dc",
+      "ramp",
+      "pulses",
+      "noise"
+    ],
+    "compressor_api_invalid_value_setters_per_capture": 15,
+    "native_compressor_fft_vector_old_new_complete_observations_equal": true,
+    "diagnostic_linux_off_old_new_compressor_channel_hashes_changed": 0,
+    "fft_current_graph_renders": 90,
+    "vector_current_graph_renders": 96,
+    "fft_aligned_negative_variants_per_linux_mode": 21,
+    "vector_aligned_negative_variants_per_linux_mode": 15,
+    "current_idl_members": 18489,
+    "partial_runtime_api_members": 33,
+    "fully_verified_api_members": 0,
+    "raw_capture_archives": 11,
+    "compressor_archive_replay_captures": 5,
+    "initial_test_assumption_corrected": "Ratio one still has detector startup envelope; ideal delayed-signal error is diagnostic only. Exact silence/lookahead/shared-stereo-gain and parameter/repeat checks retained.",
+    "diagnostic_compressor_privacy_off_balanced_full_channel_hashes_different": 240,
+    "full_audio_pipeline_cross_cpu_proven": false,
+    "full_gpu_media_coverage_proven": false,
+    "cross_platform_template_user_selectable": false,
+    "current_full_sdk_verified": false,
+    "daily_app_untouched": true,
+    "all_jobs_terminal": true,
+    "paid_model_calls": 0,
+    "full_scope_complete": false,
+    "remaining": "media/base SincResampler explicit portable backend and Blink callers; separate WebRTC and AudioBufferSource paths; HRTF/worklet/realtime/hardware; own patched Linux full pipeline (Mac-only CoreFoundation UI currently obstructs full Linux build); fonts/platform/GPU/profile consistency; complete SDK/UI/account/sites and100starts7days; alloriginal57/P1P14/A-L.",
+    "review": "out/evidence/privacy-v20g-compressor-review.json"
+  },
+  "older_candidate_milestones": [
+    {
+      "engine": "v19k",
+      "framework_sha256": "65947a3aac9a46165f76de8d0c78d553d7a509c119a3eec92955e9e5b250592f",
+      "installed": false,
+      "review": "out/evidence/privacy-v19k-candidate-review.json",
+      "cpu_template_coherence_passed": true,
+      "gpu_media_regression_passed": true,
+      "native_error_lifecycle_bounded_passed": true,
+      "concurrent_otr_teardown_passed": true,
+      "storage_capacity_privacy_passed": true,
+      "bucket_capacity_budget_passed": null,
+      "full_regressions_complete": false,
+      "full_scope_complete": false,
+      "identity_surface_bounded_passed": true,
+      "privacy_configuration_bounded_passed": true
+    },
+    {
+      "engine": "v19m",
+      "framework_sha256": "2caef772847daec436dbb3876a5b42e5d840d7473e923f98ade97b8d5261d186",
+      "installed": false,
+      "review": "out/evidence/privacy-v19m-network-review.json",
+      "native_idle_network_bounded_passed": true,
+      "full_network_privacy_proven": false,
+      "cpu_template_coherence_passed": true,
+      "gpu_media_regression_passed": true,
+      "native_error_lifecycle_bounded_passed": true,
+      "concurrent_otr_teardown_passed": true,
+      "storage_capacity_privacy_passed": true,
+      "bucket_capacity_budget_passed": true,
+      "full_regressions_complete": false,
+      "full_scope_complete": false,
+      "public_google_gmail_forms_bounded_passed": true,
+      "synthetic_site_cookie_preservation_passed": true,
+      "website_push_permission_subscription_bounded_passed": true,
+      "website_push_restart_continuity_bounded_passed": true,
+      "os_notification_consent_proven": false,
+      "notification_delivery_proven": false,
+      "navigation_push_review": "out/evidence/privacy-v19m-navigation-push-review.json",
+      "identity_surface_bounded_regression_passed": true,
+      "identity_surface_assertions": 140,
+      "healthy_configuration_bounded_passed": true,
+      "regression_review": "out/evidence/privacy-v19m-regression-review.json",
+      "quota_pressure_regression_passed": false,
+      "quota_pressure_open_finding": "OPFS intermittently AbortError instead of strict QuotaExceededError in balanced and off; original failures retained, source suggests data-pipe error race; diagnosis pending, not passed.",
+      "storage_capacity_scope": "Owned2GiB APFS public estimates only; metadata budget2/4GiB only; no full storage claim",
+      "native_tls_h2_endpoint_bounded_passed": true,
+      "tls_official_parity_proven": false,
+      "storage_transport_review": "out/evidence/privacy-v19m-storage-transport-review.json",
+      "sdk_component_contract_passed": true,
+      "sdk_current_browser_integration_proven": false
+    },
+    {
+      "engine": "v19n",
+      "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+      "installed": false,
+      "review": "out/evidence/privacy-v19n-seven-realms-http1-review.json",
+      "build_package_receipt_chain_passed": true,
+      "native_opfs_error_fix": "Wait for backend write result before reporting producer failure; default callback completes disconnected writer",
+      "quota_pressure_regression_passed": true,
+      "opfs_error_matrix_passed": true,
+      "native_idle_network_bounded_passed": null,
+      "cpu_template_coherence_passed": null,
+      "gpu_media_regression_passed": null,
+      "native_error_lifecycle_bounded_passed": null,
+      "concurrent_otr_teardown_passed": null,
+      "storage_capacity_privacy_passed": null,
+      "bucket_capacity_budget_passed": null,
+      "full_regressions_complete": false,
+      "full_scope_complete": false,
+      "scope_note": "Prior M evidence retained separately; no current-N regression pass inherited.",
+      "native_tls_h2_endpoint_bounded_passed": true,
+      "disconnect_default_callback_observed": false,
+      "current_engine_regressions_scope": "Six quota-pressure starts, two extended Window/Dedicated OPFS starts, two direct TLS/h2 starts only; other previous-M gates are not inherited.",
+      "opfs_seven_realms_bounded_passed": true,
+      "opfs_seven_cases": 112,
+      "opfs_seven_full_content_hashes": 322,
+      "http1_header_order_bounded_passed": true,
+      "linux_diagnostic_reference_collected": true,
+      "linux_exact_version_baseline_proven": false,
+      "forced_mojo_disconnect_proven": false,
+      "linux_reference_scope": "Different-patch official CfT Linux headless/SwiftShader diagnostic only, not exact version or default configuration/NVIDIA hardware baseline"
+    },
+    {
+      "engine": "v20b",
+      "framework_sha256": "4c9e3ad444d2a521a8caeb4754f2295796d0373c99e318338b0a6268e92163f4",
+      "installed": false,
+      "review": "out/evidence/privacy-v20b-persona-review.json",
+      "build_package_receipt_chain_passed": true,
+      "native_unified_persona_metadata_implemented": true,
+      "metadata_realms": 7,
+      "metadata_modes": [
+        "linux-balanced",
+        "linux-off",
+        "native-balanced"
+      ],
+      "metadata_cpu_retained_http_bounded_passed": true,
+      "startup_invalid_persona_rejection_bounded_passed": true,
+      "diagnostic_linux_template_user_selectable": false,
+      "native_profile_user_selectable": true,
+      "arbitrary_gpu_simulation_implemented": false,
+      "complete_cross_platform_persona_proven": false,
+      "full_regressions_complete": false,
+      "full_scope_complete": false,
+      "scope_note": "Current-B metadata/CPU/backend/startup evidence only. Previous-N OPFS/transport and M regression passes are not inherited. All captures SwiftShader, SDK-free, not installed. Linux reference differs in patch/headed/build/environment. Fonts/audio/API/SwiftShader JIT residuals remain open."
+    },
+    {
+      "engine": "v20c",
+      "framework_sha256": "ae87562e2b4158c8b2c304a50d84a3fe11b7cf640afd71eb16dbb3283a83edce",
+      "installed": false,
+      "review": "out/evidence/privacy-v20c-audio-review.json",
+      "full_scope_complete": false,
+      "review_issue": "Pre-command-line selector caching could persist native fallback; successor D fixes exact selector logic, not an observed native-browser startup leak."
+    },
+    {
+      "engine": "v20d",
+      "framework_sha256": "ee65493ebe3ba1fc491af6475e5205f4a9550c4fdf6902cec04d8720e3c01689",
+      "installed": false,
+      "review": "out/evidence/privacy-v20d-audio-review.json",
+      "build_package_receipt_chain_passed": true,
+      "audio_vector_backend_implemented": true,
+      "audio_current_graph_renders": 96,
+      "audio_current_channel_hashes": 192,
+      "audio_protected_off_bounded_passed": true,
+      "native_audio_old_new_control_equal": true,
+      "pre_init_audio_selector_regression_fixed": true,
+      "linux_diagnostic_reference_graphs": 32,
+      "linux_diagnostic_hashes_equal": 36,
+      "linux_diagnostic_hashes_different": 28,
+      "full_audio_parity_proven": false,
+      "metadata_realms": 7,
+      "metadata_modes": [
+        "linux-balanced",
+        "linux-off"
+      ],
+      "startup_invalid_persona_rejection_bounded_passed": true,
+      "current_idl_member_count": 18489,
+      "current_partial_audio_api_members": 12,
+      "fully_verified_api_members": 0,
+      "diagnostic_linux_template_user_selectable": false,
+      "full_regressions_complete": false,
+      "current_sdk_integration_verified": false,
+      "full_scope_complete": false,
+      "scope_note": "Current D bounded DSP/metadata/startup evidence only; previous N/M storage/transport/media/SDK gates not inherited. Different-patch headless official Linux comparison is diagnostic. FFT/twiddle/remaining DSP, fonts/platform API/GPU parity and full goal remain open."
+    },
+    {
+      "engine": "v20e",
+      "framework_sha256": "21408a7e2bfcb9d3a857c807d2da5775ec8b84e9dc90bee576c60fef6abfff2b",
+      "installed": false,
+      "review": "out/evidence/privacy-v20e-fft-review.json",
+      "build_package_receipt_chain_passed": true,
+      "authored_inputs": 32,
+      "scalar_fdlibm_fft_backend_implemented": true,
+      "cross_cpu_fft_component_cases": 110,
+      "cross_cpu_float_values": 1049270,
+      "cross_cpu_entire_buffers_equal": true,
+      "fft_current_graph_renders": 150,
+      "vector_current_graph_renders": 96,
+      "native_default_and_legacy_fft_regression_equal": true,
+      "portable_blink_feature_optout_cannot_disable": true,
+      "metadata_realms": 7,
+      "metadata_modes": [
+        "linux-balanced",
+        "linux-off"
+      ],
+      "startup_invalid_rejection_cases": 9,
+      "source_stager_raw_byte_idempotence_verified": true,
+      "current_idl_members": 18489,
+      "partial_audio_api_members": 24,
+      "fully_verified_api_members": 0,
+      "full_audio_parity_proven": false,
+      "own_linux_full_webaudio_pipeline_proven": false,
+      "cross_platform_template_user_selectable": false,
+      "full_regressions_complete": false,
+      "current_sdk_integration_verified": false,
+      "full_scope_complete": false,
+      "scope_note": "Finite FFT core equivalence under same pinned compiler, test C ABI executing production fdlibm header. Mac browser CXX transport tested separately. Not full realtime DSP/device/FP-mode parity. Current E original audio signature differs from unmodified different-patch Linux diagnostic; validate own patched Linux pipeline. No inherited old storage/network/media/SDK/site/stability pass."
+    },
+    {
+      "framework_sha256": "7f00b12db61821a631040b98a953bb75bb4f9ea6bf19af077d1ecb7ff54cd8b2",
+      "installed": false,
+      "build_package_source_chain_passed": true,
+      "authored_inputs": 33,
+      "app_transport_entries": 352,
+      "oscillator_current_graph_renders": 324,
+      "oscillator_old_baseline_graph_renders": 216,
+      "rates": [
+        22050,
+        44100,
+        96000
+      ],
+      "automation_modes": [
+        "constant",
+        "frequency-a-rate",
+        "detune-a-rate"
+      ],
+      "variants": [
+        "zero",
+        "low",
+        "positive",
+        "negative",
+        "octave",
+        "fractional"
+      ],
+      "native_oscillator_old_new_complete_observations_equal": true,
+      "diagnostic_linux_changed_render_hashes": 16,
+      "aligned_semantic_negative_variants_per_capture": 15,
+      "max_reference_error": 8.590078470802065e-06,
+      "fft_current_graph_renders": 60,
+      "vector_current_graph_renders": 64,
+      "native_fft_and_vector_old_new_complete_observations_equal": true,
+      "source_stager_idempotence_and_compiled_hashes_passed": true,
+      "daily_app_untouched": true,
+      "full_audio_pipeline_cross_cpu_proven": false,
+      "full_gpu_media_coverage_proven": false,
+      "current_full_sdk_verified": false,
+      "current_idl_catalog_regenerated": false,
+      "full_scope_complete": false,
+      "paid_model_calls": 0,
+      "engine": "v20f",
+      "review": "out/evidence/privacy-v20f-oscillator-review.json",
+      "cross_platform_template_user_selectable": false,
+      "scope_note": "Compressor sin/exp, actual resampler pipelines, HRTF/worklet/realtime/devices, same patched Linux full WebAudio, fonts/platform/GPU/profile coherence, complete SDK/UI/account/sites/100starts7days and original57/P1P14/A-L."
+    }
+  ],
+  "latest_runtime_increment": {
+    "engine": "v20m",
+    "framework_sha256": "d18a79b5dcc1b68054e153e6d00fba5978d1b0dea385c492ac5ee29029e17b0d",
+    "installed": false,
+    "experimental_profile_only": true,
+    "production_profile_activation_verified": false,
+    "same_patch_linux_worklet_verified": true,
+    "cross_cpu_worklet_complete_channel_hashes_equal": 48,
+    "native_worklet_complete_channel_hashes_unchanged": 48,
+    "independent_scalar_allpass_max_error": 0,
+    "production_recurrence_partition_alias_transition_cases_per_platform": 96,
+    "kernel_full_buffer_bytes_equal": 393216,
+    "coherent_bad_history_rejected": true,
+    "linux_reference_sha256": "d5e59babac65b2a7ba097be10351aadf022213ae21c4b7f69f0b42693b3fda04",
+    "full_audio_pipeline_cross_cpu_proven": false,
+    "full_privacy_coverage_complete": false,
+    "full_sdk_verified": false,
+    "review": "out/evidence/privacy-v20m-biquad-review.json",
+    "remaining": "Finite eight-filter/four-boundary matrices do not cover all parameter combinations, exception domains, ramps or realms. IIR/realtime/Worklet/WebRTC/media/devices/hardware drift, production crossOS profile activation/cache/Worker, GPU/fonts/platform, real account/site workflows and seven days remain open; all original57/P1P14/A-L maintained.",
+    "biquad_filter_types": 8,
+    "biquad_fixed_step_graphs_per_capture": 96,
+    "biquad_boundary_graphs_per_capture": 192,
+    "biquad_cross_cpu_complete_channel_hashes_equal": 288,
+    "biquad_matrix_independent_scalar_max_error": 0,
+    "biquad_boundary_independent_max_error": 3.725290298461914e-09,
+    "balanced_metadata_realms_per_mode": 7,
+    "current_sdk_packaged_fixture_verified": true,
+    "current_sdk_real_account_verified": false,
+    "current_sdk_delivered": false,
+    "matrix_review": "out/evidence/privacy-v20m-matrix-sdk-review.json",
+    "current_idl_catalog_integrity_verified": true,
+    "current_idl_potential_members": 18489,
+    "current_idl_fully_verified_members": 0,
+    "current_idl_biquad_partial_members_mapped": 12,
+    "biquad_frequency_response_float32_bytes_cross_cpu_equal": true,
+    "current_sdk_native_cold_starts": 100,
+    "current_sdk_native_cold_starts_verified": true,
+    "current_sdk_provider_posts_during_stability": 0,
+    "current_sdk_packaged_library_origin_verified": true
+  },
+  "previous_public_audio_stream_increment": {
+    "engine": "v20i",
+    "framework_sha256": "95382c201f83e4b663e5699dc1ce3aa91a01d2eaafd19c3535e8767869df4d62",
+    "installed": false,
+    "experimental_profile_only": true,
+    "public_stream_static_parameter_cases": 30,
+    "actual_contexts_all_modes": 90,
+    "actual_running_snapshots": 270,
+    "native_control_static_cases_unchanged": 30,
+    "media_graph_playback_cases": 16,
+    "original_signature_full_hashes_unchanged": 6,
+    "hardware_output_delay_timestamp_isolated": false,
+    "full_privacy_coverage_complete": false,
+    "full_sdk_verified": false,
+    "new_linux_runtime_verified": false,
+    "review": "out/evidence/privacy-v20i-public-audio-device-review.json",
+    "remaining": "Public clock/private physical callback isolation; maxChannelCount functional probe, renderSizeHint, audible hardware/device changes and permission states, Worklet/HRTF/WebRTC/DSP, GPU/fonts/platform/profile, all original57/P1P14/A-L and fullSDK/UI/account/sites100starts7days."
+  },
+  "previous_audio_clock_increment": {
+    "engine": "v20j",
+    "framework_sha256": "d0460ff08042ab96d264c8a70946fbe8b8e0932a71ba364345aea5c0355d89b0",
+    "installed": false,
+    "experimental_profile_only": true,
+    "public_clock_delay_cases": 60,
+    "actual_contexts_main_matrix": 90,
+    "actual_running_snapshots_main_matrix": 270,
+    "native_static_control_cases": 30,
+    "capability_lifecycle_cases": 8,
+    "actual_long_clock_transitions": 2,
+    "long_clock_observed_rows": 36,
+    "media_graph_playback_cases": 16,
+    "original_signature_full_hashes_unchanged": 6,
+    "linux_native_adapter_unit_tests": 2,
+    "real_hardware_playback_verified": false,
+    "complete_timing_privacy_proven": false,
+    "full_privacy_coverage_complete": false,
+    "new_linux_browser_runtime_verified": false,
+    "full_sdk_verified": false,
+    "review": "out/evidence/privacy-v20j-audio-clock-review.json",
+    "remaining": "Clock/scheduling side channels; audible hardware, drift/video sync/device/permission/renderSizeHint; Worklet/HRTF/WebRTC/DSP; new Linux browser and original57/P1P14/A-L GPU/fonts/platform/profile/fullSDKUI/account/sites100starts7days."
+  },
+  "previous_worklet_spatial_increment": {
+    "engine": "v20k2",
+    "framework_sha256": "af73c22b66f67643c8d64f591cf9dff3c92e0d1d49d65c41aee78bd412bb2d61",
+    "installed": false,
+    "experimental_profile_only": true,
+    "cohort_host_math_sites_changed": 2,
+    "current_offline_worklet_graphs": 48,
+    "current_offline_worklet_blocks": 768,
+    "full_offline_output_float_values_checked": 196608,
+    "native_old_new_complete_channel_hashes_equal": 48,
+    "realtime_worklet_contexts": 6,
+    "realtime_full_float_values_checked": 12288,
+    "realtime_worklet_clock_blocks_observed": 384,
+    "initial_candidate_rejected_for_native_precision_regression": true,
+    "real_hardware_playback_verified": false,
+    "full_worklet_privacy_proven": false,
+    "complete_timing_privacy_proven": false,
+    "full_privacy_coverage_complete": false,
+    "new_linux_browser_runtime_verified": false,
+    "full_sdk_verified": false,
+    "review": "out/evidence/privacy-v20k2-worklet-spatial-review.json",
+    "remaining": "Allpass is finite coverage only; dynamic detune/other filters/HRTF/vector and geometry paths, Worklet realms/device failures/WebRTC/audible quality/drift/video sync/permissions/renderSizeHint; same-patch Linux browser plus original57/P1P14/A-L GPU/fonts/platform/profile/fullSDKUI/account/sites100starts7days."
+  },
+  "previous_hrtf_cross_increment": {
+    "engine": "v20l2",
+    "framework_sha256": "f46dc3e5ff57df7498af5f12beb3aaa987fc6c375876b6138b12dd3a480fdd00",
+    "installed": false,
+    "experimental_profile_only": true,
+    "production_profile_activation_verified": false,
+    "finite_complex_math_call_sites_changed": 10,
+    "current_hrtf_graphs": 72,
+    "current_full_float_values_checked": 589824,
+    "native_complete_channel_hashes_unchanged": 72,
+    "actual_traced_stages_per_mode": 3,
+    "actual_traced_calls_per_mode": 12960,
+    "diagnostic_portable_backend_observed": true,
+    "native_portable_backend_observed": false,
+    "signal_matrix_diagnostic_hash_changes": 0,
+    "magnitude_contract_vectors": 2026,
+    "same_patch_linux_hrtf_verified": true,
+    "full_hrtf_privacy_proven": false,
+    "real_hardware_playback_verified": false,
+    "full_privacy_coverage_complete": false,
+    "full_sdk_verified": false,
+    "review": "out/evidence/privacy-v20l2-hrtf-review.json",
+    "remaining": "Actual crossCPU Worklet biquad-detune mismatch (12/48 channels). Proposed portable double-history recurrence requires actual browser build+QA. HRTF finite tests do not prove all poses/domains or numeric HRIR oracle. Production profile activation/cache/Worker/device/DSP/WebRTC/hardware quality/drift/video sync and all original57/P1P14/A-L GPU/fonts/platform/fullSDKUI/account/sites100starts7days remain open.",
+    "cross_cpu_static_channel_hashes_equal": 72,
+    "cross_cpu_dynamic_channel_hashes_equal": 96,
+    "cross_cpu_worklet_channel_hashes_equal": 36,
+    "cross_cpu_worklet_channel_hashes_compared": 48,
+    "cross_cpu_worklet_complete": false,
+    "cross_cpu_review": "out/evidence/privacy-v20l2-cross-platform-review.json"
+  }
+}

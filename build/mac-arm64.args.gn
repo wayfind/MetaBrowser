@@ -1,0 +1,13 @@
+target_os = "mac"
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+target_cpu = "arm64"
+is_debug = false
+is_component_build = false
+is_official_build = false
+use_system_xcode = false
+mac_sdk_official_universal_version = "26.2"
+use_remoteexec = false
+use_siso = false
+# Archive's revision stamp is empty: select and hash this toolchain explicitly.
+clang_base_path = "/data/metabrowser/source/unpacked/chromium-154.0.8037.97/third_party/llvm-build/Release+Asserts"

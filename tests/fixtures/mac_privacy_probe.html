@@ -1,0 +1,156 @@
+<!doctype html><meta charset="utf-8"><title>Local macOS privacy acceptance</title>
+<style>body{font:14px system-ui;background:#f7f4fb;color:#241b30;padding:24px}pre{white-space:pre-wrap}</style>
+<h1>macOS privacy acceptance</h1><pre id="result">Running local probes…</pre>
+<script>
+const limited = (p, ms=30000) => Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),ms))]);
+const digest = async data => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',data))).map(x=>x.toString(16).padStart(2,'0')).join('');
+const same = (a,b) => a.length===b.length&&a.every((v,i)=>Object.is(v,b[i]));
+async function cpuProbe(){
+ const result={window:navigator.hardwareConcurrency};
+ result.iframe=await limited(new Promise(resolve=>{const f=document.createElement('iframe');window.addEventListener('message',function receive(e){if(e.source!==f.contentWindow)return;window.removeEventListener('message',receive);f.remove();resolve(e.data)});f.srcdoc='<script>parent.postMessage(navigator.hardwareConcurrency,"*")<'+ '/script>';document.body.append(f)}));
+ async function worker(url,options){return limited(new Promise((resolve,reject)=>{const w=new Worker(url,options);w.onmessage=e=>{resolve(e.data);w.terminate()};w.onerror=e=>reject(Error(e.message));w.postMessage('run')}))}
+ result.dedicated=await worker('/worker.js');result.module=await worker('/worker.js',{type:'module'});result.nested=await worker('/nested.js');
+ result.shared=await limited(new Promise((resolve,reject)=>{const w=new SharedWorker('/shared.js');w.onerror=e=>reject(Error(e.message));w.port.onmessage=e=>{resolve(e.data);w.port.postMessage('close');w.port.close()};w.port.start();w.port.postMessage('run')}));
+ const reg=await navigator.serviceWorker.register('/service.js',{scope:'/mac-privacy-scope/'});
+ try{const active=reg.active||reg.waiting||reg.installing;if(active.state!=='activated')await limited(new Promise(resolve=>active.addEventListener('statechange',()=>{if(active.state==='activated')resolve()})));result.service=await limited(new Promise(resolve=>{const c=new MessageChannel();c.port1.onmessage=e=>{resolve(e.data);c.port1.close()};reg.active.postMessage('run',[c.port2])}))}finally{await reg.unregister()}
+ return result;
+}
+async function fontsProbe(){
+ const family=new URL(location.href).searchParams.get('font');if(!/^MetaBrowserPrivacyCanary[a-f0-9]+$/.test(family))throw Error('explicit canary required');
+ const local=new FontFace('LocalCanary',`local("${family}")`);let localLoaded=false;
+ try{await local.load();document.fonts.add(local);localLoaded=true}catch{}
+ const remote=new FontFace('RemoteCanary','url(/font.ttf)');await remote.load();document.fonts.add(remote);
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+ const width=font=>{ctx.font=`20px "${font}", monospace`;return ctx.measureText('iiiiWWWW0123456789').width};
+ const stock={};for(const [name,font,text] of [['chinese','PingFang SC','中文隐私测试'],['japanese','Hiragino Sans','日本語の表示'],['korean','Apple SD Gothic Neo','한국어 표시'],['emoji','Apple Color Emoji','😀🚀🌍'],['arabic','Arial','مرحبا بالعالم'],['hebrew','Arial','שלום עולם']]){ctx.font=`20px "${font}"`;stock[name]=ctx.measureText(text).width}
+ ctx.font='20px monospace';const genericWidth=ctx.measureText('iiiiWWWW0123456789').width;ctx.font='20px serif';const privateGlyphFallbackWidth=ctx.measureText('\ue9f1').width;ctx.font=`20px "${family}", serif`;const directPrivateGlyphWidth=ctx.measureText('\ue9f1').width;
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),text=document.createElementNS(svg.namespaceURI,'text');text.setAttribute('font-size','20');text.style.fontFamily=`"${family}", monospace`;text.textContent='iiiiWWWW0123456789';svg.append(text);document.body.append(svg);const svgDirectWidth=text.getComputedTextLength();text.style.fontFamily='monospace';const svgGenericWidth=text.getComputedTextLength();svg.remove();
+ let worker=await limited(new Promise((resolve,reject)=>{const w=new Worker('/font-worker.js?font='+family);w.onmessage=e=>{resolve(e.data);w.terminate()};w.onerror=e=>reject(Error(e.message))}));
+ return {localLoaded,remoteLoaded:remote.status==='loaded',remoteWidth:width('RemoteCanary'),localWidth:width('LocalCanary'),arialWidth:width('Arial'),directWidth:width(family),genericWidth,svgDirectWidth,svgGenericWidth,privateGlyphFallbackWidth,directPrivateGlyphWidth,stock,worker};
+}
+async function speechProbe(){
+ if(!('speechSynthesis' in window))return {available:false};
+ let voices=speechSynthesis.getVoices();const end=Date.now()+8000;while(!voices.length&&Date.now()<end){await new Promise(r=>setTimeout(r,50));voices=speechSynthesis.getVoices()}
+ return {available:true,count:voices.length,language:navigator.language,languages:voices.map(v=>v.lang),uniqueLocales:new Set(voices.map(v=>v.lang.toLowerCase())).size===voices.length,publicIdentityValid:voices.every(v=>v.name==='System voice ('+v.lang+')'&&v.voiceURI==='urn:metabrowser:voice:'+v.lang),nativeRoutingNotExposed:voices.every(v=>typeof v.NativeName==='undefined')};
+}
+async function displayProbe(){
+ function snapshot(){return {width:screen.width,height:screen.height,availWidth:screen.availWidth,availHeight:screen.availHeight,availLeft:screen.availLeft,availTop:screen.availTop,colorDepth:screen.colorDepth,pixelDepth:screen.pixelDepth,extended:screen.isExtended,x:screenX,y:screenY,outerWidth,outerHeight,innerWidth,innerHeight,dpr:devicePixelRatio,orientation:screen.orientation.type,angle:screen.orientation.angle,cssDeviceWidth:matchMedia('(device-width: '+screen.width+'px)').matches,cssDeviceHeight:matchMedia('(device-height: '+screen.height+'px)').matches,color8:matchMedia('(color:8)').matches,srgb:matchMedia('(color-gamut: srgb)').matches,p3:matchMedia('(color-gamut: p3)').matches,hdr:matchMedia('(dynamic-range: high)').matches}}
+ const result=snapshot();result.iframe=await limited(new Promise(resolve=>{const f=document.createElement('iframe');window.addEventListener('message',function receive(e){if(e.source!==f.contentWindow)return;window.removeEventListener('message',receive);f.remove();resolve(e.data)});f.srcdoc='<script>'+snapshot.toString()+';parent.postMessage(snapshot(),"*")<'+ '/script>';document.body.append(f)}));return result;
+}
+async function hdrProbe(){
+ const c=document.createElement('canvas');c.width=64;c.height=24;const x=c.getContext('2d',{colorSpace:'display-p3',colorType:'float16'});
+ const g=x.createLinearGradient(0,0,64,24);g.addColorStop(0,'color(display-p3 0.234 0.547 0.811 / .75)');g.addColorStop(1,'color(display-p3 0.801 0.143 0.322 / .75)');x.fillStyle=g;x.fillRect(0,0,64,24);
+ const read=()=>x.getImageData(0,0,64,24,{colorSpace:'display-p3',pixelFormat:'rgba-float16'}).data;
+ const a=read(),b=read(),crop=x.getImageData(8,6,24,10,{colorSpace:'display-p3',pixelFormat:'rgba-float16'}).data;
+ let cropEqual=true;for(let y=0;y<10;y++)for(let z=0;z<24;z++)for(let k=0;k<4;k++)cropEqual&&=Object.is(crop[(y*24+z)*4+k],a[((y+6)*64+z+8)*4+k]);
+ const png=c.toDataURL();const exported=await new Promise(resolve=>c.toBlob(resolve));
+ const off=new OffscreenCanvas(64,24),ox=off.getContext('2d',{colorSpace:'display-p3',colorType:'float16'});ox.drawImage(c,0,0);const blob=await off.convertToBlob();
+ return {attributes:x.getContextAttributes(),type:a.constructor.name,stable:same(a,b),cropEqual,finite:a.every(Number.isFinite),alphaStable:a.every((v,i)=>i%4!==3||Object.is(v,b[i])),hash:await digest(a.buffer),sample:Array.from(a.slice(0,32)),pngStable:png===c.toDataURL(),blob:exported.size>0,offscreenBlob:blob.size>0};
+}
+async function audioProbe(){
+ const c=new AudioContext({sampleRate:44100});await c.resume();
+ try{
+  const source=c.createBufferSource(),buffer=c.createBuffer(1,4096,44100);buffer.getChannelData(0).fill(.125);source.buffer=buffer;source.loop=true;
+  const analyser=c.createAnalyser();analyser.fftSize=256;analyser.smoothingTimeConstant=0;const mute=c.createGain();mute.gain.value=0;source.connect(analyser);analyser.connect(mute);mute.connect(c.destination);source.start();
+  // Wait for actual graph output, not a wall-clock guess during audio startup.
+  await limited((async()=>{const ready=new Float32Array(256);for(;;){analyser.getFloatTimeDomainData(ready);if(ready.every(v=>Math.abs(v-.125)<.00001))return;await new Promise(r=>setTimeout(r,40))}})());await c.suspend();
+  const time=new Float32Array(264).fill(73),repeat=new Float32Array(264).fill(73),bytes=new Uint8Array(264).fill(73);analyser.getFloatTimeDomainData(time);analyser.getFloatTimeDomainData(repeat);analyser.getByteTimeDomainData(bytes);
+  const freq=new Float32Array(136).fill(73),freqRepeat=new Float32Array(136).fill(73),freqBytes=new Uint8Array(136).fill(73);analyser.getFloatFrequencyData(freq);analyser.getFloatFrequencyData(freqRepeat);analyser.getByteFrequencyData(freqBytes);
+  const byteOf=v=>Math.trunc(Math.min(255,Math.max(0,v)))||0;
+  let byteParity=true,freqByteParity=true;for(let i=0;i<256;i++)byteParity&&=bytes[i]===byteOf(128*(1+time[i]));for(let i=0;i<128;i++)freqByteParity&&=freqBytes[i]===byteOf(255*(freq[i]-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels));
+  await c.audioWorklet.addModule('/audio-worklet.js');await c.resume();const worklet=new AudioWorkletNode(c,'privacy-probe');const workletResult=await limited(new Promise(resolve=>worklet.port.onmessage=e=>resolve(e.data)));worklet.disconnect();
+  return {stable:same(time,repeat),freqStable:same(freq,freqRepeat),byteParity,freqByteParity,tailUntouched:time.slice(256).every(v=>v===73)&&bytes.slice(256).every(v=>v===73)&&freq.slice(128).every(v=>v===73)&&freqBytes.slice(128).every(v=>v===73),timeHash:await digest(time.buffer),freqHash:await digest(freq.buffer),timeSample:Array.from(time.slice(0,16)),worklet:workletResult};
+ }finally{await c.close()}
+}
+async function gpuProbe(){
+ const result={available:!!navigator.gpu};if(!navigator.gpu)return result;
+ const adapter=await navigator.gpu.requestAdapter();result.adapter=!!adapter;if(!adapter)return result;
+ const info=value=>({vendor:value.vendor,architecture:value.architecture,device:value.device,description:value.description,driver:value.driver,backend:value.backend,memoryHeaps:value.memoryHeaps?.length});
+ result.info=info(adapter.info);const device=await adapter.requestDevice();result.deviceInfo=info(device.adapterInfo);
+ try{
+  const buffer=device.createBuffer({size:16,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC});const read=device.createBuffer({size:16,usage:GPUBufferUsage.COPY_DST|GPUBufferUsage.MAP_READ});
+  const module=device.createShaderModule({code:'@group(0) @binding(0) var<storage,read_write> data:array<u32>; @compute @workgroup_size(1) fn main(@builtin(global_invocation_id) id:vec3<u32>){ data[id.x]=id.x*id.x+7u; }'});
+  const pipeline=device.createComputePipeline({layout:'auto',compute:{module,entryPoint:'main'}}),group=device.createBindGroup({layout:pipeline.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer}}]});const encoder=device.createCommandEncoder(),pass=encoder.beginComputePass();pass.setPipeline(pipeline);pass.setBindGroup(0,group);pass.dispatchWorkgroups(4);pass.end();encoder.copyBufferToBuffer(buffer,0,read,0,16);device.queue.submit([encoder.finish()]);await read.mapAsync(GPUMapMode.READ);result.compute=Array.from(new Uint32Array(read.getMappedRange()));read.unmap();read.destroy();buffer.destroy();
+ }finally{device.destroy()}
+ return result;
+}
+// WEBGL_PROBE_BEGIN
+async function webglProbe(isWorker=false){
+ const hash=async data=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',data))).map(x=>x.toString(16).padStart(2,'0')).join('');
+ const equals=(a,b)=>a.length===b.length&&a.every((v,i)=>Object.is(v,b[i]));
+ function context(version){const c=isWorker?new OffscreenCanvas(32,24):document.createElement('canvas');c.width=32;c.height=24;const gl=c.getContext(version,{preserveDrawingBuffer:true,antialias:false});if(!gl)throw Error(version+' unavailable');return gl}
+ function render(gl,v2){
+  const vertex=gl.createShader(gl.VERTEX_SHADER);gl.shaderSource(vertex,v2?'#version 300 es\nvoid main(){vec2 p=vec2((gl_VertexID==1)?3.0:-1.0,(gl_VertexID==2)?3.0:-1.0);gl_Position=vec4(p,0,1);}':'attribute vec2 position;void main(){gl_Position=vec4(position,0,1);}');gl.compileShader(vertex);
+  const fragment=gl.createShader(gl.FRAGMENT_SHADER);const body='vec2 p=gl_FragCoord.xy;COLOR=vec4(fract(sin(p.x*.13+p.y*.37)*14.3),fract(p.x*.173),fract(p.y*.137),.75);';gl.shaderSource(fragment,v2?'#version 300 es\nprecision highp float;out vec4 color;void main(){'+body.replace('COLOR','color')+'}':'precision highp float;void main(){'+body.replace('COLOR','gl_FragColor')+'}');gl.compileShader(fragment);
+  const program=gl.createProgram();gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('fixture shader compilation');gl.useProgram(program);
+  if(!v2){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const attr=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(attr);gl.vertexAttribPointer(attr,2,gl.FLOAT,false,0,0)}
+  gl.viewport(0,0,32,24);gl.drawArrays(gl.TRIANGLES,0,3);
+ }
+ function read(gl,type=gl.UNSIGNED_BYTE,x=0,y=0,width=32,height=24){const a=type===gl.FLOAT?new Float32Array(width*height*4):new Uint8Array(width*height*4);gl.readPixels(x,y,width,height,gl.RGBA,type,a);if(gl.getError()!==gl.NO_ERROR)throw Error('fixture readPixels failed');return a}
+ const result={};
+ for(const v2 of [false,true]){
+  const gl=context(v2?'webgl2':'webgl');try{
+   render(gl,v2);const full=read(gl),repeat=read(gl),crop=new Uint8Array(10*8*4);gl.readPixels(5,3,10,8,gl.RGBA,gl.UNSIGNED_BYTE,crop);let cropEqual=true;for(let y=0;y<8;y++)for(let x=0;x<10;x++)for(let k=0;k<4;k++)cropEqual&&=crop[(y*10+x)*4+k]===full[((y+3)*32+x+5)*4+k];
+   const report={hash:await hash(full),sample:Array.from(full.slice(0,32)),stable:equals(full,repeat),cropEqual};
+   gl.enable(0xffff);const afterError=new Uint8Array(full.length);gl.readPixels(0,0,32,24,gl.RGBA,gl.UNSIGNED_BYTE,afterError);report.priorErrorPreserved=gl.getError()===gl.INVALID_ENUM&&gl.getError()===gl.NO_ERROR&&equals(full,afterError);
+   if(v2){
+    const stride=192,skip=400,total=skip+23*stride+128,offset=3,packed=new Uint8Array(total+offset+17).fill(73);gl.pixelStorei(gl.PACK_ALIGNMENT,8);gl.pixelStorei(gl.PACK_ROW_LENGTH,47);gl.pixelStorei(gl.PACK_SKIP_PIXELS,4);gl.pixelStorei(gl.PACK_SKIP_ROWS,2);gl.readPixels(0,0,32,24,gl.RGBA,gl.UNSIGNED_BYTE,packed,offset);
+    const check=(data,base)=>{let ok=true;const written=new Set();for(let y=0;y<24;y++)for(let x=0;x<128;x++){const index=base+skip+y*stride+x;written.add(index);ok&&=data[index]===full[y*128+x]}for(let i=0;i<data.length;i++)if(!written.has(i))ok&&=data[i]===73;return ok};report.packAndPadding=check(packed,offset)&&gl.getError()===gl.NO_ERROR;
+    const pbo=gl.createBuffer();gl.bindBuffer(gl.PIXEL_PACK_BUFFER,pbo);gl.bufferData(gl.PIXEL_PACK_BUFFER,new Uint8Array(total+5+17).fill(73),gl.STREAM_READ);gl.readPixels(0,0,32,24,gl.RGBA,gl.UNSIGNED_BYTE,5);const copied=new Uint8Array(total+5+17);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,0,copied);report.pboAndPadding=check(copied,5)&&gl.getError()===gl.NO_ERROR;gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);gl.deleteBuffer(pbo);
+    gl.pixelStorei(gl.PACK_ALIGNMENT,4);gl.pixelStorei(gl.PACK_ROW_LENGTH,0);gl.pixelStorei(gl.PACK_SKIP_PIXELS,0);gl.pixelStorei(gl.PACK_SKIP_ROWS,0);
+    if(typeof SharedArrayBuffer!=='undefined'){const shared=new Uint8Array(new SharedArrayBuffer(full.length));gl.readPixels(0,0,32,24,gl.RGBA,gl.UNSIGNED_BYTE,shared);report.sharedArrayBuffer=equals(shared,full)&&gl.getError()===gl.NO_ERROR}else report.sharedArrayBuffer='unavailable';
+    const texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8UI,32,24,0,gl.RGBA_INTEGER,gl.UNSIGNED_BYTE,null);const fbo=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);gl.clearBufferuiv(gl.COLOR,0,new Uint32Array([11,27,93,255]));const integers=new Uint8Array(full.length);gl.readPixels(0,0,32,24,gl.RGBA_INTEGER,gl.UNSIGNED_BYTE,integers);report.integerDataExact=integers.every((v,i)=>v===[11,27,93,255][i%4])&&gl.getError()===gl.NO_ERROR;
+    if(gl.getExtension('EXT_color_buffer_float')){
+     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,32,24,0,gl.RGBA,gl.FLOAT,null);render(gl,true);const floats=read(gl,gl.FLOAT),again=read(gl,gl.FLOAT);report.float={stable:equals(floats,again),hash:await hash(floats.buffer),sample:Array.from(floats.slice(0,32))};
+     const fpbo=gl.createBuffer();gl.bindBuffer(gl.PIXEL_PACK_BUFFER,fpbo);gl.bufferData(gl.PIXEL_PACK_BUFFER,floats.byteLength+16,gl.STREAM_READ);gl.readPixels(0,0,32,24,gl.RGBA,gl.FLOAT,16);const fcopy=new Float32Array(floats.length);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,16,fcopy);report.float.pboEqual=equals(fcopy,floats)&&gl.getError()===gl.NO_ERROR;gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);gl.deleteBuffer(fpbo);
+     // Fractional HDR magnitudes above one exposed a float32 rounding gap in
+     // the old absolute epsilon. Compare real framebuffer values and PBOs.
+     gl.clearBufferfv(gl.COLOR,0,new Float32Array([1.5,-2.5,128.5,.75]));
+     const hdr=read(gl,gl.FLOAT),hdrAgain=read(gl,gl.FLOAT),hdrCrop=read(gl,gl.FLOAT,5,3,10,8);let hdrCropEqual=true;
+     for(let y=0;y<8;y++)for(let x=0;x<10;x++)for(let c=0;c<4;c++)hdrCropEqual&&=Object.is(hdrCrop[(y*10+x)*4+c],hdr[((y+3)*32+x+5)*4+c]);
+     const hpbo=gl.createBuffer();gl.bindBuffer(gl.PIXEL_PACK_BUFFER,hpbo);gl.bufferData(gl.PIXEL_PACK_BUFFER,hdr.byteLength+16,gl.STREAM_READ);gl.readPixels(0,0,32,24,gl.RGBA,gl.FLOAT,16);const hdrCopy=new Float32Array(hdr.length);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,16,hdrCopy);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);gl.deleteBuffer(hpbo);
+     const hdrOriginal=[1.5,-2.5,128.5,.75],changedByChannel=[false,false,false];let hdrBound=true,hdrAlpha=true;for(let i=0;i<hdr.length;i++){const c=i%4,original=hdrOriginal[c];if(c===3)hdrAlpha&&=Object.is(hdr[i],original);else{changedByChannel[c]||=!Object.is(hdr[i],original);hdrBound&&=Number.isFinite(hdr[i])&&Math.abs(hdr[i]-original)<=Math.max(5e-8,Math.abs(original)*2**-23)}}
+     report.hdrFloat={changedByChannel,withinBound:hdrBound,alphaStable:hdrAlpha,stable:equals(hdr,hdrAgain),cropEqual:hdrCropEqual,pboEqual:equals(hdr,hdrCopy),noError:gl.getError()===gl.NO_ERROR,hash:await hash(hdr.buffer),sample:Array.from(hdr.slice(0,32))};
+    }else report.float={unavailable:true};
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.deleteFramebuffer(fbo);gl.deleteTexture(texture);
+    const norm16=gl.getExtension('EXT_texture_norm16');gl.getExtension('EXT_render_snorm');
+    const cases=[['rgb565',gl.RGB565,gl.RGB,gl.UNSIGNED_SHORT_5_6_5,Uint16Array,1,0],['rgba4444',gl.RGBA4,gl.RGBA,gl.UNSIGNED_SHORT_4_4_4_4,Uint16Array,1,15],['rgba5551',gl.RGB5_A1,gl.RGBA,gl.UNSIGNED_SHORT_5_5_5_1,Uint16Array,1,1],['rgb10a2',gl.RGB10_A2,gl.RGBA,gl.UNSIGNED_INT_2_10_10_10_REV,Uint32Array,1,0xc0000000],['r11g11b10f',gl.R11F_G11F_B10F,gl.RGB,gl.UNSIGNED_INT_10F_11F_11F_REV,Uint32Array,1,0],['rgb9e5',gl.RGB9_E5,gl.RGB,gl.UNSIGNED_INT_5_9_9_9_REV,Uint32Array,1,0xf8000000],['rgba16f',gl.RGBA16F,gl.RGBA,gl.HALF_FLOAT,Uint16Array,4,0],['r32f',gl.R32F,gl.RED,gl.FLOAT,Float32Array,1,0],['rg32f',gl.RG32F,gl.RG,gl.FLOAT,Float32Array,2,0]];
+    if(norm16)cases.push(['rgba16',norm16.RGBA16_EXT,gl.RGBA,gl.UNSIGNED_SHORT,Uint16Array,4,0]);
+    report.formats={};
+    for(const [name,internal,format,type,ArrayType,elements,mask] of cases){
+     const t=gl.createTexture(),f=gl.createFramebuffer();gl.bindTexture(gl.TEXTURE_2D,t);gl.texStorage2D(gl.TEXTURE_2D,1,internal,32,24);gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);
+     try{
+      if(gl.getError()!==gl.NO_ERROR||gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE){report.formats[name]={supported:false,reason:'framebuffer'};continue}
+      render(gl,true);const values=new ArrayType(32*24*elements);gl.readPixels(0,0,32,24,format,type,values);const error=gl.getError();if(error!==gl.NO_ERROR){report.formats[name]={supported:false,reason:'read-type',error};continue}
+      const again=new ArrayType(values.length);gl.readPixels(0,0,32,24,format,type,again);const cropped=new ArrayType(10*8*elements);gl.readPixels(5,3,10,8,format,type,cropped);let cropEqual=true;for(let y=0;y<8;y++)for(let x=0;x<10;x++)for(let k=0;k<elements;k++)cropEqual&&=Object.is(cropped[(y*10+x)*elements+k],values[((y+3)*32+x+5)*elements+k]);
+      const buffer=gl.createBuffer();gl.bindBuffer(gl.PIXEL_PACK_BUFFER,buffer);gl.bufferData(gl.PIXEL_PACK_BUFFER,values.byteLength+16,gl.STREAM_READ);gl.readPixels(0,0,32,24,format,type,16);const copy=new ArrayType(values.length);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,16,copy);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);gl.deleteBuffer(buffer);
+      const invariant=mask?new Uint32Array(Array.from(values,v=>(v&mask)>>>0)):elements===4?new ArrayType(Array.from(values).filter((_,i)=>i%4===3)):null;
+      report.formats[name]={supported:true,stable:equals(values,again),cropEqual,pboEqual:equals(values,copy),noError:gl.getError()===gl.NO_ERROR,hash:await hash(values.buffer),invariant:invariant?await hash(invariant.buffer):null};
+     }finally{gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.deleteFramebuffer(f);gl.deleteTexture(t);while(gl.getError()!==gl.NO_ERROR){}}
+    }
+   }
+   result[v2?'webgl2':'webgl1']=report;
+  }finally{gl.getExtension('WEBGL_lose_context')?.loseContext()}
+ }
+ return result;
+}
+// WEBGL_PROBE_END
+async function webglAllProbe(){
+ const result={window:await webglProbe()};
+ async function worker(options){return limited(new Promise((resolve,reject)=>{const w=new Worker('/webgl-worker.js',options);w.onmessage=e=>{resolve(e.data);w.terminate()};w.onerror=e=>reject(Error(e.message));w.postMessage('run')}))}
+ result.dedicated=await worker();result.module=await worker({type:'module'});
+ result.shared=await limited(new Promise((resolve,reject)=>{const w=new SharedWorker('/webgl-shared.js');w.onerror=e=>reject(Error(e.message));w.port.onmessage=e=>{resolve(e.data);w.port.close()};w.port.start();w.port.postMessage('run')}));
+ const reg=await navigator.serviceWorker.register('/webgl-service.js',{scope:'/mac-webgl-scope/'});
+ try{const active=reg.active||reg.waiting||reg.installing;if(active.state!=='activated')await limited(new Promise(resolve=>active.addEventListener('statechange',()=>{if(active.state==='activated')resolve()})));result.service=await limited(new Promise(resolve=>{const channel=new MessageChannel();channel.port1.onmessage=e=>{resolve(e.data);channel.port1.close()};reg.active.postMessage('run',[channel.port2])}))}finally{await reg.unregister()}
+ return result;
+}
+async function iceProbe(){
+ const p=new RTCPeerConnection({iceServers:[{urls:'stun:127.0.0.1:18844'}]});p.createDataChannel('local-probe');const candidates=[];
+ try{const done=new Promise(resolve=>{p.onicecandidate=e=>{if(e.candidate){const c=e.candidate.toJSON();candidates.push(c.candidate)}else resolve()}});await p.setLocalDescription(await p.createOffer());await Promise.race([done,new Promise(resolve=>setTimeout(resolve,3500))]);return candidates.map(candidate=>{const parts=candidate.split(' ');return {protocol:parts[2],type:parts[parts.indexOf('typ')+1],mdns:parts[4]?.endsWith('.local'),addressClass:parts[4]==='203.0.113.7'?'fixture-public':parts[4]?.endsWith('.local')?'mdns':'other',hasRelatedAddress:parts.includes('raddr')&&parts[parts.indexOf('raddr')+1]!=='0.0.0.0'}})}finally{p.close()}
+}
+async function run(){
+ const result={};for(const [name,probe] of Object.entries({cpu:cpuProbe,fonts:fontsProbe,display:displayProbe,hdr:hdrProbe,audio:audioProbe,gpu:gpuProbe,webgl:webglAllProbe,speech:speechProbe,ice:iceProbe})){try{result[name]=await limited(probe(),60000)}catch(error){result[name]={error:String(error)}}}
+ document.querySelector('#result').textContent=JSON.stringify(result,null,2);await fetch('/report?run='+new URL(location.href).searchParams.get('run'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(result)});
+}
+run();
+</script>

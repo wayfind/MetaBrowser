@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "46febb977d387dc37db986dee0bbb2d6cf5d22797ab1724f95da62f379b8f260",
+  "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+  "members": [
+    {
+      "member_id": "c58a29b3916180354995b89ce4c98002311aa0afba5e5ef69879e51afe60e09b",
+      "owner": "StorageBucketManager",
+      "name": "open",
+      "declaration_source": "third_party/blink/renderer/modules/buckets/storage_bucket_manager.idl",
+      "declaration_sha256": "893dadf296c12bfb59f3b7098b7fb0215c47ce1508e0fe49117b1b64d1f468c5",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "410b30d8077da6fd164fd92c04d7e565c17bb7377822d2a60f72efc0aa04838d",
+      "owner": "StorageBucketManager",
+      "name": "delete",
+      "declaration_source": "third_party/blink/renderer/modules/buckets/storage_bucket_manager.idl",
+      "declaration_sha256": "893dadf296c12bfb59f3b7098b7fb0215c47ce1508e0fe49117b1b64d1f468c5",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "4bcd04745366c4d63656202f4b357928a441b929ff43f579d946f450760e45cb",
+      "owner": "StorageBucket",
+      "name": "getDirectory",
+      "declaration_source": "third_party/blink/renderer/modules/buckets/storage_bucket.idl",
+      "declaration_sha256": "3a0a54cfff0c81b1b1480c84c3a746f8a95f1fdc0ca3c86c1253ec077702e424",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "1862b72f4880a1974369274eea00b10f19f7ab78f7d91f717c8e3dfc3a143989",
+      "owner": "FileSystemDirectoryHandle",
+      "name": "getFileHandle",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_directory_handle.idl",
+      "declaration_sha256": "85bff0aafe4a762b3fbf41bbae4fe787682d8bb967b406e7666a14996efcc39d",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "93c9c64bc2a2dbbbb71060445e5163edcd4a6847c4922a04d85c0335a68ca5a9",
+      "owner": "FileSystemFileHandle",
+      "name": "createWritable",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_file_handle.idl",
+      "declaration_sha256": "8f1ebb66d6a0cdfdc28e93ae06193c59460773385eacd2e0b009839798ad1c50",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "bdb73a6cf2cfcbfc8badad598aea5df63256da29bf1ae50c0b72cb482c648051",
+      "owner": "FileSystemFileHandle",
+      "name": "getFile",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_file_handle.idl",
+      "declaration_sha256": "8f1ebb66d6a0cdfdc28e93ae06193c59460773385eacd2e0b009839798ad1c50",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "6df61b390d72291092fa08b6a4a98438c443ebb684a3033050a090cef1b5669c",
+      "owner": "FileSystemWritableFileStream",
+      "name": "write",
+      "declaration_source": "third_party/blink/renderer/modules/file_system_access/file_system_writable_file_stream.idl",
+      "declaration_sha256": "66eea546ac88b1561805e6be787105d7a5d4ad33d66ca5f158369fb25ede48e4",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "0ff8dbada9df37db7c12e1cd679d5f1ec40b0894d5c2e0f49025182acba8b2d7",
+      "owner": "WritableStream",
+      "name": "close",
+      "declaration_source": "third_party/blink/renderer/core/streams/writable_stream.idl",
+      "declaration_sha256": "492b410809b005f5cf06ddcfa4f7c8fae3a1b0ad7d10fae597b0752bd59c2ccd",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    },
+    {
+      "member_id": "4a64660d025254e9a9d5842405d5685435c2b2692378b672969e87ecbc0fb141",
+      "owner": "WritableStream",
+      "name": "abort",
+      "declaration_source": "third_party/blink/renderer/core/streams/writable_stream.idl",
+      "declaration_sha256": "492b410809b005f5cf06ddcfa4f7c8fae3a1b0ad7d10fae597b0752bd59c2ccd",
+      "review_status": "partial_runtime_evidence",
+      "evidence": [
+        {
+          "path": "out/evidence/opfs-seven-v19n-balanced-acceptance.json",
+          "sha256": "70ada0b1793510cd1f23caa2d1389893ad552795ca65326d82befdcc85e12149",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        },
+        {
+          "path": "out/evidence/opfs-seven-v19n-off-acceptance.json",
+          "sha256": "a928c07a760cbb4c366cacbd2680e45a6ec3523f6a77553e11f7e827e6b67a28",
+          "pointer": "/passed",
+          "framework_sha256": "50b957c0465ef7f301e94554df96fa39ee2416d2ac266a09491a09bc26f90b66",
+          "scope": "Same-origin Window/iframe and five real worker categories. Bounded sizes and explicit buckets only; not forced Mojo disconnect, cross-site partitions, physical exhaustion or all payload/value classes."
+        }
+      ],
+      "implementation_privacy_review": "pending",
+      "limits": "Only explicit owned OPFS buckets and FileSystemWritableFileStream receivers in same-origin Window/iframe/five worker categories. Six bounded payload classes, normal writes/quota/rollback/cancel/delete-inflight only. Generic WritableStream sinks, user-picked files, all values/overloads, physical exhaustion, forced Mojo disconnect and cross-site/profile/permission lifecycles remain unverified."
+    }
+  ],
+  "partially_mapped_member_count": 9,
+  "verified_member_count": 0,
+  "full_privacy_coverage_proven": false,
+  "note": "Sparse OPFS-specific overlay; inherited WritableStream methods only exercised with FileSystemWritableFileStream receivers."
+}

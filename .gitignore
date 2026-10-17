@@ -71,3 +71,18 @@ captures
 .antigravitycli
 .plans
 .pi
+
+# Native MetaBrowser (merged from native-agent-browser). Upstream ignores docs/
+# and build/ everywhere; the native project tracks both at the repository root.
+!/docs/
+!/build/
+.zig-cache/
+zig-out/
+out/
+downloads/
+/chromium/*
+!/chromium/metabrowser/
+!/chromium/identity/
+!/chromium/privacy/
+depot_tools/
+*.dSYM/

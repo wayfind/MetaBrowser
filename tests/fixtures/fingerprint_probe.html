@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Local native fingerprint evidence probe</title>
+<style>body{font:15px system-ui;max-width:960px;margin:32px auto;padding:0 20px}pre{white-space:pre-wrap;overflow-wrap:anywhere}iframe{width:320px;height:90px}</style>
+<h1>Native API evidence · P4–P13</h1>
+<p>Local comparison evidence only. Results do not establish anonymity or equivalence to another browser. No account data, stored content, DRM license, camera, microphone, or geolocation is requested.</p>
+<p id="status">Collecting bounded native API samples…</p><pre id="output"></pre>
+<script>
+'use strict';
+const params = new URLSearchParams(location.search);
+const run = params.get('run') || crypto.randomUUID();
+const resizeSamples=[];
+addEventListener('resize',()=>{if(resizeSamples.length<16)resizeSamples.push({innerWidth,innerHeight,outerWidth,outerHeight,devicePixelRatio});});
+const errorValue = error => ({error: String(error && error.name || 'Error'), message: String(error && error.message || error).slice(0,240)});
+const bounded = (fn, ms=6000) => {
+ let timer;
+ return Promise.race([Promise.resolve().then(fn),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Probe deadline exceeded')),ms);})])
+  .catch(errorValue).finally(()=>clearTimeout(timer));
+};
+/* worker-shared:hash:start */
+async function hash(value) {
+ const bytes = typeof value==='string' ? new TextEncoder().encode(value) : new Uint8Array(value.buffer || value, value.byteOffset || 0, value.byteLength);
+ const digest = await crypto.subtle.digest('SHA-256',bytes);
+ return [...new Uint8Array(digest)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+/* worker-shared:hash:end */
+/* worker-shared:navigatorSnapshot:start */
+async function navigatorSnapshot() {
+ const n=navigator,out={};
+ for(const k of ['userAgent','appVersion','appName','appCodeName','platform','vendor','vendorSub','product','productSub','language','languages','hardwareConcurrency','deviceMemory','maxTouchPoints','webdriver','cookieEnabled','onLine','pdfViewerEnabled','doNotTrack']) {
+  try {const v=n[k];out[k]=v===undefined?{unsupported:true}:v;} catch(e){out[k]={error:e.name};}
+ }
+ out.userAgentData=null;
+ if(n.userAgentData) {
+  out.userAgentData={brands:n.userAgentData.brands,mobile:n.userAgentData.mobile,platform:n.userAgentData.platform};
+  try {out.userAgentData.highEntropy=await n.userAgentData.getHighEntropyValues(['architecture','bitness','platformVersion','uaFullVersion','fullVersionList','model','wow64','formFactors']);}
+  catch(e){out.userAgentData.highEntropy={error:e.name};}
+ }
+ out.plugins=n.plugins ? Array.from(n.plugins,p=>({name:p.name,filename:p.filename,description:p.description,mimeTypes:Array.from(p,m=>m.type)})) : {unsupported:true};
+ out.mimeTypes=n.mimeTypes?Array.from(n.mimeTypes,m=>({type:m.type,suffixes:m.suffixes,description:m.description})): {unsupported:true};
+ out.connection=n.connection ? Object.fromEntries(['effectiveType','rtt','downlink','saveData','type'].map(k=>[k,n.connection[k]===undefined?null:n.connection[k]])) : {unsupported:true};
+ out.features={getBattery:typeof n.getBattery,permissions:typeof n.permissions,storage:typeof n.storage};
+ return out;
+}
+/* worker-shared:navigatorSnapshot:end */
+async function workerSnapshot() {
+ const blob=new Blob([navigatorSnapshot.toString(),';self.onmessage=async()=>{try{self.postMessage(await navigatorSnapshot())}catch(e){self.postMessage({error:e.name})}}'],{type:'text/javascript'});
+ const url=URL.createObjectURL(blob),worker=new Worker(url);
+ try {return await bounded(()=>new Promise((resolve,reject)=>{worker.onmessage=e=>resolve(e.data);worker.onerror=e=>reject(new Error(e.message));worker.postMessage('collect');}),4000);}
+ finally{worker.terminate();URL.revokeObjectURL(url);}
+}
+/* worker-shared:canonicalDraw:start */
+function canonicalDraw(canvas) {
+ canvas.width=240;canvas.height=60;
+ const x=canvas.getContext('2d');if(!x)return false;
+ x.fillStyle='#f60';x.fillRect(13,7,100,37);x.fillStyle='#069';x.font='17px Arial';x.fillText('Native café 指纹 🙂',2,23);
+ x.globalCompositeOperation='multiply';x.fillStyle='rgba(120,10,210,.6)';x.beginPath();x.arc(170,30,24,0,Math.PI*2);x.fill();x.globalCompositeOperation='source-over';
+ return true;
+}
+/* worker-shared:canonicalDraw:end */
+/* worker-shared:canvasReadback:start */
+async function canvasReadback(canvas) {
+ const x=canvas.getContext('2d');if(!x)return {unsupported:true};
+ const a=new Uint8ClampedArray(x.getImageData(0,0,canvas.width,canvas.height).data);
+ const b=new Uint8ClampedArray(x.getImageData(0,0,canvas.width,canvas.height).data);
+ let export1=null,export2=null,blob1=null,blob2=null;
+ if(typeof canvas.toDataURL==='function') {
+  const data1=canvas.toDataURL('image/png'),data2=canvas.toDataURL('image/png');
+  const bytes=s=>Uint8Array.from(atob(s.split(',')[1]),v=>v.charCodeAt(0));
+  export1=await hash(bytes(data1));export2=await hash(bytes(data2));
+ }
+ if(typeof canvas.convertToBlob==='function') {
+  blob1=await canvas.convertToBlob({type:'image/png'});blob2=await canvas.convertToBlob({type:'image/png'});
+ }else if(typeof canvas.toBlob==='function') {
+  blob1=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));blob2=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+ }
+ const pixels1=await hash(a),pixels2=await hash(b);
+ const blobHash1=blob1?await hash(await blob1.arrayBuffer()):null,blobHash2=blob2?await hash(await blob2.arrayBuffer()):null;
+ return {width:canvas.width,height:canvas.height,pixels1,pixels2,export1,export2,blobHash1,blobHash2,toDataURLAvailable:typeof canvas.toDataURL==='function',checks:{pixelsRepeat:pixels1===pixels2,exportsRepeat:export1===null?null:export1===export2,blobsRepeat:blobHash1===null?null:blobHash1===blobHash2,blobMatchesDataURL:export1===null?null:export1===blobHash1}};
+}
+/* worker-shared:canvasReadback:end */
+/* worker-shared:workerMain:start */
+function workerMain() {
+ self.onmessage=async event=>{
+  let nestedWorker;
+  try {
+   const navigator=await navigatorSnapshot();
+   let canvas={unsupported:true};
+   if(typeof OffscreenCanvas==='function'){const c=new OffscreenCanvas(240,60);if(canonicalDraw(c))canvas=await canvasReadback(c);}
+   const result={navigator,canvas,workerLocation:self.location.href,transport:event.data.transport};
+   if(event.data.nested) {
+    nestedWorker=new Worker(event.data.base+'/worker.js',{type:'classic'});
+    result.nested=await new Promise((resolve,reject)=>{
+     const timer=setTimeout(()=>reject(new Error('Nested worker deadline exceeded')),4000);
+     nestedWorker.onmessage=e=>{clearTimeout(timer);resolve(e.data);};
+     nestedWorker.onerror=e=>{clearTimeout(timer);reject(new Error(e.message));};
+     nestedWorker.postMessage({base:event.data.base,transport:'nested-http-classic'});
+    });
+   }
+   self.postMessage(result);
+  } catch(e){self.postMessage({error:e.name,message:String(e.message).slice(0,240)});}
+  finally{nestedWorker?.terminate();}
+ };
+}
+/* worker-shared:workerMain:end */
+/* worker-shared:sharedWorkerMain:start */
+function sharedWorkerMain() {
+ self.onconnect=event=>{
+  const port=event.ports[0];port.start();
+  port.onmessage=async message=>{
+   if(message.data?.op==='close'){port.close();self.close();return;}
+   try {
+    let canvas={unsupported:true};
+    if(typeof OffscreenCanvas==='function'){const c=new OffscreenCanvas(240,60);try{if(canonicalDraw(c))canvas=await canvasReadback(c);}finally{c.width=0;c.height=0;}}
+    port.postMessage({nonce:message.data.nonce,canvas,navigator:await navigatorSnapshot(),transport:'http-shared-classic'});
+   }catch(error){port.postMessage({nonce:message.data.nonce,error:error.name,message:String(error.message).slice(0,240)});}
+  };
+ };
+}
+/* worker-shared:sharedWorkerMain:end */
+/* worker-shared:serviceWorkerMain:start */
+function serviceWorkerMain() {
+ self.addEventListener('install',event=>event.waitUntil(self.skipWaiting()));
+ // No clients.claim, fetch interception, or writes to CacheStorage.
+ self.addEventListener('message',event=>{
+  const port=event.ports[0];
+  if(!port||event.origin!==self.location.origin||typeof event.data?.nonce!=='string')return;
+  event.waitUntil((async()=>{
+   try {
+    let canvas={unsupported:true};
+    if(typeof OffscreenCanvas==='function'){const c=new OffscreenCanvas(240,60);try{if(canonicalDraw(c))canvas=await canvasReadback(c);}finally{c.width=0;c.height=0;}}
+    port.postMessage({nonce:event.data.nonce,canvas,navigator:await navigatorSnapshot(),transport:'http-service-worker'});
+   }catch(error){port.postMessage({nonce:event.data.nonce,error:error.name,message:String(error.message).slice(0,240)});}
+   finally{port.close();}
+  })());
+ });
+}
+/* worker-shared:serviceWorkerMain:end */
+async function sharedWorkerCanvasProbe() {
+ if(typeof SharedWorker!=='function')return {unsupported:true};
+ let worker;const nonce=crypto.randomUUID();
+ try {
+  worker=new SharedWorker('/privacy-worker-shared.js',{name:'privacy-probe-'+run+'-'+nonce,type:'classic'});
+  return await bounded(()=>new Promise((resolve,reject)=>{
+   worker.onerror=e=>reject(new Error(e.message||'SharedWorker failed'));
+   worker.port.onmessage=e=>{if(e.data?.nonce===nonce)resolve(e.data);};
+   worker.port.onmessageerror=()=>reject(new Error('SharedWorker message decode failed'));
+   worker.port.start();worker.port.postMessage({nonce});
+  }),6000);
+ }catch(error){return errorValue(error);}
+ finally{if(worker){worker.port.postMessage({op:'close'});worker.port.close();worker.terminate?.();}}
+}
+async function serviceWorkerCanvasProbe() {
+ if(!navigator.serviceWorker)return {unsupported:true};
+ let registration,channel,disposed=false,removeStateListener;
+ const nonce=crypto.randomUUID(),persistent=params.get('persist_sw')==='1';
+ const scope=persistent?'/privacy-probe-sw-cached-v1/':'/privacy-probe-sw/'+nonce+'/';
+ const scriptURL=new URL(persistent?'/privacy-worker-service.js?fixture_version=1':'/privacy-worker-service.js?probe='+nonce,location.origin).href;
+ const scopeURL=new URL(scope,location.origin).href;
+ const result={scope,scriptURL,persistent,reusedRegistration:false,
+  lifecycle:persistent?'fixture-only persistent cache; cached startup requires separate browser restart at same origin/profile':'one-off fresh installation'};
+ try {
+  if(persistent){
+   const found=await bounded(()=>navigator.serviceWorker.getRegistration(scopeURL),6000);
+   if(found?.error)throw new Error(found.message);
+   if(found){
+    const existing=found.active||found.waiting||found.installing;
+    // getRegistration returns the longest prefix, possibly an unrelated root
+    // registration. Never update, replace or unregister a mismatched one.
+    if(found.scope!==scopeURL||!existing||existing.scriptURL!==scriptURL)throw new Error('Existing registration is not the exact cached fixture scope/script');
+    registration=found;result.reusedRegistration=true;
+   }
+  }
+  if(!registration){
+   const pending=navigator.serviceWorker.register(scriptURL,{scope,type:'classic',updateViaCache:'none'});
+   pending.then(reg=>{if(disposed&&!persistent)reg.unregister();}).catch(()=>{});
+   const registered=await bounded(()=>pending,6000);
+   if(registered.error)throw new Error(registered.message);
+   registration=registered;
+  }
+  const worker=result.reusedRegistration?(registration.active||registration.waiting||registration.installing):(registration.installing||registration.waiting||registration.active);
+  if(registration.scope!==scopeURL||worker?.scriptURL!==scriptURL)throw new Error('ServiceWorker scope or script identity changed');
+  if(!worker)throw new Error('Own ServiceWorker unavailable after registration');
+  const activated=await bounded(()=>new Promise((resolve,reject)=>{
+   const check=()=>{if(worker.state==='activated')resolve(true);else if(worker.state==='redundant')reject(new Error('Own ServiceWorker became redundant'));};
+   worker.addEventListener('statechange',check);removeStateListener=()=>worker.removeEventListener('statechange',check);check();
+  }),6000);
+  if(activated?.error)throw new Error(activated.message);
+  removeStateListener();channel=new MessageChannel();
+  const response=await bounded(()=>new Promise((resolve,reject)=>{
+   channel.port1.onmessage=e=>{if(e.data?.nonce===nonce)resolve(e.data);};
+   channel.port1.onmessageerror=()=>reject(new Error('ServiceWorker message decode failed'));
+   channel.port1.start();worker.postMessage({nonce},[channel.port2]);
+  }),6000);
+  Object.assign(result,response);return result;
+ }catch(error){Object.assign(result,errorValue(error));return result;}
+ finally{
+  disposed=true;removeStateListener?.();channel?.port1.close();channel?.port2.close();
+  // Never enumerate/unregister other registrations. Only this unique scope's
+  // returned registration is owned by this probe, including late completion.
+  result.cleanup={ownRegistrationOnly:true,preservedForCachedRestart:persistent,unregistered:registration&&!persistent?await bounded(()=>registration.unregister(),2000):null};
+ }
+}
+function workerSource() {
+ return [hash,navigatorSnapshot,canonicalDraw,canvasReadback,workerMain].map(fn=>fn.toString()).join('\n')+'\nworkerMain();';
+}
+async function workerCanvasMatrix() {
+ const specs=[{name:'httpClassic',type:'classic'},{name:'httpModule',type:'module'},{name:'blobClassic',type:'classic',blob:true},{name:'nestedClassic',type:'classic',nested:true}];
+ return Object.fromEntries(await Promise.all(specs.map(async spec=>{
+  let worker,url;
+  try {
+   url=spec.blob?URL.createObjectURL(new Blob([workerSource()],{type:'text/javascript'})):location.origin+'/worker.js';
+   worker=new Worker(url,{type:spec.type});
+   const result=await bounded(()=>new Promise((resolve,reject)=>{
+    worker.onmessage=e=>resolve(e.data);worker.onerror=e=>reject(new Error(e.message));
+    worker.postMessage({base:location.origin,nested:!!spec.nested,transport:spec.name});
+   }),7000);
+   return [spec.name,result];
+  }catch(e){return [spec.name,errorValue(e)];}
+  finally{worker?.terminate();if(spec.blob&&url)URL.revokeObjectURL(url);}
+ })));
+}
+function opaqueRawReadback(canvas) {
+ const width=canvas.width,height=canvas.height;
+ if(width*height>240*60)throw new Error('Opaque canvas exceeds sample budget');
+ const x=canvas.getContext('2d');if(!x)throw new Error('Opaque 2D context unavailable');
+ const rgba1=new Uint8ClampedArray(x.getImageData(0,0,width,height).data);
+ const rgba2=new Uint8ClampedArray(x.getImageData(0,0,width,height).data);
+ const dataURL1=canvas.toDataURL('image/png'),dataURL2=canvas.toDataURL('image/png');
+ if(dataURL1.length>65536||dataURL2.length>65536)throw new Error('Opaque PNG exceeds sample budget');
+ return {width,height,rgba1,rgba2,dataURL1,dataURL2};
+}
+async function hashOpaqueSample(sample,width,height) {
+ if(!sample||sample.width!==width||sample.height!==height)throw new Error('Unexpected opaque canvas dimensions');
+ const length=width*height*4;
+ for(const key of ['rgba1','rgba2']){
+  if(!(sample[key] instanceof Uint8ClampedArray)||sample[key].length!==length||sample[key].byteLength!==length)throw new Error('Invalid bounded opaque RGBA sample');
+ }
+ const pngBytes=[];
+ for(const key of ['dataURL1','dataURL2']){
+  const value=sample[key];
+  if(typeof value!=='string'||value.length>65536||!/^data:image\/png;base64,[A-Za-z0-9+/]*={0,2}$/.test(value))throw new Error('Invalid bounded opaque PNG sample');
+  pngBytes.push(Uint8Array.from(atob(value.split(',')[1]),v=>v.charCodeAt(0)));
+ }
+ // SHA-256 runs in the trustworthy parent using the same existing hash helper.
+ const [pixels1,pixels2,export1,export2]=await Promise.all([hash(sample.rgba1),hash(sample.rgba2),hash(pngBytes[0]),hash(pngBytes[1])]);
+ return {width,height,pixels1,pixels2,export1,export2,
+  hashing:'parent SHA-256; bounded raw samples discarded before report',
+  checks:{pixelsRepeat:pixels1===pixels2,exportsRepeat:export1===export2}};
+}
+async function opaqueCanvasRealm(parentReadback) {
+ const frame=document.createElement('iframe');frame.title='Opaque sandbox canvas realm';
+ frame.setAttribute('sandbox','allow-scripts');
+ const nonce=crypto.randomUUID();
+ // This diagnostic solid swatch has an independently known raw RGBA vector.
+ // It avoids inferring unprotected bytes from any protected canvas readback.
+ const expectedBytes=new Uint8Array(16*16*4);
+ for(let i=0;i<expectedBytes.length;i+=4)expectedBytes.set([17,34,51,255],i);
+ const rawExpected=await hash(expectedBytes);
+ const parentSentinel=document.createElement('canvas');parentSentinel.width=16;parentSentinel.height=16;
+ const px=parentSentinel.getContext('2d');px.fillStyle='rgb(17,34,51)';px.fillRect(0,0,16,16);
+ const parentSolid=await canvasReadback(parentSentinel);
+ let listener;
+ try {
+  const reply=new Promise(resolve=>{
+   listener=event=>{
+    if(event.source!==frame.contentWindow||event.origin!=='null'||event.data?.kind!=='opaque-canvas-realm'||event.data.nonce!==nonce)return;
+    resolve(event.data.result);
+   };
+   addEventListener('message',listener);
+  });
+  const script=[canonicalDraw,opaqueRawReadback].map(fn=>fn.toString()).join('\n')+`
+(()=>{
+ let result;
+ try {
+  const canvas=document.createElement('canvas');canonicalDraw(canvas);
+  const solid=document.createElement('canvas');solid.width=16;solid.height=16;
+  const sx=solid.getContext('2d');sx.fillStyle='rgb(17,34,51)';sx.fillRect(0,0,16,16);
+  result={origin:self.origin,url:location.href,secureContext:isSecureContext,cryptoSubtleAvailable:!!self.crypto?.subtle,
+          own:opaqueRawReadback(canvas),solid:opaqueRawReadback(solid)};
+ }catch(error){result={error:error.name,message:String(error.message).slice(0,240),origin:self.origin};}
+ parent.postMessage({kind:'opaque-canvas-realm',nonce:${JSON.stringify(nonce)},result},${JSON.stringify(location.origin)});
+})();`;
+  frame.srcdoc='<!doctype html><meta charset="utf-8"><title>Opaque canvas</title><script>'+script+'<'+'/script>';
+  document.body.append(frame);
+  let raw=await bounded(()=>reply,6000);
+  if(raw.error)return {transport:'sandbox srcdoc allow-scripts; source + null-origin + nonce checked',error:raw.error,message:raw.message,origin:raw.origin};
+  if(raw.origin!=='null'||raw.url!=='about:srcdoc')throw new Error('Unexpected opaque realm provenance');
+  const result={origin:raw.origin,url:raw.url,secureContext:raw.secureContext,cryptoSubtleAvailable:raw.cryptoSubtleAvailable,
+   own:await hashOpaqueSample(raw.own,240,60),solid:await hashOpaqueSample(raw.solid,16,16)};
+  delete raw.own;delete raw.solid;raw=null;
+  return {transport:'postMessage only; event.source, origin=null and nonce checked',
+   expectedOrigin:'null',reportedOrigin:result.origin,url:result.url,secureContext:result.secureContext,cryptoSubtleAvailable:result.cryptoSubtleAvailable,
+   own:result.own,solid:result.solid,rawExpectedSolidPixels:rawExpected,parentSolid,
+   checks:{originOpaque:result.origin==='null',canonicalStable:result.own.checks.pixelsRepeat,
+    solidStable:result.solid.checks.pixelsRepeat,canonicalExportsStable:result.own.checks.exportsRepeat,
+    canonicalDistinctFromParent:result.own.pixels1!==parentReadback.pixels1,
+    solidDistinctFromParent:result.solid.pixels1!==parentSolid.pixels1,
+    rawExpectedNotExposed:result.solid.pixels1!==rawExpected&&result.solid.pixels2!==rawExpected},
+   interpretation:'Raw equality or parent equality is evidence, not a passing privacy assertion; expected to differ only when protection is enabled.'};
+ }catch(error){return errorValue(error);}
+ finally{removeEventListener('message',listener);frame.remove();}
+}
+async function inheritedCanvasRealms() {
+ const parentCanvas=document.createElement('canvas');canonicalDraw(parentCanvas);
+ const parentReadback=await canvasReadback(parentCanvas),observations={};
+ for(const kind of ['initialEmpty','aboutBlank','srcdoc','documentWrite']) {
+  const frame=document.createElement('iframe');frame.title='Inherited canvas '+kind;
+  try {
+   if(kind==='aboutBlank'||kind==='srcdoc') {
+    const loaded=new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=()=>reject(new Error('Inherited frame load failed'));});
+    if(kind==='srcdoc')frame.srcdoc='<!doctype html><meta charset="utf-8"><title>Srcdoc canvas realm</title>';
+    else frame.src='about:blank';
+    document.body.append(frame);const state=await bounded(()=>loaded,3000);if(state?.error)throw new Error(state.message);
+   } else {
+    // Initial-empty sampling installs and starts the child read synchronously
+    // after insertion, before any await or explicit navigation in this branch.
+    document.body.append(frame);
+    if(kind==='documentWrite'){frame.contentDocument.open();frame.contentDocument.write('<!doctype html><title>Written canvas realm</title>');frame.contentDocument.close();}
+   }
+   const realm=frame.contentWindow,doc=frame.contentDocument;
+   if(realm.origin!==location.origin){observations[kind]={excluded:'opaque or different effective origin',effectiveOrigin:realm.origin};continue;}
+   realm.parentProbeCanvas=parentCanvas;
+   const script=doc.createElement('script');
+   script.textContent=[hash,canonicalDraw,canvasReadback].map(fn=>fn.toString()).join('\n')+`
+window.inheritedCanvasResult=(async()=>{
+ const canvas=document.createElement('canvas');canonicalDraw(canvas);window.inheritedProbeCanvas=canvas;
+ const own=canvasReadback(canvas);
+ const copied=document.createElement('canvas');copied.width=240;copied.height=60;copied.getContext('2d').drawImage(window.parentProbeCanvas,0,0);
+ return {own:await own,parentToChild:await canvasReadback(copied)};
+})();`;
+   doc.documentElement.append(script);
+   const capturedURL=doc.URL,effectiveOrigin=realm.origin;
+   const result=await bounded(()=>realm.inheritedCanvasResult,4000);
+   if(!result||result.error){observations[kind]={capturedURL,effectiveOrigin,result:result||{error:'Child script did not execute'}};continue;}
+   const back=document.createElement('canvas');back.width=240;back.height=60;back.getContext('2d').drawImage(realm.inheritedProbeCanvas,0,0);
+   const childToParent=await canvasReadback(back);
+   observations[kind]={capturedURL,effectiveOrigin,...result,childToParent,parity:{ownPixels:result.own.pixels1===parentReadback.pixels1,ownExport:result.own.export1===parentReadback.export1,parentToChildPixels:result.parentToChild.pixels1===parentReadback.pixels1,childToParentPixels:childToParent.pixels1===parentReadback.pixels1}};
+  }catch(e){observations[kind]=errorValue(e);}
+  finally{frame.remove();}
+ }
+ observations.opaqueSandboxSrcdoc=await opaqueCanvasRealm(parentReadback);
+ return {scope:'unsandboxed inherited documents plus an isolated opaque sandbox via postMessage only',parent:parentReadback,observations};
+}
+async function canvasReadRegressions() {
+ const canvases=[];
+ const make=(width,height)=>{const c=document.createElement('canvas');c.width=width;c.height=height;canvases.push(c);return c;};
+ const crop=(image,x,y,width,height)=>{
+  const output=new Uint8ClampedArray(width*height*4);
+  for(let row=0;row<height;row++)output.set(image.data.subarray(((y+row)*image.width+x)*4,((y+row)*image.width+x+width)*4),row*width*4);
+  return output;
+ };
+ try {
+  const canvas=make(240,60);canonicalDraw(canvas);const context=canvas.getContext('2d');
+  const full=context.getImageData(0,0,240,60);
+  const rectangles=[{x:13,y:7,width:37,height:19},{x:0,y:0,width:120,height:30},{x:120,y:0,width:120,height:30},{x:0,y:30,width:120,height:30},{x:120,y:30,width:120,height:30}];
+  const pieces=[];
+  for(const rect of rectangles){
+   const expected=crop(full,rect.x,rect.y,rect.width,rect.height);
+   const first=context.getImageData(rect.x,rect.y,rect.width,rect.height),second=context.getImageData(rect.x,rect.y,rect.width,rect.height);
+   const [fullCropHash,subrectHash,repeatHash]=await Promise.all([hash(expected),hash(first.data),hash(second.data)]);
+   pieces.push({...rect,fullCropHash,subrectHash,repeatHash,checks:{matchesFullCrop:fullCropHash===subrectHash,repeat:subrectHash===repeatHash}});
+  }
+  const stitched=new Uint8ClampedArray(full.data.length);
+  for(const rect of rectangles.slice(1)){
+   const tile=context.getImageData(rect.x,rect.y,rect.width,rect.height);
+   for(let row=0;row<rect.height;row++)stitched.set(tile.data.subarray(row*rect.width*4,(row+1)*rect.width*4),((rect.y+row)*240+rect.x)*4);
+  }
+  const fullHash=await hash(full.data),stitchedHash=await hash(stitched);
+  const transparentCanvas=make(8,8),tx=transparentCanvas.getContext('2d');
+  // Known alpha coverage: central opaque pixels, remaining source transparent.
+  // Readback must not invent alpha either inside untouched pixels or outside
+  // source bounds. RGB observations remain hashes, never normalized away.
+  tx.fillStyle='rgba(17,34,51,1)';tx.fillRect(2,2,4,4);
+  const inside1=tx.getImageData(0,0,8,8),inside2=tx.getImageData(0,0,8,8);
+  const outside1=tx.getImageData(-2,-2,12,12),outside2=tx.getImageData(-2,-2,12,12);
+  let alphaExpected=true,alphaRepeat=true,outsideAlphaZero=true,insideTransparentAlphaZero=true;
+  for(let y=0;y<12;y++)for(let x=0;x<12;x++){
+   const offset=(y*12+x)*4,sourceX=x-2,sourceY=y-2;
+   const expected=sourceX>=2&&sourceX<6&&sourceY>=2&&sourceY<6?255:0;
+   alphaExpected=alphaExpected&&outside1.data[offset+3]===expected;
+   alphaRepeat=alphaRepeat&&outside1.data[offset+3]===outside2.data[offset+3];
+   if(sourceX<0||sourceY<0||sourceX>=8||sourceY>=8)outsideAlphaZero=outsideAlphaZero&&outside1.data[offset+3]===0;
+  }
+  for(let y=0;y<8;y++)for(let x=0;x<8;x++)if(x<2||x>=6||y<2||y>=6)insideTransparentAlphaZero=insideTransparentAlphaZero&&inside1.data[(y*8+x)*4+3]===0;
+  const transparency={source:{width:8,height:8},read:{x:-2,y:-2,width:12,height:12},
+   insideHashes:await Promise.all([hash(inside1.data),hash(inside2.data)]),outsideHashes:await Promise.all([hash(outside1.data),hash(outside2.data)]),
+   checks:{alphaMatchesKnownCoverage:alphaExpected,alphaRepeat,outsideAlphaZero,insideTransparentAlphaZero}};
+  // Only one ~16 MiB source surface; no full-sized ImageData/export/copy.
+  // This explicitly tests a source-size budget rather than read-rectangle size.
+  const large=make(4097,1024),lx=large.getContext('2d');
+  const budget={source:{width:4097,height:1024,pixels:4097*1024,rgbaBytes:4097*1024*4},read:{x:0,y:0,width:1,height:1},
+   expectedByMode:{unprotectedBaseline:'read succeeds',protectedCandidate:'NotSupportedError when a 4 Mi-pixel source budget is enabled'},
+   interpretation:'Mode-specific evidence only; no assertion or HDR coverage claim.'};
+  try {
+   if(!lx)throw new Error('2D context unavailable');
+   lx.fillStyle='rgb(17,34,51)';lx.fillRect(0,0,1,1);
+   const sample=lx.getImageData(0,0,1,1);
+   budget.actual={status:'completed',width:sample.width,height:sample.height,hash:await hash(sample.data),alpha:sample.data[3]};
+  }catch(error){budget.actual={status:'exception',...errorValue(error)};}
+  return {croppedAndTiled:{fullHash,stitchedHash,pieces,checks:{allSubrectsMatch:pieces.every(p=>p.checks.matchesFullCrop),allSubrectsRepeat:pieces.every(p=>p.checks.repeat),stitchedMatchesFull:fullHash===stitchedHash}},transparency,sourceSizeBudget:budget,allocation:'4097x1024 maximum source; only 1x1 read on that source; dimensions released in finally',hdrCoverage:'not tested'};
+ }finally{for(const canvas of canvases){canvas.width=0;canvas.height=0;}}
+}
+async function enhancedCanvasProbe() {
+ const [base,inheritedRealms,workers,readRegressions,sharedWorker,serviceWorker]=await Promise.all([bounded(canvasProbe),bounded(inheritedCanvasRealms,25000),bounded(workerCanvasMatrix,8000),bounded(canvasReadRegressions,8000),sharedWorkerCanvasProbe(),serviceWorkerCanvasProbe()]);
+ let offscreenMain={unsupported:true};
+ if(typeof OffscreenCanvas==='function'){const c=new OffscreenCanvas(240,60);if(canonicalDraw(c))offscreenMain=await canvasReadback(c);}
+ const reference=base.pixels1;
+ const parity={mainOffscreen:reference&&offscreenMain.pixels1?reference===offscreenMain.pixels1:null,workers:{}};
+ for(const [name,value]of Object.entries(workers)){parity.workers[name]={pixels:value.canvas?.pixels1?value.canvas.pixels1===reference:null,nestedPixels:value.nested?.canvas?.pixels1?value.nested.canvas.pixels1===reference:null};}
+ parity.sharedWorker=sharedWorker.canvas?.pixels1?sharedWorker.canvas.pixels1===reference:null;
+ parity.serviceWorker=serviceWorker.canvas?.pixels1?serviceWorker.canvas.pixels1===reference:null;
+ return {...base,offscreenMain,inheritedRealms,workers,sharedWorker,serviceWorker,parity,readRegressions};
+}
+async function canvasProbe() {
+ const c=document.createElement('canvas');c.width=240;c.height=60;
+ if(!canonicalDraw(c))return {unsupported:true};
+ const x=c.getContext('2d');
+ const sourceCopy=async()=>{const d=document.createElement('canvas');d.width=c.width;d.height=c.height;const dx=d.getContext('2d');dx.drawImage(c,0,0);return hash(dx.getImageData(0,0,d.width,d.height).data);};
+ const sourceBefore=await sourceCopy();
+ const pixels1=await hash(x.getImageData(0,0,240,60).data),pixels2=await hash(x.getImageData(0,0,240,60).data);
+ const data1=c.toDataURL('image/png'),data2=c.toDataURL('image/png');
+ const pngBytes=s=>Uint8Array.from(atob(s.split(',')[1]),v=>v.charCodeAt(0));
+ const export1=await hash(pngBytes(data1)),export2=await hash(pngBytes(data2));
+ const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
+ const blobHash=blob?await hash(await blob.arrayBuffer()):null;
+ const sourceAfter=await sourceCopy();
+ const fonts={};for(const font of ['Arial','Times New Roman','monospace','sans-serif','serif','PingFang SC','Microsoft YaHei','Noto Sans']){x.font='17px "'+font+'"';const m=x.measureText('mmmmWWW café 指纹🙂');fonts[font]={width:m.width,ascent:m.actualBoundingBoxAscent,descent:m.actualBoundingBoxDescent};}
+ return {width:c.width,height:c.height,pixels1,pixels2,export1,export2,blobHash,sourceBefore,sourceAfter,
+  checks:{pixelsRepeat:pixels1===pixels2,exportsRepeat:export1===export2,blobMatchesDataURL:blobHash===export1,sourceCopyUnchanged:sourceBefore===sourceAfter},fonts};
+}
+async function glProbe(kind) {
+ const c=document.createElement('canvas');c.width=32;c.height=32;
+ const gl=c.getContext(kind,{antialias:false,preserveDrawingBuffer:true});if(!gl)return {unsupported:true};
+ const names=['VENDOR','RENDERER','VERSION','SHADING_LANGUAGE_VERSION','MAX_TEXTURE_SIZE','MAX_CUBE_MAP_TEXTURE_SIZE','MAX_RENDERBUFFER_SIZE','MAX_VERTEX_ATTRIBS','MAX_VERTEX_UNIFORM_VECTORS','MAX_FRAGMENT_UNIFORM_VECTORS','MAX_VARYING_VECTORS','MAX_COMBINED_TEXTURE_IMAGE_UNITS','MAX_VERTEX_TEXTURE_IMAGE_UNITS','MAX_TEXTURE_IMAGE_UNITS','MAX_VIEWPORT_DIMS','ALIASED_LINE_WIDTH_RANGE','ALIASED_POINT_SIZE_RANGE','RED_BITS','GREEN_BITS','BLUE_BITS','ALPHA_BITS','DEPTH_BITS','STENCIL_BITS','MAX_3D_TEXTURE_SIZE','MAX_ARRAY_TEXTURE_LAYERS','MAX_DRAW_BUFFERS','MAX_COLOR_ATTACHMENTS','MAX_SAMPLES','MAX_UNIFORM_BUFFER_BINDINGS'];
+ const limits={};for(const name of names){if(gl[name]!==undefined){let v=gl.getParameter(gl[name]);limits[name]=ArrayBuffer.isView(v)?Array.from(v):v;}}
+ const debug=gl.getExtension('WEBGL_debug_renderer_info');
+ const unmasked=debug?{vendor:gl.getParameter(debug.UNMASKED_VENDOR_WEBGL),renderer:gl.getParameter(debug.UNMASKED_RENDERER_WEBGL)}:{unsupported:true};
+ const extensions=(gl.getSupportedExtensions()||[]).sort();const precision={};
+ for(const stage of ['VERTEX_SHADER','FRAGMENT_SHADER'])for(const type of ['LOW_FLOAT','MEDIUM_FLOAT','HIGH_FLOAT','HIGH_INT']){const p=gl.getShaderPrecisionFormat(gl[stage],gl[type]);precision[stage+'.'+type]=p?{rangeMin:p.rangeMin,rangeMax:p.rangeMax,precision:p.precision}:null;}
+ // A real shader draw, not a constant clear-only buffer.
+ const shader=(type,source)=>{const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;};
+ const program=gl.createProgram();
+ const vertex=shader(gl.VERTEX_SHADER,kind==='webgl2'?'#version 300 es\nin vec2 p; out vec2 uv; void main(){uv=p; gl_Position=vec4(p,0.,1.);}':'attribute vec2 p; varying vec2 uv; void main(){uv=p; gl_Position=vec4(p,0.,1.);}');
+ const fragment=shader(gl.FRAGMENT_SHADER,kind==='webgl2'?'#version 300 es\nprecision mediump float; in vec2 uv; out vec4 color; void main(){color=vec4(uv*.5+.5,.37,1.);}':'precision mediump float; varying vec2 uv; void main(){gl_FragColor=vec4(uv*.5+.5,.37,1.);}');
+ gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);
+ if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program));
+ gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,0,1]),gl.STATIC_DRAW);
+ const position=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);gl.viewport(0,0,32,32);gl.clearColor(.1,.2,.3,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);gl.finish();
+ const a=new Uint8Array(32*32*4),b=new Uint8Array(a.length);gl.readPixels(0,0,32,32,gl.RGBA,gl.UNSIGNED_BYTE,a);gl.readPixels(0,0,32,32,gl.RGBA,gl.UNSIGNED_BYTE,b);
+ const first=await hash(a),second=await hash(b);const result={limits,unmasked,extensions,precision,contextAttributes:gl.getContextAttributes(),render:{width:32,height:32,first,second,repeat:first===second,error:gl.getError()}};
+ gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vertex);gl.deleteShader(fragment);gl.getExtension('WEBGL_lose_context')?.loseContext();return result;
+}
+async function audioProbe() {
+ const Constructor=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!Constructor)return {unsupported:true};
+ const context=new Constructor(1,5000,44100),osc=context.createOscillator(),compressor=context.createDynamicsCompressor();
+ osc.type='triangle';osc.frequency.value=10000;compressor.threshold.value=-50;compressor.knee.value=40;compressor.ratio.value=12;compressor.attack.value=0;compressor.release.value=.25;osc.connect(compressor);compressor.connect(context.destination);osc.start(0);
+ const buffer=await context.startRendering();const a=new Float32Array(buffer.getChannelData(0)),b=new Float32Array(buffer.getChannelData(0));
+ const copy1=new Float32Array(buffer.length),copy2=new Float32Array(buffer.length);buffer.copyFromChannel(copy1,0);buffer.copyFromChannel(copy2,0);
+ const hashes=await Promise.all([a,b,copy1,copy2].map(hash));
+ return {sampleRate:buffer.sampleRate,length:buffer.length,duration:buffer.duration,channels:buffer.numberOfChannels,samples4500to4510:Array.from(a.slice(4500,4510)),sumAbsolute4500to5000:a.slice(4500).reduce((s,v)=>s+Math.abs(v),0),hashes,
+  checks:{finite:[a,b,copy1,copy2].every(v=>v.every(Number.isFinite)),getChannelRepeat:hashes[0]===hashes[1],copyRepeat:hashes[2]===hashes[3],getMatchesCopy:hashes[0]===hashes[2]}};
+}
+function screenProbe() {
+ return {screen:Object.fromEntries(['width','height','availWidth','availHeight','availLeft','availTop','colorDepth','pixelDepth','isExtended'].map(k=>[k,screen[k]??null])),orientation:screen.orientation?{type:screen.orientation.type,angle:screen.orientation.angle}:null,
+  window:{innerWidth,innerHeight,outerWidth,outerHeight,screenX,screenY,devicePixelRatio},visualViewport:visualViewport?{width:visualViewport.width,height:visualViewport.height,scale:visualViewport.scale,offsetLeft:visualViewport.offsetLeft,offsetTop:visualViewport.offsetTop}:null,
+  media:Object.fromEntries(['(pointer:coarse)','(pointer:fine)','(hover:hover)','(prefers-color-scheme:dark)','(prefers-reduced-motion:reduce)','(color-gamut:p3)'].map(q=>[q,matchMedia(q).matches]))};
+}
+function domProbe() {
+ const names=['HTMLDetailsElement','HTMLDialogElement','SerialPort','Bluetooth','USB','GamepadEvent','WebSocket','MIDIAccess','GPU','HID','PublicKeyCredential','PaymentRequest','speechSynthesis','WebAssembly','MutationObserver','IntersectionObserver','ResizeObserver','DOMMatrix','DOMPoint','OffscreenCanvas','Worker','SharedWorker','ServiceWorker','WebGLRenderingContext','WebGL2RenderingContext','AudioContext','OfflineAudioContext','RTCPeerConnection','MediaSource','MediaRecorder','Notification','Permissions','StorageManager','indexedDB','BroadcastChannel','TextEncoder','ReadableStream','WritableStream','CompressionStream','DecompressionStream','chrome','process'];
+ return {apis:Object.fromEntries(names.map(k=>[k,{type:typeof window[k],present:k in window}])),navigatorAPIs:Object.fromEntries(['serviceWorker','share','permissions','clipboard','mediaDevices','credentials','virtualKeyboard','ink','userAgentData','serial','bluetooth','usb','gpu','hid'].map(k=>[k,{type:typeof navigator[k],present:k in navigator}])),windowKeys:Object.keys(window).sort().slice(0,2048),secureContext:isSecureContext,crossOriginIsolated,
+  nativeStrings:{getContext:Function.prototype.toString.call(HTMLCanvasElement.prototype.getContext),getImageData:Function.prototype.toString.call(CanvasRenderingContext2D.prototype.getImageData),getParameter:window.WebGLRenderingContext?Function.prototype.toString.call(WebGLRenderingContext.prototype.getParameter):null},css:{grid:CSS.supports('display','grid'),has:CSS.supports('selector(:has(*))')},pdfViewer:navigator.pdfViewerEnabled??null};
+}
+function mediaProbe() {
+ const audio=document.createElement('audio'),video=document.createElement('video');
+ const types=['video/mp4; codecs="avc1.42E01E"','audio/mp4; codecs="mp4a.40.2"','video/webm; codecs="vp8"','video/webm; codecs="vp9"','video/mp4; codecs="av01.0.05M.08"','audio/webm; codecs="opus"','audio/ogg; codecs="vorbis"'];
+ return {types:Object.fromEntries(types.map(type=>[type,{audio:audio.canPlayType(type),video:video.canPlayType(type),mediaSource:window.MediaSource?MediaSource.isTypeSupported(type):null,mediaRecorder:window.MediaRecorder?MediaRecorder.isTypeSupported(type):null}])),emeAvailable:typeof navigator.requestMediaKeySystemAccess==='function',drmProbe:'not requested; no key-system access or license request'};
+}
+function intlProbe() {
+ const date=new Date('2026-01-15T12:00:00Z'),summer=new Date('2026-07-15T12:00:00Z');
+ const math={sin:Math.sin(1e20),cos:Math.cos(1e20),tan:Math.tan(.5),acos:Math.acos(.123),asin:Math.asin(.5),atan:Math.atan(2),sinh:Math.sinh(1),cosh:Math.cosh(1),tanh:Math.tanh(1),expm1:Math.expm1(.1),log1p:Math.log1p(.1),pow:Math.pow(Math.PI,-100),hypot:Math.hypot(1e100,1e-100),fround:Math.fround(1/3)};
+ return {dateTime:new Intl.DateTimeFormat().resolvedOptions(),number:new Intl.NumberFormat().resolvedOptions(),collator:new Intl.Collator().resolvedOptions(),winterOffset:date.getTimezoneOffset(),summerOffset:summer.getTimezoneOffset(),fixedDate:date.toString(),math,mathFixed15:{expm1:Math.expm1(1).toFixed(15),log1p:Math.log1p(10).toFixed(15),sin:Math.sin(1).toFixed(15)},regexpLookbehind:new RegExp('(?<=a)b').test('ab'),stack:new Error('local-probe').stack?.split('\n').slice(0,6).join('\n')};
+}
+async function permissionProbe() {
+ const names=['geolocation','notifications','camera','microphone','persistent-storage','clipboard-read','clipboard-write','midi','background-sync','accelerometer','gyroscope','magnetometer'];
+ const permissions={};await Promise.all(names.map(async name=>{permissions[name]=await bounded(async()=>({state:(await navigator.permissions.query({name})).state}),2000);}));
+ return {permissions,storage:navigator.storage?await bounded(()=>navigator.storage.estimate(),2000):{unsupported:true},storageAPIs:{localStorage:typeof window.localStorage,sessionStorage:typeof window.sessionStorage,indexedDB:typeof indexedDB,caches:typeof caches},storedContent:'not enumerated or read'};
+}
+async function iceProbe() {
+ if(params.get('ice')!=='1')return {skipped:'explicit ?ice=1 opt-in required; no external STUN/TURN'};
+ if(!window.RTCPeerConnection)return {unsupported:true};
+ const pc=new RTCPeerConnection({iceServers:[]}),candidates=[];
+ try {pc.createDataChannel('local-probe');const done=new Promise(resolve=>{pc.onicecandidate=e=>{if(e.candidate)candidates.push(e.candidate.toJSON());else resolve('complete');};});await pc.setLocalDescription(await pc.createOffer());const completion=await bounded(()=>done,3000);return {iceServers:[],candidates:candidates.slice(0,32),completion};}
+ finally{pc.close();}
+}
+async function frameSnapshots(origins) {
+ return Promise.all(origins.map(async origin=>{
+  const frame=document.createElement('iframe');frame.title='Probe realm '+origin;
+  const result=await bounded(()=>new Promise(resolve=>{
+   const listener=e=>{if(e.source===frame.contentWindow&&e.origin===origin&&e.data?.kind==='fingerprint-realm'&&e.data.run===run){removeEventListener('message',listener);resolve({origin,data:e.data.data});}};
+   frame._listener=listener;addEventListener('message',listener);
+   frame.src=origin+'/?frame=1&run='+encodeURIComponent(run)+'&parent='+encodeURIComponent(location.origin);document.body.append(frame);
+  }),6000);
+  removeEventListener('message',frame._listener);frame.remove();return {origin,result};
+ }));
+}
+async function main() {
+ if(params.get('frame')==='1') {
+  const parentOrigin=params.get('parent');
+  const parsed=new URL(parentOrigin);
+  if(!['127.0.0.1','localhost'].includes(parsed.hostname)||parsed.protocol!=='http:')throw new Error('Loopback parent required');
+  const data={navigator:await bounded(navigatorSnapshot),canvas:await bounded(canvasProbe)};
+  parent.postMessage({kind:'fingerprint-realm',run,data},parentOrigin);return;
+ }
+ const config=await (await fetch('/config')).json();
+ const result={schema:1,purpose:'native evidence only; no anonymization verdict',run,origin:location.origin,iceOptIn:params.get('ice')==='1',probes:{}};
+ const jobs={P4:async()=>({main:await navigatorSnapshot(),worker:await workerSnapshot()}),P5:screenProbe,P6:enhancedCanvasProbe,P7:async()=>({webgl:await bounded(()=>glProbe('webgl')),webgl2:await bounded(()=>glProbe('webgl2'))}),P8:audioProbe,P9:domProbe,P10:mediaProbe,P11:intlProbe,P12:permissionProbe,P13:iceProbe};
+ await Promise.all(Object.entries(jobs).map(async([name,fn])=>{result.probes[name]=await bounded(fn,name==='P6'?29000:10000);}));
+ result.realms=await frameSnapshots(config.origins);
+ const fields=['userAgent','platform','language','languages','hardwareConcurrency','deviceMemory','userAgentData'];
+ const mainNav=result.probes.P4.main,workerNav=result.probes.P4.worker;
+ result.parity={worker:Object.fromEntries(fields.map(k=>[k,JSON.stringify(mainNav?.[k])===JSON.stringify(workerNav?.[k])])),frames:result.realms.map(r=>({origin:r.origin,fields:Object.fromEntries(fields.map(k=>[k,JSON.stringify(mainNav?.[k])===JSON.stringify(r.result?.data?.navigator?.[k])]))}))};
+ result.probes.P5.resizeSamples=resizeSamples;
+ const response=await fetch('/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(result)});
+ if(!response.ok)throw new Error('Report rejected: '+response.status);
+ const stored=await response.json();document.querySelector('#status').textContent='Saved local report '+stored.id;
+ document.querySelector('#output').textContent=JSON.stringify({stored,report:result},null,2);window.fingerprintProbeResult=result;
+}
+main().catch(e=>{document.querySelector('#status').textContent='Probe failed';document.querySelector('#output').textContent=JSON.stringify(errorValue(e));});
+</script></html>

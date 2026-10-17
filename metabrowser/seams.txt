@@ -6,3 +6,20 @@
 .github/README.md           -1                   fork landing page; upstream has none (GitHub shows it before README.md)
 .github/workflows/metabrowser.yml   -1           fork CI (new file)
 .github/workflows/upstream-sync.yml -1           daily upstream merge PR (new file)
+#
+# Native MetaBrowser, merged at the repository root on 2026-10-17 (independent history
+# from native-agent-browser). A trailing "/" registers a fork-owned directory: files under
+# it must not exist upstream. .gitignore gets an append-only block at the end.
+.gitignore                  15                   native build outputs; re-include root docs/ and build/
+HANDOFF.md                  -1                   native cross-machine handoff
+README.native.md            -1                   native README (upstream README.md stays untouched)
+build.zig                   -1                   native Zig AgentCore adapter build
+upstream.lock.json          -1                   pinned Chromium/Zig/AgentCore versions
+build/                      -1                   native GN args
+chromium/                   -1                   native Chromium patches and Views integration
+docs/                       -1                   native design, privacy ledger and evidence summaries
+scripts/                    -1                   native build, packaging and verification scripts
+src/                        -1                   native Zig sources
+tests/integration/          -1                   native integration tests (unittest scripts; not collected by root pytest)
+tests/cross/                -1                   native cross-compiled C tests
+tests/fixtures/             -1                   native probes and media fixtures

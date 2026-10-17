@@ -1,0 +1,49 @@
+{
+  "framework_sha256": "fe922a163149167fd3321cf403213330dda705a96a424a8aaf1ae077bc5edbdd",
+  "catalog_sha256": "b677f8563b45b1213777476ce614c9c71af0fb2465f24d534486a9d8d198421f",
+  "members": [
+    {
+      "member_id": "c58a29b3916180354995b89ce4c98002311aa0afba5e5ef69879e51afe60e09b",
+      "owner": "StorageBucketManager",
+      "name": "open",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending_full_scope",
+      "evidence": "out/evidence/bucket-policy-v19h-review.json",
+      "evidence_sha256": "cc83ba61dd912f9f5c2f4b3921ca7cf395fcc4a7974c8cff3c6dccee51f137f7",
+      "limits": "Window/iframe/DedicatedWorker, six positive quota values, immutable reopen, bounded batched count/cleanup/recovery. Not all worker classes, permission transitions, expiration/durability or complete API protection."
+    },
+    {
+      "member_id": "38d3c426092b88462964c0d690ed6da82ad2506a5d269f7ca7c7a53a382d7339",
+      "owner": "StorageBucketManager",
+      "name": "keys",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending_full_scope",
+      "evidence": "out/evidence/bucket-policy-v19h-review.json",
+      "evidence_sha256": "cc83ba61dd912f9f5c2f4b3921ca7cf395fcc4a7974c8cff3c6dccee51f137f7",
+      "limits": "Window/iframe/DedicatedWorker, six positive quota values, immutable reopen, bounded batched count/cleanup/recovery. Not all worker classes, permission transitions, expiration/durability or complete API protection."
+    },
+    {
+      "member_id": "410b30d8077da6fd164fd92c04d7e565c17bb7377822d2a60f72efc0aa04838d",
+      "owner": "StorageBucketManager",
+      "name": "delete",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending_full_scope",
+      "evidence": "out/evidence/bucket-policy-v19h-review.json",
+      "evidence_sha256": "cc83ba61dd912f9f5c2f4b3921ca7cf395fcc4a7974c8cff3c6dccee51f137f7",
+      "limits": "Window/iframe/DedicatedWorker, six positive quota values, immutable reopen, bounded batched count/cleanup/recovery. Not all worker classes, permission transitions, expiration/durability or complete API protection."
+    },
+    {
+      "member_id": "3a8ab92740ef6d3edd59faa38ce1621edf7b5dcf7e61efee7e76a6e71aea0d5b",
+      "owner": "StorageBucket",
+      "name": "estimate",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending_full_scope",
+      "evidence": "out/evidence/bucket-policy-v19h-review.json",
+      "evidence_sha256": "cc83ba61dd912f9f5c2f4b3921ca7cf395fcc4a7974c8cff3c6dccee51f137f7",
+      "limits": "Window/iframe/DedicatedWorker, six positive quota values, immutable reopen, bounded batched count/cleanup/recovery. Not all worker classes, permission transitions, expiration/durability or complete API protection."
+    }
+  ],
+  "partially_mapped_member_count": 4,
+  "verified_member_count": 0,
+  "full_privacy_coverage_proven": false
+}

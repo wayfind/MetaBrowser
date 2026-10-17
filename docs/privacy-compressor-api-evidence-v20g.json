@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "20f78ed2b7f1971b065c8a267c2e736c15d32b08dcceaf5e303d721d2fbe861d",
+  "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594",
+  "members": [
+    {
+      "member_id": "5f49044b84cdf245374ae31ffb4d2622b3bffc2329b3ea2019475679c0b6d479",
+      "owner": "DynamicsCompressorNode",
+      "name": "threshold",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.idl",
+      "declaration_sha256": "22ed38008e35cd75c980ba4580689de7c717a2c64b1c814a3c8b29a19c63ce0e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "6f24fb6e93d0c7b8595aa382fdbfce3bbf4daabdbfe81e0eada0c6afd5d2daa1",
+      "owner": "DynamicsCompressorNode",
+      "name": "knee",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.idl",
+      "declaration_sha256": "22ed38008e35cd75c980ba4580689de7c717a2c64b1c814a3c8b29a19c63ce0e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "6ced550a09713ad404cfd22f328bafbdbd3d30d8d1383aaea74e1fe75ee5ca78",
+      "owner": "DynamicsCompressorNode",
+      "name": "ratio",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.idl",
+      "declaration_sha256": "22ed38008e35cd75c980ba4580689de7c717a2c64b1c814a3c8b29a19c63ce0e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "e9141b39be10939a9c464db9b1dcbf4515265b289fe0c794ab19cf9b6269081c",
+      "owner": "DynamicsCompressorNode",
+      "name": "attack",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.idl",
+      "declaration_sha256": "22ed38008e35cd75c980ba4580689de7c717a2c64b1c814a3c8b29a19c63ce0e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "ac18480680754f3e29b093352c20ba3b104592cad6506a296abc58e00294631b",
+      "owner": "DynamicsCompressorNode",
+      "name": "release",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.idl",
+      "declaration_sha256": "22ed38008e35cd75c980ba4580689de7c717a2c64b1c814a3c8b29a19c63ce0e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "27ba6958adba8d9123cef069846a5f765d4bbb69a920ebcd700118dd38b6b884",
+      "owner": "DynamicsCompressorNode",
+      "name": "reduction",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.idl",
+      "declaration_sha256": "22ed38008e35cd75c980ba4580689de7c717a2c64b1c814a3c8b29a19c63ce0e",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "a7e0090b3cc99d425b2e5dd934a0b7377d6357a039c9127b5eb1be992292e7de",
+      "owner": "AudioParam",
+      "name": "value",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_param.idl",
+      "declaration_sha256": "a07b81d11cb84c28dddb8a3a0a63d7518472d6d0ccf93b51c5664a23426a9239",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "a95ebcd235f8b402c264cc1e8afa0d44c44c8c5a876dabd2ec4ca6c06f1ee4bc",
+      "owner": "AudioParam",
+      "name": "setValueAtTime",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_param.idl",
+      "declaration_sha256": "a07b81d11cb84c28dddb8a3a0a63d7518472d6d0ccf93b51c5664a23426a9239",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    },
+    {
+      "member_id": "9a121fad244f2df47cb18954bf3fc01e7c436f7de0e18444a0dae3bd877aaa19",
+      "owner": "AudioParam",
+      "name": "linearRampToValueAtTime",
+      "declaration_source": "third_party/blink/renderer/modules/webaudio/audio_param.idl",
+      "declaration_sha256": "a07b81d11cb84c28dddb8a3a0a63d7518472d6d0ccf93b51c5664a23426a9239",
+      "review_status": "partial_runtime_evidence",
+      "implementation_privacy_review": "pending",
+      "evidence": [
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-balanced-acceptance.json",
+          "sha256": "e8ceb6d9282c1c88f181f3194dba65fe7fbe9a6de5a94ae61fcf11c3d6fdb0e2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        },
+        {
+          "path": "out/evidence/audio-compressor-v20g-linux-off-acceptance.json",
+          "sha256": "163396b508aec412870ad3675f647f148158c642963a2049217ab0cfada57bc2",
+          "pointer": "/accepted",
+          "framework_sha256": "524a88764f7448b02e4815acef0355e97528a4a2696f0cdb662f203b80934594"
+        }
+      ],
+      "limits": "Window offline stereo, three rates, five fixed/scheduled parameter presets and five signals. Nonfinite value setters tested. AudioParam.value setters only; getter not asserted. Compressor parameters are k-rate, not arbitrary sample-rate automation. Ratio-one startup reference difference is diagnostic, not ideal bypass proof. Not all values/realms/devices/realtime/whole pipeline portability."
+    }
+  ],
+  "mapped_member_count": 9,
+  "fully_verified_member_count": 0,
+  "full_scope_complete": false
+}

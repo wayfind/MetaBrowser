@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "chromium": {
+    "repository": "https://chromium.googlesource.com/chromium/src.git",
+    "tag": "154.0.8037.97",
+    "commit": "b510e9d7cd3a2fbd78d0ddc42234103206c5f78d",
+    "source_archive": "https://storage.googleapis.com/chromium-browser-official/chromium-154.0.8037.97.tar.xz",
+    "source_archive_sha256": "20723618e77b209b90a21f72c403155b44129515a1bc92ce72df4a086f861303"
+  },
+  "depot_tools": {
+    "repository": "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
+    "commit": "26b75c9b6bd10093b52b3dab6e77c48a84471b7c",
+    "source_archive_sha256": "0fbdd9d367b00df3ebe8f14c2376c1d1f3ffeeba333169496af66827798cc06c"
+  },
+  "metacodes": {
+    "repository": "https://github.com/metask-ai/metacodes",
+    "candidate_commit": "51ec7dbc0bdb488872133d02aa5504b7a88bdca6",
+    "integration_status": "Native dialogue, lifecycle/recovery, multimodal, Skill, coding, MCP and governed browser-action fixture acceptance passed; official A2A client/cancellation passed; real Metask account and active GLM SDK model verified. Broader production multisite scenarios remain separate acceptance work.",
+    "sdk_commit": "e3a3b932db606d2f43d7ed3d3112768b3f0afa10",
+    "sdk_abi_revision": 21,
+    "sdk_manifest_sha256": "839b958a19a16f7a58b28ded46ccb76112023e232d7fa961fc284e0136206e25"
+  },
+  "zig": "0.16.0",
+  "cross_build": {
+    "target": "aarch64-macos",
+    "deployment_target": "13.0",
+    "apple_sdk_version": "26.2",
+    "xcode_build": "17C52",
+    "linux_clang_sha256": "99885b8b9c6dcdf84a34b98fe0caec9a9eb2b01788f909886bcf5a7b8bfc1fa8",
+    "mac_runtime_sha256": "3a58ee21a570b296b07560467db47ebd212133c1d406d1b0ff87030e483d8867",
+    "mig_cipd_instance": "4wxov_ILjFdgBumBqgUgOgIcr4kcMh7i4b4oJi_cLjcC"
+  }
+}
