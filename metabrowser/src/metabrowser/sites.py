@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from urllib.parse import quote, urlsplit
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
@@ -27,10 +28,10 @@ from . import paths
 from .actuator import render
 from .tools.base import Risk, ToolContext, ToolError, ToolRegistry, ToolResult, ToolSpec
 from .tools.l1 import _settle
-from .tools.l2 import _records_result, _rows_to_records
+from .tools.l2 import _records_result, _rows_to_records, collect_table_pages, pagination_hint
 
 STEP_KINDS = {"goto", "click", "fill", "select", "press", "wait", "extract_table", "extract_text",
-              "assert", "ensure_login", "capture_start", "capture_read"}
+              "assert", "ensure_login", "capture_start", "capture_read", "collect_pages"}
 
 
 class _Vars(dict):
@@ -46,6 +47,7 @@ class Capability:
     input_schema: dict[str, Any]
     steps: list[dict[str, Any]]
     returns: Optional[str] = None
+    tests: list[dict] = field(default_factory=list)
     reads: list[str] = field(default_factory=list)
     writes: list[str] = field(default_factory=list)
 
@@ -78,6 +80,22 @@ def _ident(value: str, what: str) -> str:
     return value
 
 
+def capability_from_dict(c: dict[str, Any], origin: str = "capability") -> Capability:
+    """Validate and build a capability (pack file or forge draft)."""
+    name = _ident(c.get("name", ""), f"capability name in {origin}")
+    for i, step in enumerate(c.get("steps", [])):
+        if step.get("do") not in STEP_KINDS:
+            raise ValueError(f"{origin} step {i}: unknown 'do' {step.get('do')!r}")
+        if step["do"] in ("click", "fill", "select") and not step.get("target"):
+            raise ValueError(f"{origin} step {i}: '{step['do']}' needs a target")
+    schema = c.get("input_schema") or {"type": "object", "properties": {}}
+    if schema.get("type") != "object":
+        raise ValueError(f"{origin}: input_schema root must be an object")
+    return Capability(name=name, description=c.get("description", name), risk=Risk.parse(c.get("risk", "read")),
+                      input_schema=schema, steps=c.get("steps", []), returns=c.get("returns"),
+                      reads=c.get("reads", []), writes=c.get("writes", []), tests=c.get("tests", []))
+
+
 def load_pack(root: Path) -> SitePack:
     root = Path(root)
     meta = json.loads((root / "site.json").read_text(encoding="utf-8"))
@@ -85,15 +103,9 @@ def load_pack(root: Path) -> SitePack:
     caps: dict[str, Capability] = {}
     for f in sorted((root / "capabilities").glob("*.json")) if (root / "capabilities").is_dir() else []:
         c = json.loads(f.read_text(encoding="utf-8"))
-        name = _ident(c.get("name", f.stem), f"capability name in {f.name}")
-        for i, step in enumerate(c.get("steps", [])):
-            if step.get("do") not in STEP_KINDS:
-                raise ValueError(f"{f.name} step {i}: unknown 'do' {step.get('do')!r}")
-        schema = c.get("input_schema") or {"type": "object", "properties": {}}
-        if schema.get("type") != "object":
-            raise ValueError(f"{f.name}: input_schema root must be an object")
-        caps[name] = Capability(name, c.get("description", name), Risk.parse(c.get("risk", "read")), schema,
-                                c.get("steps", []), c.get("returns"), c.get("reads", []), c.get("writes", []))
+        c.setdefault("name", f.stem)
+        cap = capability_from_dict(c, f.name)
+        caps[cap.name] = cap
     # Tenant-specific URL (SaaS subdomains, self-hosted ERP) without editing the pack.
     base_url = os.environ.get(f"METABROWSER_SITE_{site_id.upper()}_URL", meta["base_url"])
     return SitePack(site_id, meta.get("name", site_id), base_url, root, meta, caps)
@@ -137,7 +149,44 @@ async def _resolve(ctx: ToolContext, tab: Any, candidates: list[dict[str, Any]],
     raise ToolError("target_not_found", f"none of the locator candidates matched: {candidates}")
 
 
-async def run_recipe(ctx: ToolContext, site: SitePack, cap: Capability, args: dict[str, Any]) -> ToolResult:
+class SafeStop(Exception):
+    """Draft-test safe mode stopped before a step whose real target is submit-level or riskier."""
+
+    def __init__(self, step: int, risk: Risk, reason: str):
+        super().__init__(f"stopped before step {step}: {risk.label} ({reason})")
+        self.step, self.risk, self.reason = step, risk, reason
+
+
+async def _step_guard(ctx: ToolContext, tab: Any, ref: str, site: SitePack, cap: Capability, i: int,
+                      safe_mode: bool) -> None:
+    """Re-assess every acting step against its real target: a generated skill's declared risk is
+    not trusted. Above the declared level -> PolicyGate (or a safe stop in draft tests)."""
+    from .tools.l1 import text_risk
+
+    info = await ctx.runtime.actuator.element(tab, ref)
+    base = Risk.SUBMIT if info.is_submit else Risk.INPUT
+    risk, reason = text_risk(ctx.runtime, info.name, tab.page.url, base)
+    if safe_mode:
+        if risk >= Risk.SUBMIT:
+            raise SafeStop(i, risk, reason or "form submit")
+        return
+    if risk <= cap.risk:
+        return
+    spec = ToolSpec(f"site.{site.id}.{cap.name}#step{i}", "L3", risk, f"step {i} of {cap.name}",
+                    {"type": "object", "properties": {}}, _no_handler)
+    decision = await ctx.registry.gate.check(ctx, spec, risk, f"recipe step {i} target “{info.name[:40]}” — {reason}",
+                                             {"step": i, "target": info.name})
+    if not decision.allowed:
+        raise ToolError("denied", f"{site.id}.{cap.name} step {i} ({risk.label}: {info.name[:40]}) was denied: "
+                                  f"{decision.reason}", risk=risk.label, step=i)
+
+
+async def _no_handler(ctx, args):  # pragma: no cover - placeholder spec for gate checks
+    raise ToolError("internal", "not callable")
+
+
+async def run_recipe(ctx: ToolContext, site: SitePack, cap: Capability, args: dict[str, Any],
+                     safe_mode: bool = False, log: Optional[list] = None) -> ToolResult:
     tab = await ctx.runtime.tab_for(ctx.session_id, args.get("tab"))
     ctx.notes["tab"] = tab.id
     page = tab.page
@@ -146,26 +195,35 @@ async def run_recipe(ctx: ToolContext, site: SitePack, cap: Capability, args: di
     # Optional inputs default to "" so templates like "{query}" render as empty.
     values = {**{k: "" for k in cap.input_schema.get("properties", {})}, **args}
     sub = lambda v: site.render(v, values) if isinstance(v, str) else v  # noqa: E731
+    url_values = {k: quote(str(v), safe="") for k, v in values.items()}
+    sub_url = lambda v: site.render(v, url_values)  # noqa: E731  (arguments inside URLs are encoded)
+    partial = ""
     tgt = lambda st: _render_target(site, st["target"], values)  # noqa: E731
     for i, step in enumerate(cap.steps):
         kind = step["do"]
         try:
             if kind == "goto":
-                await page.goto(sub(step["url"]), wait_until="domcontentloaded")
+                await page.goto(sub_url(step["url"]), wait_until="domcontentloaded")
             elif kind == "ensure_login":
                 await ctx.registry.call("auth.ensure_login", {"site": site.id, "tab": tab.id},
                                         session_id=ctx.session_id, actor="recipe")
             elif kind == "click":
-                await act.click(tab, await _resolve(ctx, tab, tgt(step)))
-                await _settle(tab)
+                ref = await _resolve(ctx, tab, tgt(step))
+                await _step_guard(ctx, tab, ref, site, cap, i, safe_mode)
+                before = tab.nav_count
+                await act.click(tab, ref)
+                await _settle(tab, before)
             elif kind == "fill":
                 await act.type(tab, await _resolve(ctx, tab, tgt(step)), str(sub(step["value"])))
             elif kind == "select":
                 await act.select(tab, await _resolve(ctx, tab, tgt(step)), [str(sub(step["value"]))])
             elif kind == "press":
                 ref = await _resolve(ctx, tab, tgt(step)) if step.get("target") else None
+                if ref and step["key"] == "Enter":
+                    await _step_guard(ctx, tab, ref, site, cap, i, safe_mode)
+                before = tab.nav_count
                 await act.press(tab, step["key"], ref)
-                await _settle(tab)
+                await _settle(tab, before)
             elif kind == "wait":
                 t = int(step.get("timeout_ms", 15000))
                 if "text" in step:
@@ -191,6 +249,12 @@ async def run_recipe(ctx: ToolContext, site: SitePack, cap: Capability, args: di
                     raise ToolError("no_table", "expected table not found")
                 t = tables[int(step.get("index", 0))]
                 outputs[step.get("as", "table")] = _rows_to_records(t["header"], t["rows"])
+                partial = await pagination_hint(act, tab)
+            elif kind == "collect_pages":
+                recs, n_pages, reason = await collect_table_pages(act, tab, step.get("selector"), None,
+                                                                  step.get("next_text"), int(step.get("max_pages", 20)))
+                outputs[step.get("as", "rows")] = recs
+                partial = f" from {n_pages} page(s), stopped: {reason}"
             elif kind == "extract_text":
                 outputs[step.get("as", "text")] = await act.read_text(tab, step.get("selector"))
             elif kind == "capture_start":
@@ -201,13 +265,25 @@ async def run_recipe(ctx: ToolContext, site: SitePack, cap: Capability, args: di
                     await page.wait_for_timeout(int(step["wait_ms"]))
                 outputs[step.get("as", "responses")] = [json.loads(c["body"]) for c in tab.captured]
                 tab.capture_pattern = None
+            if log is not None:
+                log.append({"step": i, "do": kind, "ok": True, "url": page.url})
+        except SafeStop:
+            if log is not None:
+                log.append({"step": i, "do": kind, "ok": False, "safe_stop": True, "url": page.url})
+            raise
         except ToolError as e:
+            if log is not None:
+                log.append({"step": i, "do": kind, "ok": False, "error": e.message[:300], "url": page.url})
+            if e.code in ("denied", "approval_required"):
+                raise  # a policy decision, not a broken recipe
             raise await _recipe_failure(ctx, tab, site, cap, i, step, e.message) from e
         except Exception as e:
+            if log is not None:
+                log.append({"step": i, "do": kind, "ok": False, "error": f"{type(e).__name__}: {e}"[:300], "url": page.url})
             raise await _recipe_failure(ctx, tab, site, cap, i, step, f"{type(e).__name__}: {e}") from e
     key = cap.returns
     if key and isinstance(outputs.get(key), list) and outputs[key] and isinstance(outputs[key][0], dict):
-        return _records_result(outputs[key], f"{site.id}-{cap.name}")
+        return _records_result(outputs[key], f"{site.id}-{cap.name}", partial)
     value = outputs.get(key) if key else outputs
     text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
     return ToolResult(text=f"{site.id}.{cap.name} ok\n{text[:20000]}", data=value)
@@ -231,11 +307,16 @@ def register_pack(reg: ToolRegistry, site: SitePack) -> None:
     reg.runtime.sites[site.id] = site
     rt = reg.runtime
     rt.risk_patterns = [p for p in rt.risk_patterns if getattr(p[0], "site", None) != site.id]
+    # A site's risks apply on that site only: its base_url host plus optional extra `hosts`
+    # (e.g. a product spread over several domains). An explicit url_glob narrows further.
+    hosts = [urlsplit(site.base_url).hostname or ""] + list(site.meta.get("hosts", []))
     for risk in site.meta.get("risks", []):
         if risk.get("match_text"):
-            rx = _SiteRegex(risk["match_text"], site.id)
-            rt.risk_patterns.append((rx, risk.get("url_glob"), Risk.parse(risk.get("level", "submit")),
-                                     f"{site.id}: {risk.get('reason', risk.get('id', 'site risk'))}"))
+            globs = [risk["url_glob"]] if risk.get("url_glob") else [f"*://{h}/*" for h in hosts if h] + [f"*://{h}" for h in hosts if h]
+            for glob in globs:
+                rx = _SiteRegex(risk["match_text"], site.id)
+                rt.risk_patterns.append((rx, glob, Risk.parse(risk.get("level", "submit")),
+                                         f"{site.id}: {risk.get('reason', risk.get('id', 'site risk'))}"))
     for cap in site.capabilities.values():
         props = dict(cap.input_schema.get("properties", {}))
         props.setdefault("tab", {"type": "string", "description": "Tab id; defaults to your active tab."})
@@ -257,6 +338,42 @@ class _SiteRegex:
 
     def search(self, text: str):
         return self._rx.search(text)
+
+
+async def site_run(ctx, args):
+    """Stable entry point for every site capability (including ones forged after the agent runtime
+    started): the agent's tool surface never changes, so the prompt cache prefix stays valid."""
+    site = ctx.runtime.sites.get(args["site"])
+    if site is None:
+        raise ToolError("unknown_site", f"no site {args['site']!r}; known: {', '.join(ctx.runtime.sites) or 'none'}")
+    cap = site.capabilities.get(args["capability"])
+    if cap is None:
+        raise ToolError("unknown_capability", f"{site.id} has no capability {args['capability']!r}; "
+                                              f"known: {', '.join(site.capabilities) or 'none'}")
+    missing = [k for k in cap.input_schema.get("required", []) if k not in (args.get("args") or {})]
+    if missing:
+        raise ToolError("invalid_arguments", f"{site.id}.{cap.name} needs: {', '.join(missing)}")
+    call_args = dict(args.get("args") or {})
+    if args.get("tab"):
+        call_args["tab"] = args["tab"]
+    return await run_recipe(ctx, site, cap, call_args)
+
+
+async def assess_site_run(ctx, args) -> tuple[Risk, str]:
+    site = ctx.runtime.sites.get(args.get("site", ""))
+    cap = site.capabilities.get(args.get("capability", "")) if site else None
+    return (cap.risk, f"declared by {site.id}.{cap.name}") if cap else (Risk.READ, "")
+
+
+def register_site_run(reg: ToolRegistry) -> None:
+    reg.add(ToolSpec("site.run", "L3", Risk.READ,
+                     "Run a site skill capability by name (see the site skills list in your browser context). "
+                     "Recipes are deterministic and cheap; on failure the current page is returned for L1/L2 fallback.",
+                     {"type": "object", "properties": {
+                         "site": {"type": "string"}, "capability": {"type": "string"},
+                         "args": {"type": "object", "description": "capability arguments"},
+                         "tab": {"type": "string"}}, "required": ["site", "capability"]},
+                     site_run, assess=assess_site_run))
 
 
 def load_all(reg: ToolRegistry, extra: list[Path] | None = None) -> list[SitePack]:

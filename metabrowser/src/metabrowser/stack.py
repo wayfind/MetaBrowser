@@ -10,7 +10,8 @@ from typing import Any, Optional
 from . import paths, sites
 from .policy import PolicyGate
 from .runtime import BrowserRuntime, LaunchOptions
-from .tools import l1, l2
+from .recorder import Recorder
+from .tools import forge, l1, l2
 from .tools.base import ToolRegistry
 from .trace import TraceRecorder
 
@@ -35,5 +36,8 @@ def build_stack(options: Optional[LaunchOptions] = None, *, context: Any = None,
     registry = ToolRegistry(runtime, gate, trace)
     l1.register(registry)
     l2.register(registry)
+    forge.register(registry)
+    runtime.recorder = Recorder(runtime)
     packs = sites.load_all(registry, site_dirs) if load_sites else []
+    sites.register_site_run(registry)
     return Stack(runtime, registry, gate, trace, packs)

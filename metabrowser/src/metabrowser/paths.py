@@ -55,6 +55,8 @@ def bundled_extension_dir() -> Path:
 
 
 def bundled_sites_dir() -> Path:
+    if os.environ.get("METABROWSER_BUNDLED_SITES"):  # eval runs pin a frozen snapshot of the packs
+        return Path(os.environ["METABROWSER_BUNDLED_SITES"])
     root = package_root()
     return root / "_sites" if (root / "_sites").is_dir() else root / "sites"
 

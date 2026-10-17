@@ -1,4 +1,4 @@
-"""CdpActuator: CloakBrowser binary driven over the Playwright CDP pipe, pushed as far as CDP allows.
+"""CdpActuator: ungoogled-chromium driven over the Playwright CDP pipe.
 
 Perception — the browser's own accessibility tree (Accessibility.getFullAXTree), per frame:
   * same-process iframes through the page session (frameId), out-of-process iframes through
@@ -6,8 +6,8 @@ Perception — the browser's own accessibility tree (Accessibility.getFullAXTree
   * nothing is injected into the page's JS world and the DOM is never mutated — refs live in
     the actuator, keyed by backendDOMNodeId.
 Action — element geometry from DOM.getContentQuads, then the page's mouse/keyboard: under
-CloakBrowser humanize those are human-like (Bezier paths, typing cadence) and dispatched through
-CloakBrowser's patched CDP input path. No selectors are needed, so humanize restrictions on
+MetaBrowser humanize those are human-like (Bezier paths, typing cadence) and dispatched through
+standard Chromium CDP input. No selectors are needed, so humanize restrictions on
 selector kinds never apply.
 Page-side reads (main text, tables) run in a private isolated world (Page.createIsolatedWorld),
 invisible to page scripts.
@@ -29,8 +29,11 @@ INTERACTIVE = {
     "button", "link", "textbox", "searchbox", "combobox", "checkbox", "radio", "switch", "tab", "menuitem",
     "menuitemcheckbox", "menuitemradio", "option", "slider", "spinbutton", "listbox", "treeitem", "ListBoxOption",
     "MenuListOption", "textField", "PopUpButton", "DisclosureTriangle",
+    "Date", "DateTime", "InputTime", "date", "dateTime", "inputTime",
 }
-TEXT_INPUT = {"textbox", "searchbox", "textField", "combobox", "spinbutton"}
+DATE_ROLES = {"Date": "YYYY-MM-DD", "date": "YYYY-MM-DD", "DateTime": "YYYY-MM-DDTHH:MM",
+              "dateTime": "YYYY-MM-DDTHH:MM", "InputTime": "HH:MM", "inputTime": "HH:MM"}
+TEXT_INPUT = {"textbox", "searchbox", "textField", "combobox", "spinbutton"} | set(DATE_ROLES)
 CONTEXT = {"heading", "alert", "alertdialog", "dialog", "status"}
 TABLES = {"table", "grid", "treegrid"}
 STATE_PROPS = ("checked", "disabled", "expanded", "selected", "pressed", "required", "focused", "readonly")
@@ -83,6 +86,17 @@ function (sel) {
 SCROLL_JS = "function () { return {y: Math.round(scrollY), height: document.documentElement.scrollHeight, viewport: innerHeight}; }"
 SUBMIT_JS = ("function () { const t = (this.type || '').toLowerCase(); "
              "return {submit: !!(this.form && t === 'submit'), tag: this.tagName.toLowerCase(), type: t}; }")
+VALUE_INPUTS = {"date": "YYYY-MM-DD", "datetime-local": "YYYY-MM-DDTHH:MM", "month": "YYYY-MM",
+                "time": "HH:MM", "week": "YYYY-Www", "color": "#rrggbb", "range": "a number in range"}
+SET_VALUE_JS = r"""
+function (v) {
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+  setter.call(this, v);
+  this.dispatchEvent(new Event('input', {bubbles: true}));
+  this.dispatchEvent(new Event('change', {bubbles: true}));
+  return this.value;
+}
+"""
 SELECT_JS = r"""
 function (labels) {
   if (this.tagName !== 'SELECT') return null;
@@ -271,7 +285,12 @@ class CdpActuator:
         lines: list[str] = []
         frames_seen: list[str] = []
         truncated = False
+        # the year/month/day spinbuttons inside a native date/time control are noise: the control
+        # itself is listed (with its value and format) and page_type sets it in one call
+        inside_date = {(n.frame.key, c.node_id) for n in nodes if n.role in DATE_ROLES for c in _subtree(n, by_frame_id)}
         for n in nodes:
+            if (n.frame.key, n.node_id) in inside_date:
+                continue
             if len(lines) >= max_items:
                 truncated = True
                 break
@@ -283,7 +302,9 @@ class CdpActuator:
                 continue
             if n.role in INTERACTIVE and n.backend_id:
                 line = f"[{self._ref(tab, n)}] {n.role} \"{_clip(n.name, 60)}\""
-                if n.value not in (None, "") and n.role in TEXT_INPUT | {"slider"}:
+                if n.role in DATE_ROLES:
+                    line += f" value=\"{n.value or ''}\" (type {DATE_ROLES[n.role]})"
+                elif n.value not in (None, "") and n.role in TEXT_INPUT | {"slider"}:
                     if n.role in TEXT_INPUT and await self._is_password(n):
                         line += " value=***"
                     else:
@@ -393,7 +414,8 @@ class CdpActuator:
         try:
             found = await fh.session.send("DOM.querySelector", {"nodeId": doc["root"]["nodeId"], "selector": css})
         except Exception as e:
-            raise ToolError("invalid_selector", f"bad CSS selector {css!r}: {e}")
+            raise ToolError("invalid_selector", f"bad CSS selector {css!r} (plain CSS only — no Playwright pseudo "
+                                                f"selectors like :has-text); prefer an [eN] ref from page_snapshot: {str(e)[:120]}")
         if not found.get("nodeId"):
             return None
         desc = await fh.session.send("DOM.describeNode", {"nodeId": found["nodeId"]})
@@ -508,6 +530,17 @@ class CdpActuator:
         await raw_click(x, y, button=button, click_count=2 if double else 1)
 
     async def type(self, tab: Any, ref: str, text: str, *, clear: bool = True, submit: bool = False) -> None:
+        fh, backend, _role, _name = self._resolve(tab, ref)
+        kind = await self._call_on(tab, fh, backend, "function () { return this.tagName === 'INPUT' ? (this.type || '').toLowerCase() : ''; }")
+        if kind in VALUE_INPUTS:
+            # native date/time/month/week/color/range controls are segmented widgets: keystrokes land in
+            # one segment. Set the value as the browser's own picker does and fire input/change.
+            got = await self._call_on(tab, fh, backend, SET_VALUE_JS, text)
+            if not got:
+                raise ToolError("invalid_value", f"{kind} input expects {VALUE_INPUTS[kind]} (got {text!r})")
+            if submit:
+                await tab.page.keyboard.press("Enter")
+            return
         await self.click(tab, ref)  # focus the way a person does
         kb = tab.page.keyboard
         if clear:

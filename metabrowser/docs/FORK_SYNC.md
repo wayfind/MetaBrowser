@@ -4,9 +4,10 @@
 
 ## 1. 接触面
 
-MetaBrowser 与上游只在**包装层**接触（Chromium 内核是 CloakHQ 预编译二进制，不在仓库里）。对包装层的依赖只走公开 API：
-`launch_persistent_context_async`、`binary_info`、`resolve_human_config`、`CLOAKBROWSER_BINARY_PATH` 等，
-集中在 `metabrowser/src/metabrowser/runtime.py`。上游内部重构不影响我们；公开 API 变化只需改这一处。
+2026-10-14 已解除 CloakBrowser 的运行时依赖：默认引擎是 ungoogled-chromium，启动/安装在
+`metabrowser/src/metabrowser/engine.py`，拟人化层是保留 MIT 许可的独立源码快照（`human/NOTICE.md`）。
+仓库历史暂保持 overlay，不在本次引擎替换中改写历史或禁用已有同步工作流。
+未来上游人类输入算法的更新需单独审查并移植；合并上游不会自动更新这个快照。
 
 ## 2. 切入点（seams）设计
 
@@ -45,4 +46,4 @@ cd metabrowser && pytest && python tests/e2e/run_e2e.py
 ## 4. 注意
 
 - 上游 `ci.yml` / `publish.yml` 原样保留；不要在 fork 上打 `v*` tag（会触发上游发布流程），MetaBrowser 用 `metabrowser-v*`。
-- 上游升级浏览器二进制版本后跑一遍 e2e：侧边栏打开方式、跨站 iframe 隔离、humanize 行为都依赖二进制。
+- 更新 ungoogled-chromium 固定版本/哈希后跑 e2e：侧边栏、跨站 iframe、输入及录制均须重新验证。

@@ -59,16 +59,22 @@ def build_core(metacodes_src: Path, *, optimize: str = "ReleaseSafe", log=print)
     out = paths.ensure(paths.home() / "agentcore")
     paths.ensure(out / "lib")
     paths.ensure(out / "bin")
-    static = bundle / "lib" / "libmetask_agentcore.a"
-    if sys.platform == "darwin":
-        dylib = out / "lib" / "libmetask_agentcore.dylib"
-        cmd = ["clang", "-dynamiclib", "-o", str(dylib), f"-Wl,-force_load,{static}",
-               "-Wl,-exported_symbol,_metask_agentcore_get_api", "-install_name", "@rpath/libmetask_agentcore.dylib"]
-    else:
-        dylib = out / "lib" / "libmetask_agentcore.so"
-        cmd = ["cc", "-shared", "-o", str(dylib), "-Wl,--whole-archive", str(static), "-Wl,--no-whole-archive",
-               "-lpthread", "-ldl", "-lm"]
-    subprocess.run(cmd, check=True)
+    name = "libmetask_agentcore.dylib" if sys.platform == "darwin" else "libmetask_agentcore.so"
+    dylib = out / "lib" / name
+    shared = manifest.get("shared_library") or {}
+    official = bundle / shared.get("path", f"lib/{name}")
+    if official.is_file():
+        # Revision 18+: every bundle ships the shared library (manifest hash, export gate) — use it as is.
+        shutil.copy2(official, dylib)
+    else:  # older bundles: link the static archive ourselves, exporting only the discovery symbol
+        static = bundle / "lib" / "libmetask_agentcore.a"
+        if sys.platform == "darwin":
+            cmd = ["clang", "-dynamiclib", "-o", str(dylib), f"-Wl,-force_load,{static}",
+                   "-Wl,-exported_symbol,_metask_agentcore_get_api", "-install_name", "@rpath/" + name]
+        else:
+            cmd = ["cc", "-shared", "-o", str(dylib), "-Wl,--whole-archive", str(static),
+                   "-Wl,--no-whole-archive", "-lpthread", "-ldl", "-lm"]
+        subprocess.run(cmd, check=True)
     shutil.copy2(bundle / "bin" / "rg", out / "bin" / "rg")
     shutil.copy2(bundle / "manifest.json", out / "manifest.json")
     shutil.rmtree(prefix, ignore_errors=True)

@@ -6,6 +6,7 @@ returned as path + preview so they never flood the model context.
 
 from __future__ import annotations
 
+import asyncio
 import csv
 import json
 import re
@@ -37,13 +38,116 @@ def _save_records(records: list[dict[str, Any]], stem: str) -> str:
     return str(path)
 
 
+_ID_HEADER = re.compile(r"(^|[^a-z])(id|no|code|phone|tel|zip)([^a-z]|$)|编号|单号|订单号|号码|电话|邮编|ID", re.I)
+_NUM = re.compile(r"^[¥$€£]?\s*-?[\d,]+(\.\d+)?\s*(元|%|万)?$")
+
+
+def column_totals(records: list[dict[str, Any]]) -> dict[str, float]:
+    """Sums of mostly-numeric columns: the model should not add up dozens of rows by hand."""
+    totals: dict[str, float] = {}
+    if not records:
+        return totals
+    for key in records[0]:
+        vals = [str(r.get(key, "")).strip() for r in records]
+        nums = [v for v in vals if v and _NUM.match(v)]
+        if len(nums) >= max(2, int(0.8 * len(vals))) and not _ID_HEADER.search(str(key)):
+            totals[key] = round(sum(float(re.sub(r"[^\d.\-]", "", v)) for v in nums), 2)
+    return totals
+
+
 def _records_result(records: list[dict[str, Any]], stem: str, note: str = "") -> ToolResult:
+    totals = column_totals(records)
+    tot = ("\ncolumn totals: " + "; ".join(f"{k}={v:g}" for k, v in totals.items())) if totals else ""
     if len(records) <= INLINE_ROWS:
-        return ToolResult(text=f"{len(records)} rows{note}\n" + json.dumps(records, ensure_ascii=False), data=records)
+        return ToolResult(text=f"{len(records)} rows{note}{tot}\n" + json.dumps(records, ensure_ascii=False), data=records)
     path = _save_records(records, stem)
     preview = json.dumps(records[:10], ensure_ascii=False)
-    return ToolResult(text=f"{len(records)} rows{note}; saved to {path}\nfirst 10: {preview}",
-                      data={"path": path, "count": len(records)}, artifacts=[path])
+    return ToolResult(text=f"{len(records)} rows{note}; saved to {path}{tot}\nfirst 10: {preview}",
+                      data={"path": path, "count": len(records), "totals": totals}, artifacts=[path])
+
+
+NEXT_RX = r"^\s*(next|next page|下一页|下页|›|»|>)\s*$"
+
+
+async def next_control(act, tab, next_ref: str | None = None, next_text: str | None = None) -> str | None:
+    """Ref of an enabled 'next page' control, or None (missing or disabled)."""
+    if next_ref:
+        ref = next_ref
+    else:
+        rx = next_text or NEXT_RX
+        ref = await act.find(tab, role="link", name=rx) or await act.find(tab, role="button", name=rx)
+    if not ref:
+        return None
+    fh, backend = act._resolve(tab, ref)[:2]
+    try:
+        disabled = await act._call_on(tab, fh, backend,
+                                      "function () { return !!(this.disabled || this.getAttribute('aria-disabled') === 'true'); }")
+    except ToolError:
+        return None
+    return None if disabled else ref
+
+
+async def pagination_hint(act, tab) -> str:
+    """Warn when the extracted rows are only the current page of a paginated list."""
+    try:
+        ref = await next_control(act, tab)
+    except Exception:
+        return ""
+    return (f" — PARTIAL: an enabled next-page control exists ({ref}); this is only the current page. "
+            "Use data_collect_pages (or net capture) before counting or summing.") if ref else ""
+
+
+def _table_sig(table: dict[str, Any]) -> str:
+    return json.dumps(table.get("rows", [])[:50], ensure_ascii=False)
+
+
+async def collect_table_pages(act, tab, table_selector: str | None = None, next_ref: str | None = None,
+                              next_text: str | None = None, max_pages: int = 10,
+                              change_timeout_s: float = 10.0) -> tuple[list[dict[str, Any]], int, str]:
+    """Extract a table, click next, wait until the TABLE CHANGES (client-rendered grids load rows
+    asynchronously after the click), repeat. Returns (records, pages, stop reason)."""
+    records: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    pages, reason = 0, "max_pages"
+    prev_sig = None
+    for pages in range(1, max_pages + 1):
+        tables = await act.tables(tab, table_selector)
+        if not tables:
+            reason = "no table"
+            break
+        prev_sig = _table_sig(tables[0])
+        new = 0
+        for r in _rows_to_records(tables[0]["header"], tables[0]["rows"]):
+            key = json.dumps(r, sort_keys=True, ensure_ascii=False)
+            if key not in seen:
+                seen.add(key)
+                records.append(r)
+                new += 1
+        if new == 0:
+            reason = "no new rows"
+            break
+        if pages == max_pages:
+            break
+        ref = await next_control(act, tab, next_ref if pages == 1 else None, next_text)
+        if not ref:
+            reason = "last page (no enabled next control)"
+            break
+        before = tab.nav_count
+        await act.click(tab, ref)
+        await _settle(tab, before)
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + change_timeout_s
+        changed = False
+        while loop.time() < deadline:
+            tables = await act.tables(tab, table_selector)
+            if tables and _table_sig(tables[0]) != prev_sig:
+                changed = True
+                break
+            await asyncio.sleep(0.2)
+        if not changed:
+            reason = "next did not change the table"
+            break
+    return records, pages, reason
 
 
 async def read(ctx, args):
@@ -67,8 +171,9 @@ async def extract_table(ctx, args):
     if idx >= len(tables):
         raise ToolError("no_table", f"only {len(tables)} table(s) on page")
     t = tables[idx]
+    hint = await pagination_hint(ctx.runtime.actuator, tab)
     return _records_result(_rows_to_records(t["header"], t["rows"]), "table",
-                           f" (table {idx + 1}/{len(tables)})")
+                           f" (table {idx + 1}/{len(tables)}){hint}")
 
 
 async def fill_form(ctx, args):
@@ -93,44 +198,18 @@ async def fill_form(ctx, args):
 
 
 async def collect_pages(ctx, args):
-    """Extract a table, click 'next', repeat. Stops on max_pages, missing/disabled next, or no new rows."""
+    """All pages of a paginated list (server-rendered or client-rendered)."""
     tab = await _tab(ctx, args)
     _no_dialog(tab)
     act = ctx.runtime.actuator
-    max_pages = int(args.get("max_pages", 10))
-    next_rx = args.get("next_text", r"^(next|下一页|›|»|>)")
-    records: list[dict[str, Any]] = []
-    seen = set()
-    pages = 0
-    for pages in range(1, max_pages + 1):
-        tables = await act.tables(tab, args.get("table_selector"))
-        if not tables:
-            break
-        new = 0
-        for r in _rows_to_records(tables[0]["header"], tables[0]["rows"]):
-            key = json.dumps(r, sort_keys=True)
-            if key not in seen:
-                seen.add(key)
-                records.append(r)
-                new += 1
-        if new == 0 or pages == max_pages:
-            break
-        if args.get("next_selector"):
-            ref = await act.find(tab, css=args["next_selector"])
-        else:
-            ref = await act.find(tab, role="link", name=next_rx) or await act.find(tab, role="button", name=next_rx)
-        if not ref:
-            break
-        info = await act.element(tab, ref)
-        if info.tag == "button" and await act._call_on(tab, *act._resolve(tab, ref)[:2], "function () { return this.disabled; }"):
-            break
-        await act.click(tab, ref)
-        await _settle(tab)
-        try:
-            await tab.page.wait_for_load_state("networkidle", timeout=10000)
-        except Exception:
-            pass
-    return _records_result(records, "pages", f" from {pages} page(s)")
+    next_ref = args.get("next_ref")
+    if args.get("next_selector") and not next_ref:
+        next_ref = await act.find(tab, css=args["next_selector"])
+        if not next_ref:
+            raise ToolError("not_found", f"no element for next_selector {args['next_selector']!r}; prefer next_ref from page_snapshot")
+    records, pages, reason = await collect_table_pages(act, tab, args.get("table_selector"), next_ref,
+                                                       args.get("next_text"), int(args.get("max_pages", 20)))
+    return _records_result(records, "pages", f" from {pages} page(s), stopped: {reason}")
 
 
 async def capture_start(ctx, args):
@@ -216,8 +295,11 @@ def register(reg: ToolRegistry) -> None:
                      "ref": {"type": "string"}, "label": {"type": "string"}, "value": {"type": "string"},
                      "secret": {"type": "boolean"}}}}}, ["fields"]), fill_form))
     add(ToolSpec("data.collect_pages", "L2", Risk.READ,
-                 "Paginate through a list: extract table, click next, repeat until max_pages or no new rows.",
-                 S({"tab": TAB, "table_selector": {"type": "string"}, "next_selector": {"type": "string"},
+                 "All pages of a paginated table (also client-rendered grids: waits for the table to change after "
+                 "each next click). Give next_ref from page_snapshot if the next control isn't named next/下一页. "
+                 "Returns rows + numeric column totals.",
+                 S({"tab": TAB, "table_selector": {"type": "string"}, "next_ref": REF,
+                    "next_selector": {"type": "string", "description": "plain CSS only (no :has-text)"},
                     "next_text": {"type": "string"}, "max_pages": {"type": "integer"}}), collect_pages))
     add(ToolSpec("net.capture_start", "L2", Risk.READ,
                  "Start recording JSON XHR/fetch responses whose URL matches a glob. Often the cheapest way to "

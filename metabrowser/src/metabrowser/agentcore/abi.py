@@ -1,7 +1,8 @@
-"""ctypes projection of metacodes AgentCore C ABI v1, revision 17.
+"""ctypes projection of metacodes AgentCore C ABI v1, revision 18.
 
-Revision 17 keeps revision 15's struct layouts and tables (16 was skipped); it adds the
-`file_target` permission candidate scope for Write/Edit (see host.permission_response).
+Revision 18 adds Session prompt profiles (named kernel sections: ADD host:*, REPLACE/REMOVE
+metacodes:*), per-Run context blocks, `session_control.set_prompt_profile`, and ships a shared
+library in every bundle. Revision 17 added the `file_target` permission candidate scope.
 
 Mirrors sdk/metask/agentcore.h. Every struct size is asserted at import time
 against the header's static asserts, and the discovered API root is checked for
@@ -18,7 +19,7 @@ from pathlib import Path
 from typing import Optional
 
 ABI_VERSION = 1
-ABI_REVISION = 17
+ABI_REVISION = 18
 
 # status / provider / permission / shell / callback codes (subset used by MetaBrowser)
 STATUS_OK = 0
@@ -41,6 +42,8 @@ UI_ANSWERED, UI_UNAVAILABLE, UI_FATAL, UI_CANCELLED = 0, 1, 2, 3
 HOST_OK, HOST_FAILED, HOST_REJECTED, HOST_FATAL = 0, 1, 2, 3
 RUN_INPUT_TEXT, RUN_INPUT_SKILL, RUN_INPUT_MULTIMODAL = 1, 2, 3
 SKILL_SOURCE_USER, SKILL_SOURCE_WORKSPACE = 1, 2
+PROMPT_OP_ADD, PROMPT_OP_REPLACE, PROMPT_OP_REMOVE = 1, 2, 3
+MAX_CONTEXT_BLOCKS = 32
 
 u32, u64, vp = C.c_uint32, C.c_uint64, C.c_void_p
 
@@ -105,9 +108,24 @@ class SessionHostConfig(C.Structure):
                 ("protocol_kind_code", u32), ("reserved", u64 * 3)]
 
 
+class PromptSection(C.Structure):
+    _fields_ = [("struct_size", u32), ("op_code", u32), ("id", BytesView), ("order", C.c_int64),
+                ("text", BytesView), ("interpolate", u32), ("reserved0", u32), ("reserved", u64 * 2)]
+
+
+class PromptProfile(C.Structure):
+    _fields_ = [("struct_size", u32), ("reserved0", u32), ("sections", C.POINTER(PromptSection)),
+                ("section_count", u64), ("reserved", u64 * 4)]
+
+
+class ContextBlock(C.Structure):
+    _fields_ = [("struct_size", u32), ("reserved0", u32), ("label", BytesView), ("text", BytesView),
+                ("reserved", u64 * 2)]
+
+
 class SessionCreateConfig(C.Structure):
     _fields_ = [("struct_size", u32), ("reserved0", u32), ("host", C.POINTER(SessionHostConfig)),
-                ("model", BytesView), ("reserved", u64 * 4)]
+                ("model", BytesView), ("prompt_profile", C.POINTER(PromptProfile)), ("reserved", u64 * 3)]
 
 
 class SkillSource(C.Structure):
@@ -134,7 +152,8 @@ class RunInput(C.Structure):
 
 
 class RunOptions(C.Structure):
-    _fields_ = [("struct_size", u32), ("max_turns", u32), ("reserved", u64 * 4)]
+    _fields_ = [("struct_size", u32), ("max_turns", u32), ("context_blocks", C.POINTER(ContextBlock)),
+                ("context_block_count", u64), ("reserved", u64 * 2)]
 
 
 class RunResult(C.Structure):
@@ -154,6 +173,7 @@ SessionAbortFn = C.CFUNCTYPE(u32, vp, u64, u32, DIAG)
 SessionDescribeFn = C.CFUNCTYPE(u32, vp, C.POINTER(OwnedBytes), DIAG)
 SessionSetModelFn = C.CFUNCTYPE(u32, vp, BytesView, DIAG)
 SessionUpdateRulesFn = C.CFUNCTYPE(u32, vp, C.POINTER(PermissionRuleSet), DIAG)
+SessionSetPromptProfileFn = C.CFUNCTYPE(u32, vp, C.POINTER(PromptProfile), DIAG)
 QuerySkillCatalogFn = C.CFUNCTYPE(u32, vp, C.POINTER(SkillCatalogQuery), C.POINTER(vp), C.POINTER(OwnedBytes), DIAG)
 ReleaseCatalogFn = C.CFUNCTYPE(u32, vp, DIAG)
 BufferReleaseFn = C.CFUNCTYPE(None, C.POINTER(OwnedBytes))
@@ -171,7 +191,8 @@ class SessionApi(C.Structure):
 class SessionControlApi(C.Structure):
     _fields_ = [("struct_size", u32), ("reserved0", u32), ("restore", vp), ("describe", SessionDescribeFn),
                 ("set_model", SessionSetModelFn), ("update_permission_rules", SessionUpdateRulesFn),
-                ("compact", vp), ("abort_compact", vp), ("export_checkpoint", vp)]
+                ("compact", vp), ("abort_compact", vp), ("export_checkpoint", vp),
+                ("set_prompt_profile", SessionSetPromptProfileFn)]
 
 
 class SkillApi(C.Structure):
@@ -195,7 +216,8 @@ _EXPECTED_SIZES = {
     BytesView: 16, OwnedBytes: 16, RunContext: 56, HostTool: 96, RuntimeConfig: 96, SessionCallbacks: 72,
     SkillPolicy: 56, PermissionRuleSet: 88, SessionHostConfig: 168, SessionCreateConfig: 64, SkillSource: 64,
     SkillCatalogQuery: 80, RunInputPart: 72, RunInput: 104, RunOptions: 40, RunResult: 72, RuntimeApi: 24,
-    SessionApi: 40, SessionControlApi: 64, SkillApi: 32, McpApi: 40, Api: 64,
+    SessionApi: 40, SessionControlApi: 72, SkillApi: 32, McpApi: 40, Api: 64,
+    PromptSection: 72, PromptProfile: 56, ContextBlock: 56,
 }
 for _t, _n in _EXPECTED_SIZES.items():
     assert C.sizeof(_t) == _n, f"AgentCore ABI layout mismatch: {_t.__name__} is {C.sizeof(_t)} bytes, header says {_n}"

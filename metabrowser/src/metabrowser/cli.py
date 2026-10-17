@@ -10,6 +10,10 @@
   metabrowser tools                    list tools (no browser needed)
   metabrowser site list|validate|install|kg-export|kg-sync
   metabrowser trace list|show|verify
+  metabrowser record list              recorded demonstrations (record from the side panel)
+  metabrowser eval run [--tasks …]     evaluate the agent on the fixture suite (real model from env)
+  metabrowser eval report|compare      render / compare eval results
+  metabrowser eval serve               run the fixture sites (shop, back-office, ad platform) to try things
 """
 
 from __future__ import annotations
@@ -33,7 +37,7 @@ def _launch_options(a):
     from .runtime import LaunchOptions
 
     return LaunchOptions(profile=a.profile, headless=a.headless, humanize=not a.no_humanize, proxy=a.proxy,
-                         args=list(a.browser_arg))
+                         args=list(a.browser_arg), engine=a.engine, browser_path=a.browser_path)
 
 
 def _add_browser_args(p: argparse.ArgumentParser) -> None:
@@ -43,6 +47,9 @@ def _add_browser_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--proxy")
     p.add_argument("--site-dir", action="append", type=Path, default=[], help="extra site pack root (repeatable)")
     p.add_argument("--browser-arg", action="append", default=[], help="extra Chromium flag (repeatable)")
+    p.add_argument("--engine", default="ungoogled", choices=["ungoogled", "chromium"],
+                   help="default: ungoogled-chromium; chromium explicitly uses Playwright's test browser")
+    p.add_argument("--browser-path", help="browser executable or Chromium.app (or METABROWSER_BROWSER_PATH)")
 
 
 # -- serve ---------------------------------------------------------------------
@@ -130,8 +137,19 @@ def cmd_mcp(a) -> int:
             print("metabrowser daemon not running", file=sys.stderr)
             return 1
         log = (paths.ensure(paths.home() / "logs") / "daemon.log").open("ab")
-        subprocess.Popen([sys.executable, "-m", "metabrowser", "serve", "--profile", a.profile,
-                          *(["--headless"] if a.headless else [])],
+        browser_args = ["--profile", a.profile, "--engine", a.engine]
+        if a.browser_path:
+            browser_args.extend(["--browser-path", a.browser_path])
+        if a.headless:
+            browser_args.append("--headless")
+        if a.no_humanize:
+            browser_args.append("--no-humanize")
+        if a.proxy:
+            browser_args.extend(["--proxy", a.proxy])
+        browser_args.extend(f"--browser-arg={flag}" for flag in a.browser_arg)
+        for directory in a.site_dir:
+            browser_args.extend(["--site-dir", str(directory)])
+        subprocess.Popen([sys.executable, "-m", "metabrowser", "serve", *browser_args],
                          stdout=log, stderr=log, stdin=subprocess.DEVNULL, start_new_session=True)
         info = _wait_daemon(60)
         if not info:
@@ -142,6 +160,18 @@ def cmd_mcp(a) -> int:
 
 
 # -- agent ---------------------------------------------------------------------
+
+def cmd_browser(a) -> int:
+    from .engine import install_browser, manifest, resolve_binary
+
+    try:
+        binary = install_browser(a.archive) if a.browser_cmd == "install" else resolve_binary(a.engine, a.browser_path)
+        print(json.dumps({"engine": a.engine, "executable": str(binary) if binary else None,
+                          "managed_version": manifest()["version"]}, indent=2))
+        return 0
+    except (OSError, ValueError, subprocess.CalledProcessError) as e:
+        print(f"metabrowser: {e}", file=sys.stderr)
+        return 1
 
 def cmd_agent_build_core(a) -> int:
     from .agent import build_core, find_metacodes_src
@@ -169,7 +199,7 @@ def cmd_agent_status(a) -> int:
     for k, v in cfg.public().items():
         print(f"  {k:<16} {v}")
     if not cfg.api_key:
-        print("  -> set METABROWSER_API_KEY (or ANTHROPIC_API_KEY / OPENAI_API_KEY); "
+        print("  -> run `metacodes login` (metask), or set METABROWSER_API_KEY / ANTHROPIC_API_KEY / OPENAI_API_KEY; "
               "model/provider/base_url go in ~/.metabrowser/config.json {\"agent\": {...}}")
     from .server import read_daemon_file
 
@@ -289,6 +319,54 @@ def cmd_trace(a) -> int:
     return 0
 
 
+def cmd_record(a) -> int:
+    from .recorder import list_recordings
+
+    for r in list_recordings():
+        print(f"{r['id']}  steps={r['steps']:<3} site={r['site'] or '-':<14} {r['start_url']}  {r['intent'][:60]}")
+    return 0
+
+
+def cmd_eval(a) -> int:
+    from .evals import runner
+
+    if a.eval_cmd == "run":
+        cfg = runner.RunConfig(out=Path(a.out), suite=a.suite, tasks=a.tasks.split(",") if a.tasks else None,
+                               repeat=a.repeat, label=a.label or a.model or "", engine=a.engine,
+                               headless=not a.headed, chromium_path=a.chromium,
+                               agent_overrides={k: v for k, v in (("model", a.model), ("provider", a.provider),
+                                                                  ("base_url", a.base_url)) if v})
+        summary = asyncio.run(runner.run_suite(cfg))
+        print(runner.render_report(summary))
+        print(f"results: {cfg.out}")
+        return 0 if summary["pass_rate"] > 0 else 1
+    if a.eval_cmd == "report":
+        summary = json.loads((Path(a.dir) / "summary.json").read_text())
+        print(runner.render_report(summary))
+        return 0
+    if a.eval_cmd == "compare":
+        base = json.loads((Path(a.a) / "summary.json").read_text())
+        cand = json.loads((Path(a.b) / "summary.json").read_text())
+        print(runner.compare(base, cand))
+        return 0
+    if a.eval_cmd == "serve":
+        from .evals.envs import EnvServer
+
+        async def serve():
+            env = EnvServer(a.port)
+            url = await env.start()
+            print(f"fixture sites on {url}: /shop/  /admin/ (login: /login)  /ads/ (login: /ads/login)  /erp  /widgets")
+            print(f"site packs: export METABROWSER_SITE_EXAMPLE_SHOP_URL={url}")
+            await asyncio.Event().wait()
+
+        try:
+            asyncio.run(serve())
+        except KeyboardInterrupt:
+            pass
+        return 0
+    return 2
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="metabrowser", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd")
@@ -309,6 +387,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--layers", help="comma list, e.g. L2,L3 to hide primitives")
     p.add_argument("--no-autostart", action="store_true")
     p.set_defaults(fn=cmd_mcp)
+
+    p = sub.add_parser("browser", help="install/check the open browser engine (no subscription)")
+    bsub = p.add_subparsers(dest="browser_cmd", required=True)
+    s = bsub.add_parser("install", help="install a digest-pinned official macOS build")
+    s.add_argument("--archive", type=Path, help="use an already downloaded DMG (SHA-256 is still checked)")
+    s.set_defaults(fn=cmd_browser, engine="ungoogled", browser_path=None)
+    s = bsub.add_parser("status")
+    s.add_argument("--engine", default="ungoogled", choices=["ungoogled", "chromium"])
+    s.add_argument("--browser-path")
+    s.set_defaults(fn=cmd_browser)
 
     p = sub.add_parser("agent", help="embedded metacodes agent")
     asub = p.add_subparsers(dest="agent_cmd", required=True)
@@ -358,6 +446,34 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0].startswith("-") and argv[0] not in ("-h", "--help"):
         argv = ["serve", *argv]  # bare `metabrowser` = start the product
+    p = sub.add_parser("record", help="recorded demonstrations")
+    p.add_argument("record_cmd", nargs="?", default="list", choices=["list"])
+    p.set_defaults(fn=cmd_record)
+
+    p = sub.add_parser("eval", help="evaluate the agent")
+    esub = p.add_subparsers(dest="eval_cmd", required=True)
+    s = esub.add_parser("run")
+    s.add_argument("--suite", default="core")
+    s.add_argument("--tasks", help="comma-separated task ids")
+    s.add_argument("--repeat", type=int, default=1)
+    s.add_argument("--out", default=str(paths.home() / "evals" / time.strftime("%Y%m%d-%H%M%S")))
+    s.add_argument("--label")
+    s.add_argument("--model")
+    s.add_argument("--provider")
+    s.add_argument("--base-url")
+    s.add_argument("--engine", default="ungoogled", choices=["ungoogled", "chromium", "auto"],
+                   help="auto is a compatibility alias for ungoogled; never chooses CloakBrowser")
+    s.add_argument("--browser-path", "--chromium", dest="chromium", help="browser executable (legacy alias: --chromium)")
+    s.add_argument("--headed", action="store_true")
+    s = esub.add_parser("report")
+    s.add_argument("dir")
+    s = esub.add_parser("compare")
+    s.add_argument("a")
+    s.add_argument("b")
+    s = esub.add_parser("serve")
+    s.add_argument("--port", type=int, default=8899)
+    p.set_defaults(fn=cmd_eval)
+
     a = ap.parse_args(argv)
     return a.fn(a) or 0
 

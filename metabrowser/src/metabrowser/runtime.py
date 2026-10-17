@@ -1,6 +1,6 @@
 """The single owner of the browser.
 
-Wraps a CloakBrowser persistent context and adds what agents need on top:
+Wraps an ungoogled-chromium persistent context and adds what agents need on top:
 stable tab ids, per-session active tab, tab leases between sessions, network
 capture buffers, and snapshot memory for "unchanged" detection.
 """
@@ -33,6 +33,8 @@ class Tab:
     capture_pattern: Optional[str] = None
     captured: deque = field(default_factory=lambda: deque(maxlen=200))
     dialog: Any = None            # pending JS dialog in an agent-owned tab (see _on_dialog)
+    nav_count: int = 0            # main-frame navigations committed
+    nav_pending: int = 0          # main-frame navigation requests in flight
 
     @property
     def internal(self) -> bool:
@@ -53,6 +55,8 @@ class LaunchOptions:
     args: list[str] = field(default_factory=list)
     locale: Optional[str] = None
     timezone: Optional[str] = None
+    engine: str = "ungoogled"
+    browser_path: Optional[str] = None
 
 
 class BrowserRuntime:
@@ -61,6 +65,7 @@ class BrowserRuntime:
         self.actuator = actuator or CdpActuator()
         self.context = context  # injectable for tests / external Playwright contexts
         self._owns_context = context is None
+        self._engine = None
         self.tabs: dict[str, Tab] = {}
         self.active: dict[str, str] = {}  # session -> tab id
         self._ids = itertools.count(1)
@@ -72,29 +77,26 @@ class BrowserRuntime:
     # -- lifecycle ---------------------------------------------------------
     async def start(self) -> None:
         if self.context is None:
-            from cloakbrowser import launch_persistent_context_async
+            from .engine import Engine, validate_profile
 
             o = self.options
+            validate_profile(o.profile)
             profile = paths.ensure(paths.profiles_dir() / o.profile)
-            self.context = await launch_persistent_context_async(
-                str(profile),
-                headless=o.headless,
-                humanize=o.humanize,
-                proxy=o.proxy,
-                args=o.args or None,
-                extension_paths=o.extension_paths or None,
-                locale=o.locale,
-                timezone=o.timezone,
-                accept_downloads=True,
-            )
+            self._engine = Engine(o)
+            self.context = await self._engine.start(profile=profile)
         for page in self.context.pages:
             self._register(page, owner=USER)
         self.context.on("page", lambda page: self._register(page))
 
     async def stop(self) -> None:
-        if self.context is not None and self._owns_context:
-            await self.context.close()
-        self.context = None
+        try:
+            if self._engine is not None:
+                await self._engine.stop()
+            elif self.context is not None and self._owns_context:
+                await self.context.close()
+        finally:
+            self._engine = None
+            self.context = None
 
     # -- tabs --------------------------------------------------------------
     def _register(self, page: Any, owner: Optional[str] = None) -> Tab:
@@ -109,10 +111,33 @@ class BrowserRuntime:
         page.on("close", lambda _p=None, tid=tab.id: self._forget(tid))
         page.on("response", lambda resp, t=tab: asyncio.ensure_future(self._on_response(t, resp)))
         page.on("dialog", lambda dialog, t=tab: self._on_dialog(t, dialog))
-        page.on("framenavigated", lambda frame, t=tab: self.actuator.on_navigated(t))
+        page.on("framenavigated", lambda frame, t=tab: self._on_navigated(t, frame))
+        page.on("request", lambda req, t=tab: self._on_request(t, req))
+        page.on("requestfailed", lambda req, t=tab: self._on_request_done(t, req))
         if owner != USER:
             self.active[owner] = tab.id
         return tab
+
+    def _on_navigated(self, tab: Tab, frame: Any) -> None:
+        self.actuator.on_navigated(tab)
+        if frame == tab.page.main_frame:
+            tab.nav_count += 1
+            tab.nav_pending = 0
+
+    @staticmethod
+    def _main_nav(tab: Tab, req: Any) -> bool:
+        try:
+            return req.is_navigation_request() and req.frame == tab.page.main_frame
+        except Exception:
+            return False
+
+    def _on_request(self, tab: Tab, req: Any) -> None:
+        if self._main_nav(tab, req):
+            tab.nav_pending += 1
+
+    def _on_request_done(self, tab: Tab, req: Any) -> None:
+        if self._main_nav(tab, req):
+            tab.nav_pending = max(0, tab.nav_pending - 1)
 
     def _on_dialog(self, tab: Tab, dialog: Any) -> None:
         """Playwright auto-dismisses dialogs only when nobody listens. With this listener:

@@ -60,6 +60,12 @@ class Daemon:
         self.mcp = McpHandler(stack.registry, extra_tools=self._extra_tools())
         stack.gate.approver = self._approve
         stack.trace.subscribe(lambda ev: self._broadcast_threadsafe({"kind": "trace", "event": ev}))
+        recorder = getattr(stack.runtime, "recorder", None)
+        if recorder is not None:
+            recorder.listeners.append(lambda rec, step: self._broadcast_threadsafe(
+                {"kind": "record_step", "recording": rec.id, "tab": rec.tab, "seq": step.seq, "step_kind": step.kind,
+                 "target": (step.target or {}).get("name") or (step.target or {}).get("text") or step.url[:80],
+                 "count": len([s for s in rec.steps if s.kind not in ("api",)])}))
 
     # -- embedded agent ------------------------------------------------------------------
     def start_agent(self) -> None:
@@ -77,8 +83,9 @@ class Daemon:
             host.subscribe(self._on_agent_event)
             self.agent, self.agent_error = host, None
             if not host.config.api_key:
-                self.agent_error = ("no model API key: set METABROWSER_API_KEY (or ANTHROPIC_API_KEY / "
-                                    "OPENAI_API_KEY) and restart; see `metabrowser agent status`")
+                self.agent_error = (f"no model credential ({host.config.credential_source or 'none found'}): log in with "
+                                    "`metacodes login` (metask) or set METABROWSER_API_KEY / ANTHROPIC_API_KEY / "
+                                    "OPENAI_API_KEY, then restart; see `metabrowser agent status`")
         except AgentCoreUnavailable as e:
             self.agent_error = str(e)
         except Exception as e:
@@ -212,6 +219,11 @@ class Daemon:
         r.add_post("/api/agent/sessions/{sid}/interrupt", self.agent_interrupt)
         r.add_get("/api/agent/sessions/{sid}/history", self.agent_history)
         r.add_post("/api/agent/requests/{aid}", self.agent_answer)
+        r.add_post("/api/record/start", self.record_start)
+        r.add_post("/api/record/stop", self.record_stop)
+        r.add_get("/api/recordings", self.recordings)
+        r.add_post("/api/recordings/{rid}", self.recording_update)
+        r.add_post("/api/recordings/{rid}/forge", self.recording_forge)
         return app
 
     async def _bind_loop(self, _app):
@@ -347,6 +359,83 @@ class Daemon:
         if not fut.done():
             fut.set_result(response)
         return web.json_response({"ok": True})
+
+
+
+
+    # -- recording (demonstrations for skill forging) -----------------------------------------------
+    async def record_start(self, request):
+        body = await request.json() if request.can_read_body else {}
+        tab = await _pick_tab(self.stack.runtime, body.get("url"))
+        rec = await self.stack.runtime.recorder.start(tab)
+        self.stack.trace.note("user", "record_start", recording=rec.id, tab=tab.id, url=tab.page.url)
+        return web.json_response({"recording": rec.id, "tab": tab.id, "url": tab.page.url})
+
+
+    async def record_stop(self, request):
+        from .recorder import suggest_site
+
+        body = await request.json() if request.can_read_body else {}
+        active = self.stack.runtime.recorder.active
+        tab_id = body.get("tab") or (next(iter(active)) if active else None)
+        if tab_id not in active:
+            return web.json_response({"error": "nothing is being recorded"}, status=404)
+        rec = await self.stack.runtime.recorder.stop(tab_id)
+        self.stack.trace.note("user", "record_stop", recording=rec.id, steps=len(rec.steps))
+        return web.json_response({"recording": rec.id, "steps": len(rec.steps), "start_url": rec.start_url,
+                                  "apis": len([s for s in rec.steps if s.kind == "api"]),
+                                  "site": suggest_site(rec.start_url, self.stack.runtime.sites)})
+
+
+    async def recordings(self, _request):
+        from .recorder import list_recordings
+
+        return web.json_response(list_recordings())
+
+
+    async def recording_update(self, request):
+        from .recorder import load_recording
+
+        rec = load_recording(request.match_info["rid"])
+        body = await request.json()
+        for key in ("intent", "site", "name"):
+            if key in body:
+                setattr(rec, key, str(body[key])[:2000])
+        rec.save()
+        return web.json_response({"ok": True})
+
+
+    async def recording_forge(self, request):
+        """Start a forge session: recording + intent + site map as context, skeptical-generalization profile."""
+        from .recorder import load_recording, summarize
+
+        agent = self._agent()
+        rec = load_recording(request.match_info["rid"])
+        site, name = rec.site or "site", rec.name or "new_skill"
+        site_map = "(new site)"
+        pack = self.stack.runtime.sites.get(site)
+        if pack is not None:
+            site_map = json.dumps({k: pack.meta.get(k) for k in ("base_url", "pages", "risks") if pack.meta.get(k)},
+                                  ensure_ascii=False)[:4000] + f"\ncapabilities: {', '.join(pack.capabilities) or 'none'}"
+        context = [("recording", f"id={rec.id}\nintent={rec.intent}\n\n" + summarize(rec)[:20000]),
+                   ("site map", f"site={site}\n{site_map}")]
+        loop = asyncio.get_running_loop()
+        sess = await loop.run_in_executor(None, lambda: agent.create_session(f"Forge {name}", "forge", context))
+        agent.send(sess.id, f"请根据录制 {rec.id} 为站点 {site} 生成一个通用 skill「{name}」。用户说明：{rec.intent or '（未说明）'}。"
+                            "按锻造流程：对齐意图、提出并检验假设、起草、在浏览器里验证（含变体），通过后申请启用。")
+        return web.json_response({"session": sess.id, "label": sess.label})
+
+
+async def _pick_tab(runtime, url: Optional[str]):
+    """The tab the user is looking at: the side panel sends the active Chrome tab's URL."""
+    tabs = [t for t in runtime.tabs.values() if not t.internal]
+    if url:
+        hits = [t for t in tabs if t.page.url == url] or [t for t in tabs if t.page.url.split("#")[0] == url.split("#")[0]]
+        if hits:
+            return hits[-1]
+    if not tabs:
+        raise web.HTTPBadRequest(text=json.dumps({"error": "no tab to record"}), content_type="application/json")
+    return tabs[-1]
 
 
 async def _health(_request):

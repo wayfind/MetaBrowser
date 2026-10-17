@@ -76,7 +76,10 @@ async def assess_element(ctx: ToolContext, args: dict[str, Any]) -> tuple[Risk, 
 
 async def _act(tab, coro) -> None:
     """Run an input action, but return as soon as it opens a JS dialog: the input call itself stays
-    blocked inside the renderer until the dialog is handled (by page_dialog), which must not deadlock."""
+    blocked inside the renderer until the dialog is handled (by page_dialog), which must not deadlock.
+    Afterwards wait for any navigation the action started (see _settle)."""
+    nav_before = tab.nav_count
+    tab._nav_before = nav_before
     action = asyncio.ensure_future(coro)
 
     async def dialog_opened():
@@ -90,7 +93,18 @@ async def _act(tab, coro) -> None:
         action.result()  # propagate errors
 
 
-async def _settle(tab) -> None:
+async def _settle(tab, nav_before: int | None = None, grace_s: float = 0.35, timeout_s: float = 15.0) -> None:
+    """After an action: if it started a main-frame navigation (form submit, link, JS redirect), wait
+    until the new document commits and loads. Without this, the next step can read the OLD page
+    (classic flake: a search's results extracted before the GET navigation committed)."""
+    loop = asyncio.get_running_loop()
+    before = tab.nav_count if nav_before is None else nav_before
+    end_grace = loop.time() + grace_s
+    while loop.time() < end_grace and tab.nav_count == before and not tab.nav_pending:
+        await asyncio.sleep(0.03)
+    end = loop.time() + timeout_s
+    while tab.nav_pending and tab.nav_count == before and loop.time() < end and tab.dialog is None:
+        await asyncio.sleep(0.05)
     try:
         await tab.page.wait_for_load_state("domcontentloaded", timeout=5000)
     except Exception:
@@ -112,7 +126,8 @@ async def _snapshot_result(ctx: ToolContext, tab, force: bool = False, max_items
 
 async def _after_action(ctx: ToolContext, tab, include_snapshot: bool) -> ToolResult:
     if tab.dialog is None:
-        await _settle(tab)
+        await _settle(tab, getattr(tab, "_nav_before", None))
+        tab._nav_before = None
     if not include_snapshot:
         return ToolResult(text=f"ok tab={tab.id} url={tab.page.url}")
     return await _snapshot_result(ctx, tab, force=True)

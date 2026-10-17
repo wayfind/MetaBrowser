@@ -49,11 +49,11 @@ async def agent(stack, shop, tmp_path):
 
     llm_holder = {}
 
-    async def make(turns, ui_handler=None):
+    async def make(turns, ui_handler=None, **overrides):
         llm = MockLLM(scripted(turns))
         url = await llm.start()
         cfg = AgentConfig(provider="anthropic", model="claude-sonnet-4-6", base_url=url, api_key="test-key",
-                          workspace_root=tmp_path / "ws", workspace_home=tmp_path / "agent-home")
+                          workspace_root=tmp_path / "ws", workspace_home=tmp_path / "agent-home", **overrides)
         host = AgentHost(stack.registry, asyncio.get_running_loop(), cfg, ui_handler=ui_handler,
                          skill_dirs=[("builtin", Path(__file__).parents[1] / "src/metabrowser/skills"),
                                      ("site.example_shop", SITES / "example-shop" / "skills")],
@@ -83,9 +83,17 @@ async def test_agent_loop_uses_browser_tools(agent, stack, shop):
     assert done["status"] == "OK" and done["stop_reason"] == "end_turn" and done["tool_calls"] == 1, done
     text = "".join(e["core_event"].get("text_chunk", "") for e in evs if "core_event" in e)
     assert "Found: Dan Chen" in text
-    # browser operating contract injected into the first user turn (no system-prompt slot in the ABI)
+    # revision 18 prompt profile: browser identity + method replace the coding defaults, locked
+    # safety sections stay; the per-Run browser context block leads the user record
+    system = json.dumps(llm.requests[0].get("system"), ensure_ascii=False)
+    assert "You are MetaBrowser" in system and "auth_ensure_login" in system
+    assert "MetaCode, a local CLI agent" not in system and "software engineering" not in system
+    assert "prompt injection" in system  # metacodes:system (locked) is still there
     first_user = json.dumps(llm.requests[0]["messages"][0], ensure_ascii=False)
-    assert "<metabrowser-context>" in first_user and "auth_ensure_login" in first_user
+    assert "tabs (* = your active tab)" in first_user and "example_shop" in first_user
+    manifests = [e for e in evs if "core_event" in e and "prompt_manifest" in e["core_event"]]
+    ids = [x["id"] for x in manifests[0]["core_event"]["prompt_manifest"]["sections"]]
+    assert "metacodes:safety-policy" in ids and "host:browser-rules" in ids
     # the model saw our browser tools as first-class host tools
     names = tool_names(llm.requests[0])
     assert {"page_snapshot", "data_extract_table", "site_example_shop_orders_list"} <= set(names)
@@ -121,7 +129,7 @@ async def test_permission_callback_and_browser_gate(agent, stack, shop):
         [{"tool_use": {"name": "page_navigate", "input": {"url": shop + "/admin/orders/"}}}],
         click_refund,
         lambda body: [{"text": "result: " + last_tool_result(body)[:200]}],
-    ], ui_handler=ui)
+    ], ui_handler=ui, computer_access=True)
     sess = host.create_session()
     host.send(sess.id, "试试")
     await _wait_idle(host, sess.id)
@@ -182,6 +190,23 @@ async def test_file_target_session_grant_rev17(agent, stack, shop, mb_home):
     # asked for plan.md once (file grant covers the second write), then again for other.md
     assert [Path(r["candidate"]["target"]).name for r in asked] == ["plan.md", "other.md"]
     assert all(r["candidate"]["scope"] == "file_target" for r in asked)
+
+
+async def test_tool_surface_per_mode(agent, stack, shop):
+    host, llm = await agent([[{"text": "a"}], [{"text": "b"}]])
+    op = host.create_session(mode="operator")
+    host.send(op.id, "x")
+    await _wait_idle(host, op.id)
+    fg = host.create_session(mode="forge")
+    host.send(fg.id, "y")
+    await _wait_idle(host, fg.id)
+    op_tools, fg_tools = tool_names(llm.requests[0]), tool_names(llm.requests[1])
+    assert "site_run" in op_tools and "page_snapshot" in op_tools and "Read" in op_tools
+    assert not {"Bash", "Grep", "Glob", "skill_promote", "skill_draft_save"} & set(op_tools)
+    assert {"skill_draft_save", "skill_draft_test", "skill_promote", "recording_get"} <= set(fg_tools)
+    assert len(json.dumps(llm.requests[0]["tools"])) < 26000  # was ~30 KB with every coding builtin
+    system_fg = json.dumps(llm.requests[1].get("system"), ensure_ascii=False)
+    assert "Forging a site skill" in system_fg and "Treat the recording as ONE sample" in system_fg
 
 
 async def test_parallel_sessions_have_separate_tabs(agent, stack, shop):

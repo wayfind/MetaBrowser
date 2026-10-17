@@ -1,7 +1,7 @@
-"""MetaBrowser: an agent-grade browser runtime layered on CloakBrowser.
+"""MetaBrowser: an agent-grade browser runtime on ungoogled-chromium.
 
 Layers (see docs/ARCHITECTURE.md):
-  L0 engine      cloakbrowser launch (stealth Chromium, humanize)
+  L0 engine      ungoogled-chromium (open Chromium, humanized input)
   L1 primitives  tabs / navigate / snapshot / click / type ...
   L2 semantic    read / extract_table / fill_form / collect_pages / net capture ...
   L3 site packs  site.<pack>.<capability> recipes compiled from site knowledge

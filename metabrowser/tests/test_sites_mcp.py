@@ -101,3 +101,23 @@ def test_kg_sync_into_tinykg_is_idempotent(tmp_path):
     assert first["nodes_added"] == len(plan.nodes) and first["edges_added"] == len(plan.edges)
     again = TinyKG(tmp_path / "store", TINYKG).apply(plan)
     assert again == {"nodes_added": 0, "edges_added": 0}
+
+
+def test_site_risks_are_scoped_to_their_hosts():
+    from metabrowser.stack import build_stack
+    from metabrowser.tools.base import Risk
+    from metabrowser.tools.l1 import text_risk
+
+    st = build_stack(record=False)
+    rt = st.runtime
+    # oceanengine's "导出" is submit-level on its own domains only
+    assert text_risk(rt, "导出", "https://ad.oceanengine.com/report", Risk.INPUT)[0] == Risk.SUBMIT
+    assert text_risk(rt, "导出", "https://qianchuan.jinritemai.com/x", Risk.INPUT)[0] == Risk.SUBMIT
+    assert text_risk(rt, "导出", "https://shop.example.org/report", Risk.INPUT)[0] == Risk.INPUT
+    # generic vocabulary still applies everywhere
+    assert text_risk(rt, "删除", "https://shop.example.org/x", Risk.INPUT)[0] == Risk.IRREVERSIBLE
+
+
+def test_capability_fields_are_not_shifted():
+    cap = load_pack(SITES / "example-shop").capabilities["orders_list"]
+    assert cap.reads == ["order"] and cap.writes == [] and len(cap.tests) == 2

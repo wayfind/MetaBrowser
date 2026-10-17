@@ -1,27 +1,41 @@
 # metabrowser
 
-CloakBrowser（隐身 Chromium）+ 内嵌 metacodes AgentCore：浏览器右侧原生侧边栏里的多 session agent，
+ungoogled-chromium（开源 Chromium）+ 内嵌 metacodes AgentCore：浏览器右侧原生侧边栏里的多 session agent，
 通过分层、带风险门、全程可审计的工具控制整个浏览器，用来操作电商后台、ERP/CRM 等只有网页界面的业务系统。
 
-- 架构：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · 站点包：[docs/SITE_PACK.md](docs/SITE_PACK.md) · 上游同步：[docs/FORK_SYNC.md](docs/FORK_SYNC.md)
+- 架构：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · harness（录制→锻造→评估）：[docs/HARNESS.md](docs/HARNESS.md) · 站点包：[docs/SITE_PACK.md](docs/SITE_PACK.md) · 上游同步：[docs/FORK_SYNC.md](docs/FORK_SYNC.md)
 
 ![side panel](docs/images/side-panel.png)
 
 ## 安装与启动
 
 ```bash
-pip install -e . -e ./metabrowser                                # 仓库根目录：cloakbrowser + metabrowser
+pip install -e ./metabrowser                                    # 不再安装或依赖 cloakbrowser
+metabrowser browser install                                     # macOS：固定版本 + SHA-256 校验
+metabrowser browser status                                      # 显示实际解析的浏览器路径
 metabrowser agent build-core --metacodes-src ~/prj/metacodes     # 构建并安装 AgentCore 动态库（需要 Zig 0.16）
-export METABROWSER_API_KEY=...                                   # 模型密钥，只从环境变量读取
-metabrowser agent status                                         # 检查：库、模型配置、密钥
+metacodes login                                                  # 模型：默认走 metask（复用 metacodes 登录）
+metabrowser agent status                                         # 检查：库、provider、凭据来源
 metabrowser                                                      # 启动：浏览器 + 侧边栏 + agent
 ```
+
+已安装 ungoogled-chromium 可直接使用 `metabrowser --browser-path /path/to/chromium`（macOS 可传
+`Chromium.app`），或设置 `METABROWSER_BROWSER_PATH`。Linux/Windows 当前使用本机安装的二进制；
+自动安装器暂支持 macOS Apple Silicon / Intel，版本与哈希固定在 `src/metabrowser/browser-builds.json`。
+启动时不联网校验授权、不自动下载，也不会回退到 CloakBrowser。开发测试可显式选择 `--engine chromium`。
+
+拟人化输入独立保留原 MIT 许可证；不包含 CloakBrowser 的闭源指纹补丁，不承诺通过反机器人检测。
+Zig 宿主可行性、真实 CDP 原型和分阶段迁移见 [docs/ENGINE_AND_ZIG.md](docs/ENGINE_AND_ZIG.md)。
+
+凭据来源（按顺序）：`METABROWSER_API_KEY` / provider 环境变量（`METASK_API_KEY`、`ANTHROPIC_API_KEY`、`OPENAI_API_KEY`…）→
+metacodes 登录（`METACODES_AUTH_FILE` 或 `$METACODES_HOME`/`~/.metacodes` 的 `auth.json`，只在进程内使用、不刷新、不记录）。
+未配置 provider 时：有 provider 环境变量就用它，否则用 metask（`https://napi.metask-ai.com/v1/messages`，bearer）。
 
 模型配置（可选）写在 `~/.metabrowser/config.json`：
 
 ```json
-{"agent": {"provider": "anthropic", "model": "claude-sonnet-4-6", "base_url": "https://…/v1/messages",
-           "api_key_env": "MY_KEY_VAR", "permission_mode": "default", "shell": "sandboxed"}}
+{"agent": {"provider": "metask", "model": "claude-sonnet-4-6", "api_key_env": "MY_KEY_VAR",
+           "permission_mode": "default", "shell": "sandboxed", "computer_access": false}}
 ```
 
 `metabrowser serve` 的选项：`--no-agent`、`--no-panel`、`--headless`、`--profile NAME`、`--proxy URL`、`--port N`、
@@ -45,9 +59,24 @@ metabrowser agent register-mcp        # 让独立的 metacodes CLI 也能用这�
 |----|------|
 | L1 | `tabs_*`, `page_navigate/snapshot/click/type/select/press/scroll/wait/screenshot`, `page_dialog`, `file_upload`, `browser_permissions`, `page_evaluate`（默认禁用） |
 | L2 | `page_read`, `data_extract_table`, `data_collect_pages`, `form_fill`, `net_capture_start/read`, `file_download`, `auth_ensure_login` |
-| L3 | `site_<pack>_<capability>` |
+| L3 | `site_run(site, capability, args)`（含新锻造的 skill）、`site_<pack>_<capability>` |
+| 锻造 | `recording_list/get/draft`, `site_map_get/update`, `skill_draft_save/test`, `skill_promote`（锻造模式） |
 
 感知基于浏览器无障碍树（含跨站 iframe），动作走 CloakBrowser 拟人化鼠标键盘，不注入页面脚本、不改 DOM。
+
+## 录制 → 生成 skill
+
+侧边栏 **● 录制** → 在页面上操作一遍 → **■ 停止** → 写"这段操作是在做什么？"、站点、skill 名 → **生成 skill**。
+锻造会话会参考录制、意图和站点地图起草 skill，在浏览器里用演示参数和变体验证（安全模式，不执行提交/不可逆步骤），
+通过后由你在侧边栏批准启用。`metabrowser record list` 查看录制。详见 [docs/HARNESS.md](docs/HARNESS.md)。
+
+## 评估
+
+```bash
+metabrowser eval run [--tasks shop.cheapest,ads.yesterday] [--repeat 3] [--model …]   # 真实模型、真实 CloakBrowser
+metabrowser eval compare ~/.metabrowser/evals/A ~/.metabrowser/evals/B                # A/B 成对对比
+metabrowser eval serve                                                                  # 启动评估用的模拟站点
+```
 
 ## 站点包、TinyKG、审计
 

@@ -1,14 +1,15 @@
 # MetaBrowser 架构
 
-> 状态：M0 已实现并实测（真实 CloakBrowser 145 二进制、内嵌 metacodes AgentCore、原生侧边栏容器）。
+> 状态：默认引擎已替换为 ungoogled-chromium；2026-10-14 用 macOS arm64 154.0.8037.97
+> 验证了内嵌 AgentCore、原生侧边栏、多 session、审批、录制/锻造、工具与审计。
+> Python 宿主仍是完整产品；直接 Zig CDP 原型及迁移边界见 [ENGINE_AND_ZIG.md](ENGINE_AND_ZIG.md)。
 > 上手：[../README.md](../README.md) · 站点包：[SITE_PACK.md](SITE_PACK.md) · 上游同步：[FORK_SYNC.md](FORK_SYNC.md)
 
 ## 0. 前提与目标
 
-**前提（决定架构的事实）**：CloakBrowser 仓库只包含包装库（Python/JS/.NET）；Chromium 内核是 CloakHQ 预编译、
-签名分发的闭源二进制（`BINARY-LICENSE.md`，87 个 C++ 隐身补丁不公开）。因此本项目**不修改内核**：通过 CDP
-pipe 控制浏览器，侧边栏挂在 Chromium 原生侧边栏容器里。执行层被抽象为接口，将来获得内核源码时可整体替换为
-进程内原生 actor（§7），上层不变。
+**当前选型**：默认使用 ungoogled-chromium 的开源 Chromium；通过 CDP pipe 控制浏览器，
+侧边栏挂在 Chromium 原生侧边栏容器里。不依赖 CloakBrowser 二进制、订阅服务或其闭源补丁。
+执行层被抽象为接口，未来 Zig 宿主复用工具契约；自行维护内核 fork 时可进一步接入进程内 actor。
 
 **目标**：让 metacodes agent loop 高效、低成本、可审计地完成只能在浏览器里做的业务（电商后台、ERP/CRM、传统 SaaS）。
 
@@ -25,7 +26,7 @@ pipe 控制浏览器，侧边栏挂在 Chromium 原生侧边栏容器里。执�
 ## 1. 总体结构（一个进程拥有一切）
 
 ```
-┌──────────────────── CloakBrowser Chromium（预编译二进制，有界面）────────────────────┐
+┌──────────────────── ungoogled-chromium（开源二进制，有界面）────────────────────────┐
 │  标签页 …                                       │ 原生侧边栏容器（Chromium side panel） │
 │                                                 │  Session 1 │ Session 2 │ ＋          │
 └──────▲──────────────────────────────────────────┴──────────────▲──────────────────────┘
@@ -33,7 +34,7 @@ pipe 控制浏览器，侧边栏挂在 Chromium 原生侧边栏容器里。执�
 ┌──────┴──────────────────── metabrowser daemon（Python，单进程）───┴────────────────────┐
 │ Actuator(CDP: AX 树感知 / 坐标动作 / 隔离 world)   ToolRegistry(L1/L2/L3/L4)            │
 │ PolicyGate(风险门)   TraceRecorder(哈希链)   SitePacks   /mcp(外部智能体)               │
-│ AgentHost ──ctypes──► libmetask_agentcore (metacodes AgentCore C ABI v1 rev17)        │
+│ AgentHost ──ctypes──► libmetask_agentcore (metacodes AgentCore C ABI v1 rev18)        │
 │              host tools = 全部浏览器工具；on_ui_request → 侧边栏审批；多 Session         │
 └───────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -52,10 +53,10 @@ pipe 控制浏览器，侧边栏挂在 Chromium 原生侧边栏容器里。执�
 **Actuator（`actuator/`）是唯一接触引擎的层**，`CdpActuator` 把 CDP 用到极致：
 
 - **感知**：`Accessibility.getFullAXTree` 逐帧读取浏览器计算好的无障碍树。同进程 iframe 走页面 session，
-  **跨进程（跨站）iframe 走独立 CDP session**（真实 CloakBrowser 对跨站 iframe 做进程隔离，已实测）。
+  **跨进程（跨站）iframe 走独立 CDP session**（`--site-per-process`；真实 ungoogled-chromium 已实测）。
   不向页面 JS 世界注入任何东西，**不改 DOM**（ref 由 actuator 以 backendDOMNodeId 维护）。
-- **动作**：`DOM.getContentQuads` 取几何 → 页面 `mouse.click / keyboard.type`。在 CloakBrowser humanize 下这些是
-  拟人轨迹与节奏，并经 CloakBrowser 打过补丁的 CDP 输入路径发出；不依赖选择器（humanize 不支持 role/组合选择器，实测发现）。
+- **动作**：`DOM.getContentQuads` 取几何 → 页面 `mouse.click / keyboard.type`。独立 MIT 拟人化层提供
+  轨迹与节奏，经标准 Chromium CDP 输入路径发出；不包含内核指纹补丁，不依赖选择器。
 - **页面读取**（正文、表格）在私有 isolated world 执行，页面脚本不可见。
 - **对话框**：agent 名下标签页的 alert/confirm/prompt 被挂起交给 `page_dialog`（确认文本命中风险词则需审批）；
   用户标签页保留原生对话框给人处理（避免 Playwright 默认自动关闭）。动作与对话框竞速，防止输入调用被对话框阻塞导致死锁。
@@ -92,20 +93,25 @@ irreversible。详见 SITE_PACK.md。
 ## 6. 侧边栏与多 Session
 
 - **位置**：Chromium 原生侧边栏容器（与阅读清单、书签、Gemini 侧边栏同一位置；Chrome 自己的侧边栏内容同样是 HTML/WebUI）。
-  因内核闭源，以 MV3 扩展的 `side_panel` 注入；daemon 启动时用带用户手势的 CDP 调用 `chrome.sidePanel.open` 自动打开。
+  当前复用 MV3 扩展的 `side_panel`，无需维护内核 fork；daemon 启动时用带用户手势的 CDP 调用 `chrome.sidePanel.open` 自动打开。
   扩展无 content script、无 web_accessible_resources，页面无法探测（实测 `navigator.webdriver=false`）。
 - **Session**：每个对话 = 一个 AgentCore Session（运行于独立线程，`run_input` 同步阻塞）；可随时新建；
   Run 期间的新消息排队；Stop = `session_abort`。
 - **控制范围 = 整个浏览器**，Tab Lease 防互踩：session 打开的标签归其所有，操作他人标签需 `tabs_claim`；
   扩展自身页面对 agent 不可见、不可操作。
-- ABI rev17 没有系统提示词槽位（已提 metask-ai/metacodes#184）：浏览器操作规范随每个 session 首条输入注入（`<metabrowser-context>`）。
+- **提示词档案（ABI rev18）**：会话按模式使用不同 prompt profile —— `operator`（浏览器任务方法论）与 `forge`（从演示锻造 skill 的怀疑-泛化-自证方法论）；
+  替换 `metacodes:identity`/`doing-tasks`/`validation` 并新增 `host:browser-rules`，锁定的 `safety-policy`/`system` 保留；每轮运行附带
+  "browser" 上下文块（标签页、可用站点 skill），`prompt_manifest` 事件写入审计轨迹。
+- **工具面按模式收窄**：操作模式不带编程类内置工具与锻造写工具（首个请求 41.8 KB → 31.9 KB）；`computer_access` 开启完整电脑访问。
+- **录制与锻造**：见 [HARNESS.md](HARNESS.md)。
 
-## 7. 将来的原生路线（获得内核源码时）
+## 7. 将来的原生路线（Zig 宿主 / 开源内核 fork）
 
 Chromium 145 分支已有 Gemini 代理浏览用的 `chrome/browser/actor`（click/type/navigate/scroll 等 20+ 工具、
 ExecutionEngine、ToolController）与 Blink `content_extraction`（Annotated Page Content），以及 `SIDE_PANEL_ENTRY_IDS`
 侧边栏注册。替换方式：实现一个 `NativeActuator`（进程内 actor + APC 感知）、侧边栏改为 WebUI 原生条目、AgentCore 静态库直接链接进浏览器进程。
-工具契约、站点包、风险门、轨迹、AgentCore 集成全部复用。内核补丁按 Brave `chromium_src` 覆盖 + 独立目录方式分层以便跟随 Chromium 版本。
+工具契约、站点包、风险门、轨迹、AgentCore 集成全部复用。Zig 宿主无需修改内核即可使用 CDP pipe；
+进程内 actor/WebUI 则需要维护 Chromium C++ fork。迁移顺序与验收见 [ENGINE_AND_ZIG.md](ENGINE_AND_ZIG.md)。
 
 ## 8. 与上游同步
 
@@ -122,8 +128,9 @@ overlay fork：fork 代码全部在 `metabrowser/`；对上游文件的修改只
 
 ## 10. 验证
 
-- 单元/集成：`cd metabrowser && pytest`（35 项；测试浏览器启用 humanize 与 site-per-process，与产品一致）。
-- 真机验收：`python metabrowser/tests/e2e/run_e2e.py`——真实 CloakBrowser 有界面、原生侧边栏、内嵌 AgentCore；
+- 单元/集成：`cd metabrowser && pytest`（测试浏览器启用 humanize 与 site-per-process，与产品一致；
+  `METABROWSER_TEST_CHROMIUM` 可指定实际 ungoogled-chromium）。
+- 真机验收：`python metabrowser/tests/e2e/run_e2e.py`——真实 ungoogled-chromium 有界面、原生侧边栏、内嵌 AgentCore；
   通过 CDP 像用户一样操作侧边栏（新建 session、输入任务、点击审批），覆盖 L3 配方、AgentCore 权限询问、
   不可逆动作升级拒绝、写报告、多 session、轨迹校验。模型默认用 mock，`--real-llm` 使用环境中的真实凭据。
 

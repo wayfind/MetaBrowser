@@ -80,3 +80,51 @@ async def test_upload_inside_outputs_needs_submit_approval(stack, shop, mb_home)
     risks.clear()
     await call(stack, "file.upload", ref=ref, paths=[str(secret)])
     assert risks == ["irreversible"]  # files outside ~/MetaBrowser escalate
+
+
+async def test_collect_pages_on_client_rendered_grid_with_totals(stack, shop):
+    """Ad-platform SPA: rows load via fetch after each next click; totals come from the tool, not the model."""
+    from metabrowser.evals import envs
+
+    await stack.runtime.context.add_cookies([{"name": "ads_session", "value": "ok", "domain": "127.0.0.1", "path": "/"}])
+    await call(stack, "page.navigate", url=shop + "/ads/#/report", snapshot=False)
+    await call(stack, "page.wait", text="共 23 条")
+    res = await call(stack, "data.collect_pages", table_selector="table")
+    assert len(res.data) == 23 and "stopped: last page" in res.text, res.text[:300]
+    day = envs.DATA_UNTIL.isoformat()
+    expected = round(sum(r["cost"] for r in envs.ads_report("plan", day, day)), 2)
+    assert f"消耗(元)={expected:g}" in res.text
+
+
+async def test_extract_table_flags_partial_page(stack, shop):
+    await login(stack.runtime.context, shop)
+    await call(stack, "page.navigate", url=shop + "/admin/orders/", snapshot=False)
+    res = await call(stack, "data.extract_table")
+    assert "PARTIAL" in res.text and len(res.data) == 5
+
+
+async def test_orders_recipe_collects_all_pages_and_filters_by_url(stack, shop):
+    await login(stack.runtime.context, shop)
+    res = await call(stack, "site.run", site="example_shop", capability="orders_list", args={"status": "paid"})
+    assert sorted(r["Order"] for r in res.data) == ["A1000", "A1003", "A1005", "A1007"], res.text[:200]
+    assert "PARTIAL" not in res.text
+
+
+async def test_date_inputs_are_set_in_one_call_and_totals_include_integer_metrics(stack, shop):
+    from metabrowser.evals import envs
+
+    await stack.runtime.context.add_cookies([{"name": "ads_session", "value": "ok", "domain": "127.0.0.1", "path": "/"}])
+    await call(stack, "page.navigate", url=shop + "/ads/#/report", snapshot=False)
+    await call(stack, "page.wait", text="共 23 条")
+    snap = (await call(stack, "page.snapshot", force=True)).text
+    assert 'Date "开始日期' in snap and "(type YYYY-MM-DD)" in snap and 'spinbutton "年' not in snap, snap[:800]
+    await call(stack, "page.type", ref=ref_of(snap, 'Date "开始日期'), text="2026-09-01")
+    await call(stack, "page.type", ref=ref_of(snap, 'Date "结束日期'), text="2026-09-07")
+    await call(stack, "page.click", ref=ref_of(snap, 'button "查询"'), snapshot=False)
+    await call(stack, "page.wait", text="共 23 条")
+    res = await call(stack, "data.collect_pages", table_selector="table")
+    clicks = sum(r["click"] for r in envs.ads_report("plan", "2026-09-01", "2026-09-07"))
+    assert len(res.data) == 23 and f"点击={clicks}" in res.text, res.text[:300]
+    with pytest.raises(ToolError) as e:
+        await call(stack, "page.type", ref=ref_of(snap, 'Date "开始日期'), text="9/1")
+    assert e.value.code == "invalid_value"

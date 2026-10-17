@@ -164,6 +164,9 @@ function onDaemonEvent(msg) {
     case "agent_request": return onAgentRequest(msg);
     case "agent_request_done": return document.querySelector(`[data-request="${msg.id}"]`)?.remove();
     case "approval": return onBrowserApproval(msg);
+    case "record_step":
+      if (rec.recording && msg.recording === rec.id) $("record").textContent = `■ 停止 ${msg.count} 步`;
+      return;
     case "approval_done": return document.querySelector(`[data-approval="${msg.id}"]`)?.remove();
     case "trace": {
       const e = msg.event;
@@ -192,6 +195,49 @@ $("input").addEventListener("keydown", (e) => {
 });
 $("stop").onclick = () => state.current && api(`/api/agent/sessions/${state.current}/interrupt`, {});
 $("new-session").onclick = () => newSession().catch((err) => showBanner(String(err)));
+
+// ---- recording: demonstrate -> describe intent -> forge a skill ------------------------------------
+const rec = { id: null, recording: false };
+async function activeTabUrl() {
+  const [t] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  return t ? t.url : undefined;
+}
+$("record").onclick = async () => {
+  try {
+    if (!rec.recording) {
+      const r = await api("/api/record/start", { url: await activeTabUrl() });
+      Object.assign(rec, { id: r.recording, recording: true });
+      $("record").classList.add("on");
+      $("record").textContent = "■ 停止 0 步";
+      $("record-card").hidden = true;
+    } else {
+      const r = await api("/api/record/stop", {});
+      Object.assign(rec, { recording: false, id: r.recording });
+      $("record").classList.remove("on");
+      $("record").textContent = "● 录制";
+      $("rec-steps").textContent = `${r.steps} 步 · ${r.apis} 个数据接口 · ${r.start_url}`;
+      $("rec-site").value = r.site;
+      $("record-card").hidden = false;
+      $("rec-intent").focus();
+    }
+  } catch (err) { showBanner(String(err)); }
+};
+async function saveRecording() {
+  await api(`/api/recordings/${rec.id}`, { intent: $("rec-intent").value.trim(), site: $("rec-site").value.trim(),
+                                          name: $("rec-name").value.trim() });
+}
+$("rec-save").onclick = () => saveRecording().then(() => { $("record-card").hidden = true; }).catch((e) => showBanner(String(e)));
+$("rec-discard").onclick = () => { $("record-card").hidden = true; };
+$("rec-forge").onclick = async () => {
+  try {
+    if (!$("rec-name").value.trim()) { $("rec-name").focus(); return; }
+    await saveRecording();
+    const s = await api(`/api/recordings/${rec.id}/forge`, {});
+    upsertSession(s.session, s.label);
+    select(s.session);
+    $("record-card").hidden = true;
+  } catch (err) { showBanner(String(err)); }
+};
 
 function showBanner(text) { $("banner").hidden = !text; $("banner").textContent = text || ""; }
 

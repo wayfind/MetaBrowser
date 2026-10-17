@@ -3,8 +3,8 @@
     python metabrowser/tests/e2e/run_e2e.py [--out DIR] [--real-llm]
 
 What runs for real:
-  * `python -m metabrowser serve` — the actual daemon, headed CloakBrowser binary
-    (~/.cloakbrowser, or CLOAKBROWSER_BINARY_PATH), native side panel opened at startup
+  * `python -m metabrowser serve` — the actual daemon, headed ungoogled-chromium binary
+    (managed build, or METABROWSER_BROWSER_PATH), native side panel opened at startup
   * the embedded metacodes AgentCore (METABROWSER_AGENTCORE_LIB / ~/.metabrowser/agentcore)
   * the side panel UI, driven like a user over CDP: new session, type a task, click approvals
 What is simulated:
@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import re
 import os
 import signal
 import socket
@@ -68,7 +69,61 @@ def script_for(outputs: Path, shop: str):
         lambda body: [{"text": "报告已保存到 " + str(report) + "。退款操作被用户拒绝：" +
                        ("[denied]" if "[denied]" in last_tool_result(body) else last_tool_result(body)[:120])}],
     ]
+    # forge session (after the operator scenario): read the recording, draft a generalized skill with
+    # discriminating tests, verify it live, ask to promote (approved in the panel)
+    def read_recording(body):
+        rid = re.search(r"id=([0-9A-Za-z-]+)", json.dumps(body["messages"][0], ensure_ascii=False)).group(1)
+        return [{"tool_use": {"name": "recording_get", "input": {"id": rid}}}]
+
+    cap = {"name": "orders_search", "description": "按客户名或订单号搜索订单，返回匹配行", "risk": "read",
+           "input_schema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]},
+           "steps": [{"do": "goto", "url": "{base_url}/admin/orders/"},
+                     {"do": "fill", "target": [{"role": "searchbox", "name": "search"}, {"css": "input[name=q]"}], "value": "{query}"},
+                     {"do": "press", "key": "Enter", "target": [{"css": "input[name=q]"}]},
+                     {"do": "wait", "selector": "table.orders"},
+                     {"do": "extract_table", "selector": "table.orders", "as": "rows"}],
+           "returns": "rows",
+           "tests": [{"args": {"query": "chen"}, "expect": {"min_rows": 1, "all_rows_match": {"Customer": "(?i)chen"}}},
+                     {"args": {"query": "li"}, "expect": {"min_rows": 3, "all_rows_match": {"Customer": "(?i)li"}}}]}
+    turns += [
+        read_recording,
+        [{"tool_use": {"name": "skill_draft_save", "input": {"site": "example_shop", "capability": cap}}}],
+        [{"tool_use": {"name": "skill_draft_test", "input": {"site": "example_shop", "name": "orders_search"}}}],
+        [{"tool_use": {"name": "skill_promote", "input": {"site": "example_shop", "name": "orders_search"}}}],
+        lambda body: [{"text": "skill orders_search: " + last_tool_result(body)[:160]}],
+    ]
     return scripted(turns), report
+
+
+async def poll(check, timeout=10.0, what="condition"):
+    """Python-side polling: the extension page's CSP forbids wait_for_function's string eval."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if await check():
+            return True
+        await asyncio.sleep(0.15)
+    raise TimeoutError(f"timed out waiting for {what}")
+
+
+async def answer_cards(panel, decisions, until_done_timeout=240):
+    """Click approvals like a user: deny irreversible page clicks, allow everything else."""
+    deadline = time.time() + until_done_timeout
+    while time.time() < deadline:
+        for c in await panel.query_selector_all(".approval"):
+            # textContent, not innerText: the card title is CSS-uppercased
+            title = await c.eval_on_selector(".risk", "e => e.textContent")
+            if "page.click" in title:
+                await (await c.query_selector("button:text('Deny')")).click()
+                decisions.append(("browser", title, "deny"))
+            else:
+                await (await c.query_selector("button:text('Allow once')")).click()
+                decisions.append(("browser" if "·" in title and title.split("·")[0].strip() in
+                                  ("submit", "irreversible", "system") else "agentcore", title, "allow_once"))
+            await asyncio.sleep(0.3)
+        if await panel.query_selector_all(".msg.done"):
+            return True
+        await asyncio.sleep(0.3)
+    return False
 
 
 async def main() -> int:
@@ -76,6 +131,7 @@ async def main() -> int:
     ap.add_argument("--out", default=str(HERE / "out"))
     ap.add_argument("--real-llm", action="store_true")
     ap.add_argument("--keep-open", type=float, default=0, help="seconds to leave the browser open at the end")
+    ap.add_argument("--browser-path", help="override the installed ungoogled-chromium executable")
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -100,6 +156,11 @@ async def main() -> int:
     port, cdp_port = free_port(), free_port()
     env = {**os.environ, "METABROWSER_HOME": str(home), "METABROWSER_OUTPUTS": str(outputs),
            "METABROWSER_WORKSPACE": str(out / "workspace"), "METABROWSER_SITE_EXAMPLE_SHOP_URL": shop}
+    # Resolve before changing METABROWSER_HOME to the isolated test home.
+    from metabrowser.engine import resolve_binary
+
+    env["METABROWSER_BROWSER_PATH"] = resolve_binary("ungoogled", a.browser_path)
+    env["METABROWSER_COMPUTER_ACCESS"] = "1"  # the scenario exercises an AgentCore Bash permission prompt
     if not a.real_llm:
         env.update(METABROWSER_AGENT_BASE_URL=llm_url, METABROWSER_API_KEY="mock-key")
     lib = os.environ.get("METABROWSER_AGENTCORE_LIB") or str(Path.home() / ".metabrowser/agentcore/lib/libmetask_agentcore.dylib")
@@ -140,7 +201,7 @@ async def main() -> int:
             ctx = browser.contexts[0]
             ua = await ctx.pages[0].evaluate("navigator.userAgent") if ctx.pages else ""
             version = browser.version
-            check("real CloakBrowser binary", True, f"Chromium {version}")
+            check("selected ungoogled-chromium binary", True, f"Chromium {version}; {env['METABROWSER_BROWSER_PATH']}")
             panel = None
             for _ in range(40):
                 panel = next((pg for pg in ctx.pages if pg.url.endswith("/sidepanel.html")), None)
@@ -149,7 +210,7 @@ async def main() -> int:
                 await asyncio.sleep(0.25)
             check("native side panel opened at startup", panel is not None, panel.url if panel else "")
             webdriver = await ctx.pages[0].evaluate("navigator.webdriver")
-            check("stealth intact with extension loaded", webdriver is False, f"webdriver={webdriver} UA={ua[:60]}")
+            check("webdriver flag absent with extension loaded", webdriver is False, f"webdriver={webdriver} UA={ua[:60]}")
 
             await ctx.add_cookies([{"name": "session", "value": "ok", "domain": "127.0.0.1", "path": "/"}])
             await panel.wait_for_selector("#status:text('connected')", timeout=15000)
@@ -164,23 +225,7 @@ async def main() -> int:
             await panel.press("#input", "Enter")
 
             decisions = []
-            deadline = time.time() + 240
-            while time.time() < deadline:
-                cards = await panel.query_selector_all(".approval")
-                for c in cards:
-                    # textContent, not innerText: the card title is CSS-uppercased
-                    title = await c.eval_on_selector(".risk", "e => e.textContent")
-                    if "page.click" in title:
-                        await (await c.query_selector("button:text('Deny')")).click()
-                        decisions.append(("browser", title, "deny"))
-                    else:
-                        await (await c.query_selector("button:text('Allow once')")).click()
-                        decisions.append(("agentcore", title, "allow_once"))
-                    await asyncio.sleep(0.3)
-                done = await panel.query_selector_all(".msg.done")
-                if done:
-                    break
-                await asyncio.sleep(0.3)
+            await answer_cards(panel, decisions)
             await asyncio.sleep(0.5)
             log_text = await panel.inner_text("#log")
             await panel.screenshot(path=str(out / "side-panel.png"))
@@ -194,6 +239,56 @@ async def main() -> int:
                   str(report))
             sessions = get("/api/agent/sessions")
             check("multiple agent sessions", len(sessions) >= 2, str([s["label"] for s in sessions]))
+
+            # --- the user records a demonstration, says what it is, and asks for a skill ---------
+            demo = await ctx.new_page()
+            await demo.goto(shop + "/admin/orders/")
+            await demo.bring_to_front()
+            await panel.click("#record")
+            await poll(lambda: panel.eval_on_selector("#record", "e => e.classList.contains('on')"), what="recording on")
+            await demo.fill("input[name=q]", "chen")
+            await demo.press("input[name=q]", "Enter")
+            await demo.wait_for_url("**q=chen**")
+            async def stepped():
+                return " 0 步" not in (await panel.text_content("#record") or " 0 步")
+            await poll(stepped, what="live step count")
+            live = await panel.text_content("#record")
+            await panel.click("#record")
+            await panel.wait_for_selector("#record-card:not([hidden])", timeout=10000)
+            suggested = await panel.input_value("#rec-site")
+            check("recording streamed live to the panel and stopped", "步" in live, f"{live!r}, site suggested {suggested!r}")
+            check("site recognized from the recorded tab", suggested == "example_shop", suggested)
+            await panel.fill("#rec-intent", "按客户名搜索订单，拿到匹配的订单列表")
+            await panel.fill("#rec-name", "orders_search")
+            await panel.click("#rec-forge")
+
+            async def forge_selected():
+                label = await panel.eval_on_selector("#sessions button[aria-selected=true]", "e => e.textContent")
+                return label.startswith("Forge")
+            await poll(forge_selected, timeout=20, what="forge session selected")
+            forge_decisions: list = []
+            forged = await answer_cards(panel, forge_decisions, 240)
+            forge_log = await panel.inner_text("#log")
+            await panel.screenshot(path=str(out / "side-panel-forge.png"))
+            recs = get("/api/recordings")
+            check("recording saved with the user's intent", recs and recs[0]["intent"].startswith("按客户名搜索订单"),
+                  f"{recs[0]['steps'] if recs else 0} steps")
+            check("forge session verified the draft live (2/2)", forged and "2/2 pass" in json.dumps(
+                [l for l in (home / "traces").glob("*.ndjson")][-1].read_text()), forge_log.strip().splitlines()[-1][:160])
+            check("skill promotion approved by the user in the panel",
+                  any("skill.promote" in d[1] and d[2] == "allow_once" for d in forge_decisions), str(forge_decisions))
+            req = urllib.request.Request(f"http://127.0.0.1:{port}/api/call", method="POST",
+                                         data=json.dumps({"tool": "site.run", "args": {
+                                             "site": "example_shop", "capability": "orders_search",
+                                             "args": {"query": "zhang"}}}).encode(),
+                                         headers={"Authorization": f"Bearer {info['token']}", "Content-Type": "application/json"})
+            # in a worker thread: a blocking call here would freeze this harness's own CDP client, which
+            # auto-attaches new tabs paused-on-start and must keep serving them
+            run = json.loads(await asyncio.get_running_loop().run_in_executor(
+                None, lambda: urllib.request.urlopen(req, timeout=90).read()))
+            check("forged skill generalizes to a new argument (zhang -> Carol Zhang only)",
+                  run.get("ok") and "Carol Zhang" in run.get("text", "") and "Dan Chen" not in run.get("text", ""),
+                  run.get("text", str(run))[:120])
             await browser.close()  # disconnect CDP client only
 
         try:

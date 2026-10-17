@@ -38,6 +38,12 @@ main { flex: 1; overflow-y: auto; padding: 8px; }
 button { font: inherit; }
 #send { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 4px 14px; cursor: pointer; }
 #stop { background: none; border: 1px solid var(--line); color: var(--fg); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+#record { border: 1px solid var(--line); background: none; color: var(--danger); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
+#record.on { background: var(--danger); color: #fff; }
+#record-card { margin: 8px; padding: 8px; border: 1px solid var(--accent); border-radius: 8px; display: grid; gap: 6px; }
+#record-card[hidden] { display: none; }
+#record-card textarea, #record-card input { width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 4px; background: var(--bg); color: var(--fg); }
+.row-inline { display: flex; gap: 6px; }
 #new-session { border: 1px solid var(--line); background: none; color: var(--fg); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
 #banner { margin: 8px; padding: 8px; border-radius: 8px; background: var(--warn-bg); border: 1px solid var(--warn-line); font-size: 12px; white-space: pre-wrap; }
 .msg.done { color: var(--muted); font-size: 11px; }
