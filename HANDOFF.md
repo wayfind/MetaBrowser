@@ -173,6 +173,12 @@ Zig 插件上次用独立前缀 `out/privacy-v20m-sdk-plugin` 构建。旧 `zig-
    循环代证。所有 SDK/模型测试默认本地 fixture，禁止偷偷使用付费模型。
 5. 本轮源码和候选不需要重新从零编译。先复用已校验构建，必要时再增量构建。
 
+新机器接手补充：原生 profile 的全新 fixture 验收入口见
+`docs/privacy-profile-isolation.md`。2026-10-17 已在新 Mac 上恢复并校验 v20m 交接包；
+真实浏览器首轮失败（记录保留），修正 fixture 重放与语言断言后第二轮和独立重验通过。
+范围仅为两个 native macOS 身份、一个 origin、一次冷重启，不代表正式跨系统激活。
+本机跑原生 UI 验收前，须给 Claude Code 的 `claude` 进程开启辅助功能权限。
+
 TinyKG（若新机器已配置）：项目 13068，主范围 13125，分支 13147，当前任务 13161，
 最新开发验证 13185。使用 canonical TinyKG，不创建项目级 `.kg`，不要仅依赖旧记忆
 而跳过当前文件/进程核验。没有 TinyKG 时，本文件及 Git/证据包足以恢复工作。
