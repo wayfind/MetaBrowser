@@ -114,9 +114,14 @@
       "source_section": "2.2",
       "status": "unverified",
       "evidence": [
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4 open: identity removes WEBGL_debug_renderer_info, which official Chrome always exposes."
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4 open: identity removes WEBGL_debug_renderer_info, which official Chrome always exposes. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R4 fixed: WEBGL_debug_renderer_info kept; protected renderer reads an Apple GPU-family cohort (M4 Max -> Apple M3), vendor unchanged; unmapped GPUs keep it hidden."
     },
     {
       "id": "SRC-2.3",
@@ -124,9 +129,14 @@
       "source_section": "2.3",
       "status": "unverified",
       "evidence": [
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4 open: WebGL2 also lacks WEBGL_debug_renderer_info in identity mode."
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4 open: WebGL2 also lacks WEBGL_debug_renderer_info in identity mode. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R4 fixed for WebGL2 as for WebGL1."
     },
     {
       "id": "SRC-3",
@@ -219,9 +229,14 @@
         "out/evidence/cpu-template-v19c-inconsistency.json",
         "out/evidence/privacy-v19d-candidate-review.json",
         "out/evidence/language-baseline-v20m-cft154.private.json",
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete. 2026-10-18 language baseline: v20m and official Chrome for Testing 154.0.8037.92 (headless, fresh profiles, four accept-lang cases incl. persona template) match exactly: HTTP Accept-Language keeps primary+base (e.g. ja-JP,ja;q=0.9) and navigator.languages exposes only the primary language. Stock 154 behaviour, not a privacy residual; headed mode, other templates and platforms still open. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R1 open: identity keeps real deviceMemory 32 (JS and Device-Memory hints) while the template reports 8 cores; no 8-core Apple chip ships 32 GB."
+      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete. 2026-10-18 language baseline: v20m and official Chrome for Testing 154.0.8037.92 (headless, fresh profiles, four accept-lang cases incl. persona template) match exactly: HTTP Accept-Language keeps primary+base (e.g. ja-JP,ja;q=0.9) and navigator.languages exposes only the primary language. Stock 154 behaviour, not a privacy residual; headed mode, other templates and platforms still open. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R1 open: identity keeps real deviceMemory 32 (JS and Device-Memory hints) while the template reports 8 cores; no 8-core Apple chip ships 32 GB. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R1 fixed: protected deviceMemory = min(host, 2 GiB x core bucket), identical in JS (five realms), subresource and navigation Device-Memory hints (16 on this 16-core/32 GB host)."
     },
     {
       "id": "SRC-4.5",
@@ -464,9 +479,14 @@
       "status": "partial",
       "evidence": [
         "out/evidence/identity-surfaces-v16.private.json",
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "Battery and network values observed; source confirms native passthrough 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R2 open: identity fixes JS NetworkInformation to rtt 0/downlink 10 while ECT/RTT/Downlink client hints carry real estimates, so JS and HTTP disagree."
+      "notes": "Battery and network values observed; source confirms native passthrough 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R2 open: identity fixes JS NetworkInformation to rtt 0/downlink 10 while ECT/RTT/Downlink client hints carry real estimates, so JS and HTTP disagree. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R2 fixed: protected NetworkInformation and ECT/RTT/Downlink hints share 4g/50 ms/10 Mbps in JS, subresource and navigation requests; privacy-off keeps real estimates."
     },
     {
       "id": "BUILD",
@@ -484,9 +504,14 @@
       "status": "partial",
       "evidence": [
         "out/evidence/hardware-privacy-v16-review-result.json",
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "v16 109 checks partial coverage; arbitrary models missing 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4/R5 open: identity removes WEBGL_debug_renderer_info and strips WebGPU subgroups/timestamp-query, blank architecture and zero subgroup sizes, unlike any real Apple Silicon Chrome 154."
+      "notes": "v16 109 checks partial coverage; arbitrary models missing 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4/R5 open: identity removes WEBGL_debug_renderer_info and strips WebGPU subgroups/timestamp-query, blank architecture and zero subgroup sizes, unlike any real Apple Silicon Chrome 154. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R4/R5 fixed: debug renderer cohort, WebGPU timestamp-query/subgroups, subgroup widths and metal-3 match official CfT; gpu-media 109 checks (native, SwiftShader, 10 policy controls) pass."
     },
     {
       "id": "MEDIA",
@@ -521,9 +546,14 @@
         "out/evidence/storage-capacity-v19e-v19f-failure-review.json",
         "out/evidence/storage-capacity-v19g-review.json",
         "out/evidence/bucket-policy-v19h-review.json",
-        "docs/privacy-bucket-policy-api-evidence-v19h.json"
+        "docs/privacy-bucket-policy-api-evidence-v19h.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "v19d bounded ordinary and native incognito lifecycle matrix: Window/iframe plus five real worker categories read/write/delete four stores; two sites/four contexts,20 normal exits,2580 checks,32 ordinary and33 OTR negative-evidence mutations. Native OTR target ID independently differs from original profile ID; private data absent after new browser launch. Still unverified: simultaneous regular/OTR separation, quota pressure/low-capacity, permissions, concurrency, bucket expiration/durability, all value classes and full API privacy. New simultaneous regular/DevTools-OTR regression contradicts complete lifecycle coverage: v19d balanced/off native crash on OTR disposal (WorkerWatcher moved service-node ownership before client disconnection). v19e fix staged; native rerun pending, no success claim. v19e actual native rerun fixes this disposal crash: balanced/off3096checks and25negative-evidence cases pass with byte-identical failing-off probes. Only DevTools-created OTR coexistence/disposal is proved; primary native OTR window-close and in-flight concurrency remain unverified. Native2GiB APFS sparse-volume test proves low-volume leak in v19e; partialv19f fixes workers/implicit bucket but frame and legacy binder still raw. v19g frame-binding fix in build; not yet passed. Ordinary fresh-origin2MiB pressure tests pass72 controls/48negative onv19e, not real-disk-full. v19g native rerun closes bounded low-volume public quota leak: same probes as failingv19e,48estimates per mode acrossWindow/iframe/fiveWorker categories/legacy APIs/implicit buckets,8explicit bucketcap checks per mode; actualAPFS imageunmounted. Controlled2MiB-pressure72store cases pass with full payloadSHA,16lowvolume+54pressure negative-evidence cases rejected. Actualdiskfull,liveprefbinding transitions,bucketargumentclasses/mutations/expiration andfullAPIremainunverified. v19h closes metadata-count capacity channel (v19g protected61 on2GiB). Native80case matrices on2/4GiB x balanced/off pass320cases: protected512 totalincludingdefault, controls61/116; six positive quota classes toMAX_SAFE_INTEGER, existingquota immutable onopen, cleanup/recovery.19negative types,72SHA-verified pressure controls,CPU15/GPU109 pass. NewCDP page-readiness race preserved/fixed; exact collection-source snapshots replayed. All worker stress,liveprefs,permissions,expiry/durability/diskfull/fullAPI stillopen."
+      "notes": "v19d bounded ordinary and native incognito lifecycle matrix: Window/iframe plus five real worker categories read/write/delete four stores; two sites/four contexts,20 normal exits,2580 checks,32 ordinary and33 OTR negative-evidence mutations. Native OTR target ID independently differs from original profile ID; private data absent after new browser launch. Still unverified: simultaneous regular/OTR separation, quota pressure/low-capacity, permissions, concurrency, bucket expiration/durability, all value classes and full API privacy. New simultaneous regular/DevTools-OTR regression contradicts complete lifecycle coverage: v19d balanced/off native crash on OTR disposal (WorkerWatcher moved service-node ownership before client disconnection). v19e fix staged; native rerun pending, no success claim. v19e actual native rerun fixes this disposal crash: balanced/off3096checks and25negative-evidence cases pass with byte-identical failing-off probes. Only DevTools-created OTR coexistence/disposal is proved; primary native OTR window-close and in-flight concurrency remain unverified. Native2GiB APFS sparse-volume test proves low-volume leak in v19e; partialv19f fixes workers/implicit bucket but frame and legacy binder still raw. v19g frame-binding fix in build; not yet passed. Ordinary fresh-origin2MiB pressure tests pass72 controls/48negative onv19e, not real-disk-full. v19g native rerun closes bounded low-volume public quota leak: same probes as failingv19e,48estimates per mode acrossWindow/iframe/fiveWorker categories/legacy APIs/implicit buckets,8explicit bucketcap checks per mode; actualAPFS imageunmounted. Controlled2MiB-pressure72store cases pass with full payloadSHA,16lowvolume+54pressure negative-evidence cases rejected. Actualdiskfull,liveprefbinding transitions,bucketargumentclasses/mutations/expiration andfullAPIremainunverified. v19h closes metadata-count capacity channel (v19g protected61 on2GiB). Native80case matrices on2/4GiB x balanced/off pass320cases: protected512 totalincludingdefault, controls61/116; six positive quota classes toMAX_SAFE_INTEGER, existingquota immutable onopen, cleanup/recovery.19negative types,72SHA-verified pressure controls,CPU15/GPU109 pass. NewCDP page-readiness race preserved/fixed; exact collection-source snapshots replayed. All worker stress,liveprefs,permissions,expiry/durability/diskfull/fullAPI stillopen. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): profile isolation acceptance re-run on v20n passes with independent re-verification."
     },
     {
       "id": "CROSSOS",
@@ -584,9 +614,14 @@
       "requirement": "Evaluate rounding/normalization/chosen-content recovery and residual alpha/font/rendering entropy",
       "status": "unverified",
       "evidence": [
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+        "out/evidence/identity-surfaces-v20n.private.json",
+        "out/evidence/gpu-media-v20n.private.json",
+        "out/evidence/identity-isolation-v20n-first.private.json",
+        "out/evidence/language-baseline-v20n-cft154.private.json"
       ],
-      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R3 open: identity exposes 1 speechSynthesis voice versus ~180 on official macOS Chrome."
+      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R3 open: identity exposes 1 speechSynthesis voice versus ~180 on official macOS Chrome. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R3 fixed: protected pages list the stock system voices with real names (180 here, equal to official); downloaded Enhanced/Premium voices hidden."
     }
   ],
   "required_probe_ids": [
@@ -1000,44 +1035,40 @@
     }
   ],
   "latest_runtime_increment": {
-    "engine": "v20m",
-    "framework_sha256": "d18a79b5dcc1b68054e153e6d00fba5978d1b0dea385c492ac5ee29029e17b0d",
+    "engine": "v20n",
+    "framework_sha256": "4523e8bcd13037203b48ce53e84af697e74be5a4b3e0c3bd75725cf8848151b6",
     "installed": false,
-    "experimental_profile_only": true,
-    "production_profile_activation_verified": false,
-    "same_patch_linux_worklet_verified": true,
-    "cross_cpu_worklet_complete_channel_hashes_equal": 48,
-    "native_worklet_complete_channel_hashes_unchanged": 48,
-    "independent_scalar_allpass_max_error": 0,
-    "production_recurrence_partition_alias_transition_cases_per_platform": 96,
-    "kernel_full_buffer_bytes_equal": 393216,
-    "coherent_bad_history_rejected": true,
-    "linux_reference_sha256": "d5e59babac65b2a7ba097be10351aadf022213ae21c4b7f69f0b42693b3fda04",
-    "full_audio_pipeline_cross_cpu_proven": false,
-    "full_privacy_coverage_complete": false,
-    "full_sdk_verified": false,
-    "review": "out/evidence/privacy-v20m-biquad-review.json",
-    "remaining": "Finite eight-filter/four-boundary matrices do not cover all parameter combinations, exception domains, ramps or realms. IIR/realtime/Worklet/WebRTC/media/devices/hardware drift, production crossOS profile activation/cache/Worker, GPU/fonts/platform, real account/site workflows and seven days remain open; all original57/P1P14/A-L maintained.",
-    "biquad_filter_types": 8,
-    "biquad_fixed_step_graphs_per_capture": 96,
-    "biquad_boundary_graphs_per_capture": 192,
-    "biquad_cross_cpu_complete_channel_hashes_equal": 288,
-    "biquad_matrix_independent_scalar_max_error": 0,
-    "biquad_boundary_independent_max_error": 3.725290298461914e-09,
-    "balanced_metadata_realms_per_mode": 7,
-    "current_sdk_packaged_fixture_verified": true,
-    "current_sdk_real_account_verified": false,
-    "current_sdk_delivered": false,
-    "matrix_review": "out/evidence/privacy-v20m-matrix-sdk-review.json",
-    "current_idl_catalog_integrity_verified": true,
-    "current_idl_potential_members": 18489,
-    "current_idl_fully_verified_members": 0,
-    "current_idl_biquad_partial_members_mapped": 12,
-    "biquad_frequency_response_float32_bytes_cross_cpu_equal": true,
-    "current_sdk_native_cold_starts": 100,
-    "current_sdk_native_cold_starts_verified": true,
-    "current_sdk_provider_posts_during_stability": 0,
-    "current_sdk_packaged_library_origin_verified": true
+    "base_engine": "v20m",
+    "scope": "same-version baseline residuals R1-R5 (docs/privacy-baseline-diff.md)",
+    "changed_chromium_sources": 9,
+    "engine_app_entries_changed": 1,
+    "engine_app_entries": 352,
+    "candidate_app_entries": 373,
+    "candidate_sdk_and_plugin_reused_from": "v20m",
+    "h200_v20m_backup": "/data/metabrowser/backups/v20m-pre-v20n",
+    "residuals_fixed": [
+      "R1 deviceMemory device class",
+      "R2 NetworkInformation and ECT/RTT/Downlink hints",
+      "R3 stock speech voices",
+      "R4 WEBGL_debug_renderer_info GPU-family cohort",
+      "R5 WebGPU features/subgroups/architecture"
+    ],
+    "navigation_client_hints_verified": true,
+    "identity_surface_modes_passed": 5,
+    "gpu_media_checks_passed": 109,
+    "profile_isolation_independent_passed": true,
+    "language_baseline_equal_official": true,
+    "restart100_rerun": false,
+    "mac_privacy_five_mode_fixture_rerun": false,
+    "same_patch_linux_reference": false,
+    "evidence": [
+      "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+      "out/evidence/identity-surfaces-v20n.private.json",
+      "out/evidence/gpu-media-v20n.private.json",
+      "out/evidence/identity-isolation-v20n-first.private.json",
+      "out/evidence/language-baseline-v20n-cft154.private.json"
+    ],
+    "full_scope_complete": false
   },
   "previous_public_audio_stream_increment": {
     "engine": "v20i",
@@ -1132,5 +1163,45 @@
     "cross_cpu_worklet_channel_hashes_compared": 48,
     "cross_cpu_worklet_complete": false,
     "cross_cpu_review": "out/evidence/privacy-v20l2-cross-platform-review.json"
+  },
+  "previous_biquad_sdk_increment": {
+    "engine": "v20m",
+    "framework_sha256": "d18a79b5dcc1b68054e153e6d00fba5978d1b0dea385c492ac5ee29029e17b0d",
+    "installed": false,
+    "experimental_profile_only": true,
+    "production_profile_activation_verified": false,
+    "same_patch_linux_worklet_verified": true,
+    "cross_cpu_worklet_complete_channel_hashes_equal": 48,
+    "native_worklet_complete_channel_hashes_unchanged": 48,
+    "independent_scalar_allpass_max_error": 0,
+    "production_recurrence_partition_alias_transition_cases_per_platform": 96,
+    "kernel_full_buffer_bytes_equal": 393216,
+    "coherent_bad_history_rejected": true,
+    "linux_reference_sha256": "d5e59babac65b2a7ba097be10351aadf022213ae21c4b7f69f0b42693b3fda04",
+    "full_audio_pipeline_cross_cpu_proven": false,
+    "full_privacy_coverage_complete": false,
+    "full_sdk_verified": false,
+    "review": "out/evidence/privacy-v20m-biquad-review.json",
+    "remaining": "Finite eight-filter/four-boundary matrices do not cover all parameter combinations, exception domains, ramps or realms. IIR/realtime/Worklet/WebRTC/media/devices/hardware drift, production crossOS profile activation/cache/Worker, GPU/fonts/platform, real account/site workflows and seven days remain open; all original57/P1P14/A-L maintained.",
+    "biquad_filter_types": 8,
+    "biquad_fixed_step_graphs_per_capture": 96,
+    "biquad_boundary_graphs_per_capture": 192,
+    "biquad_cross_cpu_complete_channel_hashes_equal": 288,
+    "biquad_matrix_independent_scalar_max_error": 0,
+    "biquad_boundary_independent_max_error": 3.725290298461914e-09,
+    "balanced_metadata_realms_per_mode": 7,
+    "current_sdk_packaged_fixture_verified": true,
+    "current_sdk_real_account_verified": false,
+    "current_sdk_delivered": false,
+    "matrix_review": "out/evidence/privacy-v20m-matrix-sdk-review.json",
+    "current_idl_catalog_integrity_verified": true,
+    "current_idl_potential_members": 18489,
+    "current_idl_fully_verified_members": 0,
+    "current_idl_biquad_partial_members_mapped": 12,
+    "biquad_frequency_response_float32_bytes_cross_cpu_equal": true,
+    "current_sdk_native_cold_starts": 100,
+    "current_sdk_native_cold_starts_verified": true,
+    "current_sdk_provider_posts_during_stability": 0,
+    "current_sdk_packaged_library_origin_verified": true
   }
 }

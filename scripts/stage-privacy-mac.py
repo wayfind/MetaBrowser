@@ -96,6 +96,22 @@ def make_plan(root):
 
  private:
   const bool metabrowser_protected_identity_;''', 'navigator-owner-policy-state')
+    # Hides NavigatorDeviceMemory::deviceMemory for Navigator and WorkerNavigator
+    # bindings, like hardwareConcurrency above, so both report one device class.
+    edit(path, '  void Trace(Visitor* visitor) const override;',
+         '''  float deviceMemory() const;
+  void Trace(Visitor* visitor) const override;''', 'navigator-device-memory-api')
+    path = CORE + 'execution_context/navigator_base.cc'
+    edit(path, 'ExecutionContext* NavigatorBase::GetUAExecutionContext() const {',
+         '''float NavigatorBase::deviceMemory() const {
+  const float memory = NavigatorDeviceMemory::deviceMemory();
+  // Same device class as hardwareConcurrency; never above the host.
+  return MetaBrowserProtectedIdentity()
+      ? metabrowser::ProtectedDeviceMemory(memory) : memory;
+}
+
+ExecutionContext* NavigatorBase::GetUAExecutionContext() const {''',
+         'navigator-device-memory-class')
     path = CORE + 'frame/navigator_cpu_performance.cc'
     edit(path,
          '#include "third_party/blink/renderer/core/frame/navigator_cpu_performance.h"',
@@ -196,30 +212,51 @@ def make_plan(root):
          'GPUSupportedFeatures* MakeFeatureNameSet(wgpu::Adapter adapter,\n'
          '                                          bool protected_context) {',
          'gpu-feature-policy-parameter')
-    edit(path, '  for (const auto& f : features_span) {', '''  for (const auto& f : features_span) {
+    # timestamp-query and subgroups ship on every Apple Silicon Chrome 154, so
+    # hiding them marks the browser. Only developer-flag features stay hidden.
+    old_features = '''  for (const auto& f : features_span) {
     if (protected_context &&
         (f == wgpu::FeatureName::TimestampQuery ||
          f == wgpu::FeatureName::ChromiumExperimentalTimestampQueryInsidePasses ||
          f == wgpu::FeatureName::Subgroups ||
          f == wgpu::FeatureName::ChromiumExperimentalSubgroupMatrix)) {
       continue;
-    }''', 'gpu-sensitive-optional-features')
+    }'''
+    edit(path, '  for (const auto& f : features_span) {', '''  for (const auto& f : features_span) {
+    if (protected_context &&
+        (f == wgpu::FeatureName::ChromiumExperimentalTimestampQueryInsidePasses ||
+         f == wgpu::FeatureName::ChromiumExperimentalSubgroupMatrix)) {
+      continue;
+    }''', 'gpu-sensitive-optional-features', previous=old_features)
     edit(path, '  features_ = MakeFeatureNameSet(GetHandle());',
          '  features_ = MakeFeatureNameSet(GetHandle(), metabrowser_protected_);',
          'gpu-feature-policy-capture')
+    # Subgroup widths travel with the restored subgroups feature (32 on all
+    # Apple Silicon); the tag keeps its name so earlier staging migrates.
     edit(path, '  subgroup_max_size_ = info.subgroupMaxSize;',
          '  subgroup_max_size_ = info.subgroupMaxSize;\n'
-         '  if (metabrowser_protected_) {\n'
-         '    subgroup_min_size_ = 0;\n'
-         '    subgroup_max_size_ = 0;\n'
-         '  }', 'gpu-no-disabled-subgroup-widths')
+         '  // Widths are a GPU-family constant and stay with the subgroups feature.',
+         'gpu-no-disabled-subgroup-widths', previous=(
+             '  subgroup_max_size_ = info.subgroupMaxSize;\n'
+             '  if (metabrowser_protected_) {\n'
+             '    subgroup_min_size_ = 0;\n'
+             '    subgroup_max_size_ = 0;\n'
+             '  }'))
     edit(path, '  GPUAdapterInfo* info;\n', '''  if (metabrowser_protected_) {
+    // Every Apple Silicon GPU reports one architecture ("metal-3"); other
+    // vendors keep it empty until a template supplies a cohort value.
+    return MakeGarbageCollected<GPUAdapterInfo>(
+        vendor_, vendor_ == "apple" ? architecture_ : String(),
+        subgroup_min_size_, subgroup_max_size_, is_fallback_adapter);
+  }
+  GPUAdapterInfo* info;
+''', 'gpu-adapter-identifiers', previous='''  if (metabrowser_protected_) {
     return MakeGarbageCollected<GPUAdapterInfo>(
         vendor_, String(), subgroup_min_size_, subgroup_max_size_,
         is_fallback_adapter);
   }
   GPUAdapterInfo* info;
-''', 'gpu-adapter-identifiers')
+''')
     # Freeze policy at creation. A detached owning context must not reopen info.
     path = MODULES + 'webgpu/gpu_adapter.h'
     edit(path, '  Member<GPU> gpu_;',

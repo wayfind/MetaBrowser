@@ -1,6 +1,7 @@
 # 同版本官方基线全表面对比（v20m vs CfT 154）
 
-状态：2026-10-18 首次完成采集与逐项分类。**找出 5 项需要改引擎的残差，尚未修复。**
+状态：2026-10-18 首次完成采集与逐项分类，找出 5 项需要改引擎的残差（R1–R5）。
+**同日 v20n 候选修复了这 5 项，基线对比复测通过；v20n 尚未安装或交付**（见文末「v20n 修复」）。
 这次对比只证明「和同版本官方 Chrome 的差异已列全并分类」；57 项总账、P1–P14、A–L 仍未完成。
 
 ## 方法
@@ -85,3 +86,27 @@ r1 的字体检测有误：单独写 `monospace` 时字号不同，导致所有�
 - 只测了 native-macos 模板、这台 Mac、一个窗口尺寸、有界面单窗口。
 - 用户自装字体会不会被屏蔽，这次测不出来（本机没有额外字体），需要装测试字体后再验（SRC-7.1）。
 - 没有覆盖真实权限授予、设备、媒体采集、WebRTC 候选地址、跨系统模板，以及 GPU 实际渲染能力。
+
+## v20n 修复
+
+v20n 是在 v20m 源码上增量编译的候选：framework 从 `d18a79b5…` 变为 `4523e8bc…`，只改了下面 9 个 Chromium 文件。
+引擎应用 352 项中只有 framework 不同；完整候选 `out/mac-privacy-v20n-sdk-candidate` 共 373 项，SDK 与插件沿用 v20m 的同一份。
+构建前，H200 上的 v20m 构建现场已备份到 `/data/metabrowser/backups/v20m-pre-v20n`。
+新脚本放在 `/data/metabrowser/staging-v20n/project`，原有的 `/data/metabrowser/project` 和各个历史 reference 都没有改动。
+
+| 编号 | 修复（受保护身份） | 实现位置 |
+| --- | --- | --- |
+| R1 | `deviceMemory = min(真实值, 2 GiB × 核心档位)`，JS、子资源 Client Hints、导航 Client Hints 同源 | `NavigatorBase::deviceMemory`、`FrameFetchContext`、`client_hints.cc`；规则在 `metabrowser_persona_runtime.h` |
+| R2 | NetworkInformation 与 ECT/RTT/Downlink 统一为 4g / 50 ms / 10 Mbps（按 Chrome 取整规则的常见快速网络） | `network_information.cc`、`FrameFetchContext`、`client_hints.cc` |
+| R3 | 保留系统语音的真实名称和 URI，只隐藏用户下载的 Enhanced/Premium 语音 | `speech_synthesis.cc` |
+| R4 | 保留 `WEBGL_debug_renderer_info`，renderer 按 GPU 家族归并（M1、M2、M3 及以后报 M3，去掉 Pro/Max/Ultra）；识别不出 Apple Silicon 时仍隐藏扩展 | `webgl_rendering_context_base.cc` |
+| R5 | 保留 `timestamp-query`、`subgroups`、subgroup 宽度；Apple 返回 `metal-3`；只隐藏两个开发者开关特性 | `gpu_adapter.cc` |
+
+复测证据：`out/evidence/baseline-surface-v20n-cft154-r2.private.json`。runner 新增了 Accept-CH 之后的第二次导航，用来覆盖浏览器进程的 Client Hints；同一 runner 复测的 v20m 对照是 `-v20m-cft154-r3`。
+
+- 语音、WebGL 扩展清单与 vendor、WebGPU 特性和 adapter 信息：三方完全一致。
+- 身份模式下 `deviceMemory` 为 16，JS、子资源和导航三处一致；rtt 50、downlink 10、ect 4g，三处一致。
+- v20m 的导航 Client Hints 仍发真实值（32 / 100 / 1.5），v20n 已修正。
+- 关闭隐私时两版都照常发真实值。
+- renderer 为 `ANGLE (Apple, ANGLE Metal Renderer: Apple M3, Unspecified Version)`，真实设备是 M4 Max。
+- 其余差异与修复前相同，均已分类为无害。

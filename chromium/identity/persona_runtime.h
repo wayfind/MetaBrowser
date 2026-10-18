@@ -4,6 +4,7 @@
 
 #include "base/check.h"
 #include "base/command_line.h"
+#include "base/system/sys_info.h"
 #include "third_party/blink/public/common/user_agent/metabrowser_persona.h"
 
 namespace metabrowser {
@@ -30,5 +31,25 @@ inline const Persona* EmulatedPersona() {
   if (!persona->override_metadata) return nullptr;
   return persona;
 }
+
+// Protected identities expose one device class to script and to Client Hints.
+// hardwareConcurrency is bucketed down to 1/2/4/8 cores (navigator_base.cc);
+// device memory follows that class at 2 GiB per bucketed core and never exceeds
+// the host's approximated value, so 8 cores pair with at most 16 GiB.
+constexpr unsigned ProtectedCoreBucket(unsigned cores) {
+  return cores >= 8 ? 8 : cores >= 4 ? 4 : cores >= 2 ? 2 : 1;
+}
+inline float ProtectedDeviceMemory(float approximated) {
+  const auto* persona = EmulatedPersona();
+  const unsigned cores = persona ? persona->cores
+      : static_cast<unsigned>(base::SysInfo::NumberOfProcessors());
+  const float cap = 2.0f * ProtectedCoreBucket(cores);
+  return approximated < cap ? approximated : cap;
+}
+// NetworkInformation and the ECT/RTT/Downlink hints of protected identities: a
+// common fast-connection cohort after Chrome's own rounding (RTT to 50 ms,
+// downlink capped at 10 Mbps), never the physical estimate or its changes.
+inline constexpr unsigned kProtectedRttMs = 50;
+inline constexpr double kProtectedDownlinkMbps = 10.0;
 }  // namespace metabrowser
 #endif

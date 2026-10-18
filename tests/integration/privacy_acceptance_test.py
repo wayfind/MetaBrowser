@@ -41,6 +41,11 @@ MAX_REPORT_BYTES = 1024 * 1024
 MAX_REPORTS = 64
 HASH = re.compile(r"^[0-9a-f]{64}$")
 DEBUG_EXTENSION = 'WEBGL_debug_renderer_info'
+# Protected contexts read an Apple GPU-family cohort renderer (M1, M2, M3 and
+# later -> M3) without tier names; an unmapped GPU keeps the extension hidden.
+COHORT = re.compile(r'Apple M[123](?:,|\))')
+TIER = re.compile(r'\b(?:Pro|Max|Ultra)\b')
+DEVICE_CLASS_PATHS = ('probes.P4.main.hardwareConcurrency', 'probes.P4.main.deviceMemory')
 INHERITED = ('initialEmpty', 'aboutBlank', 'srcdoc', 'documentWrite')
 WORKERS = ('httpClassic', 'httpModule', 'blobClassic', 'nestedClassic')
 # Explicitly selected stable behavior. Volatile environment measurements are
@@ -427,8 +432,16 @@ class Checker:
             self.equal(DEBUG_EXTENSION not in extensions, absent,
                        name + '.' + kind + '.listGetExtensionConsistency')
             if candidate:
-                self.check(absent and DEBUG_EXTENSION not in extensions,
-                           name + '.' + kind + '.debugExtensionAbsent')
+                if absent:
+                    self.check(DEBUG_EXTENSION not in extensions,
+                               name + '.' + kind + '.debugExtensionHidden')
+                else:
+                    renderer = field(unmasked, 'renderer')
+                    self.check(isinstance(renderer, str) and COHORT.search(renderer) is not None
+                               and TIER.search(renderer) is None,
+                               name + '.' + kind + '.rendererCohort')
+                    self.check(isinstance(field(unmasked, 'vendor'), str) and bool(unmasked['vendor']),
+                               name + '.' + kind + '.vendor')
             else:
                 self.healthy(unmasked, name + '.' + kind + '.baselineUnmasked')
                 self.check(DEBUG_EXTENSION in extensions and not absent,
@@ -453,9 +466,47 @@ def selected(report):
     }
 
 
+def protected_device_class(cores, memory):
+    """Native policy: cores bucket down to 1/2/4/8; memory <= 2 GiB per bucketed core."""
+    bucket = 8 if cores >= 8 else 4 if cores >= 4 else 2 if cores >= 2 else 1
+    return [bucket, min(memory, 2 * bucket)]
+
+
+def renderer_cohort(renderer):
+    """Python mirror of the engine's MetaBrowserRendererCohort mapping."""
+    match = re.search(r'Apple M(\d+)', renderer) if isinstance(renderer, str) else None
+    if not match or not int(match.group(1)):
+        return None
+    generation = int(match.group(1))
+    chip = 'Apple M1' if generation == 1 else 'Apple M2' if generation == 2 else 'Apple M3'
+    end = renderer.find(',', match.end())
+    return renderer[:match.start()] + chip + (renderer[end:] if end != -1 else '')
+
+
 def functionality(checker, left, right, name, audio_delta=1e-7):
+    # Only the unprotected baseline against a protected capture changes the
+    # device class and the unmasked renderer; every other pairing is exact.
+    protected_pair = name.startswith('baselineToCandidate.')
     for path in STATIC_PATHS:
+        if protected_pair and path in DEVICE_CLASS_PATHS:
+            continue
         checker.equal(field(left, path), field(right, path), name + '.' + path)
+    if protected_pair:
+        cores, memory = (field(left, path) for path in DEVICE_CLASS_PATHS)
+        checker.check(type(cores) is int and cores > 0 and type(memory) in (int, float) and memory > 0,
+                      name + '.baselineDeviceClass')
+        if type(cores) is int and type(memory) in (int, float):
+            checker.equal([field(right, path) for path in DEVICE_CLASS_PATHS],
+                          protected_device_class(cores, memory), name + '.protectedDeviceClass')
+        for kind in ('webgl', 'webgl2'):
+            base = field(left, 'probes.P7.' + kind + '.unmasked')
+            protected = field(right, 'probes.P7.' + kind + '.unmasked')
+            expected = renderer_cohort(base.get('renderer')) if isinstance(base, dict) else None
+            if expected:
+                checker.equal(protected, {'vendor': base.get('vendor'), 'renderer': expected},
+                              name + '.' + kind + '.rendererCohortFromBaseline')
+            else:
+                checker.equal(protected, {'unsupported': True}, name + '.' + kind + '.unmappedRendererHidden')
     for key in ('sampleRate', 'length', 'duration', 'channels'):
         checker.equal(field(left, 'probes.P8.' + key), field(right, 'probes.P8.' + key),
                       name + '.audio.' + key)
@@ -573,7 +624,8 @@ def evaluate(paths):
         'comparisonPolicy': {'stableFunctionalityPaths': list(STATIC_PATHS),
                              'explicitlyUnassessed': list(UNASSESSED),
                              'expectedDifferences': ['canvas/audio partition hashes',
-                                                     'WEBGL_debug_renderer_info removed',
+                                                     'WEBGL_debug_renderer_info renderer as Apple GPU-family cohort (hidden when unmapped)',
+                                                     'hardwareConcurrency/deviceMemory as protected device class',
                                                      'oversized source read rejected',
                                                      'opaque raw sentinel no longer exposed']},
         'persistentWorkerCoverage': {
@@ -615,6 +667,8 @@ class AcceptanceCheckerTests(unittest.TestCase):
             for name in keys[:-1]:
                 node = node.setdefault(name, {})
             node[keys[-1]] = {'syntheticStableValue': True}
+        # A device class the protected policy leaves unchanged (8 cores, 8 GiB).
+        report['probes']['P4']['main'].update(hardwareConcurrency=8, deviceMemory=8)
         p6 = report['probes']['P6']
         p6.update(canvas())
         p6['blobHash'] = p6.pop('blobHash1')
@@ -772,6 +826,28 @@ class AcceptanceCheckerTests(unittest.TestCase):
         checker = Checker()
         functionality(checker, a, b, 'static')
         self.assertTrue(any(not c['passed'] for c in checker.checks))
+
+    def test_protected_device_class_and_renderer_cohort(self):
+        apple = 'ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Max, Unspecified Version)'
+        def pair(cores=16, memory=32, protected=(8, 16), unmasked=None):
+            a, b = self.sample(), self.sample(True)
+            a['probes']['P4']['main'].update(hardwareConcurrency=cores, deviceMemory=memory)
+            b['probes']['P4']['main'].update(hardwareConcurrency=protected[0], deviceMemory=protected[1])
+            for kind in ('webgl', 'webgl2'):
+                a['probes']['P7'][kind]['unmasked'] = {'vendor': 'Google Inc. (Apple)', 'renderer': apple}
+                b['probes']['P7'][kind]['unmasked'] = unmasked or {
+                    'vendor': 'Google Inc. (Apple)', 'renderer': apple.replace('M4 Max', 'M3')}
+            checker = Checker()
+            functionality(checker, a, b, 'baselineToCandidate.origin')
+            return all(c['passed'] for c in checker.checks)
+        self.assertTrue(pair())
+        self.assertTrue(pair(cores=8, memory=8, protected=(8, 8)))
+        self.assertFalse(pair(protected=(8, 32)), 'deviceMemory above the device class')
+        self.assertFalse(pair(protected=(16, 16)), 'unbucketed cores')
+        self.assertFalse(pair(unmasked={'unsupported': True}), 'hidden extension on Apple Silicon (pre-v20n)')
+        self.assertFalse(pair(unmasked={'vendor': 'Google Inc. (Apple)', 'renderer': apple}), 'real tier exposed')
+        self.assertEqual(renderer_cohort(apple.replace('M4 Max', 'M1 Pro')), apple.replace('M4 Max', 'M1'))
+        self.assertIsNone(renderer_cohort('ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device))'))
 
     def test_audio_damage_is_not_accepted_as_privacy(self):
         a, b = self.sample(), self.sample(True)

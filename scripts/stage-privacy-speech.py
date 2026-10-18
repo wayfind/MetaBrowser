@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Minimize installed TTS voice identifiers without replacing the speech engine.
+"""Hide user-installed TTS voices without replacing the speech engine.
 
-Protected pages see one real voice for their public browser locale and en-US.
-Public names/URIs are generic. Explicit voice selection still sends the real
-native name privately, preserving actual speech and errors. Preview by default.
+Protected pages see the stock system voices with their real names and URIs, as
+official Chrome lists them. Downloaded quality variants ("Enhanced"/"Premium")
+depend on the user's own installs and stay hidden. Earlier staging reduced the
+list to one generically named voice per locale, which no official Chrome shows.
+Explicit voice selection still routes the native name. Preview by default.
 """
 import argparse
 import hashlib
@@ -34,11 +36,12 @@ def main():
         text = after[path]
         marker = '// METABROWSER_SPEECH_PRIVACY_V1: ' + tag + '\n'
         value = marker + new
-        if previous is not None and marker + previous in text:
-            if text.count(marker + previous) != 1:
-                raise ValueError('Duplicate prior speech patch: ' + tag)
-            after[path] = text.replace(marker + previous, value, 1)
-            return
+        for prior in ((previous,) if isinstance(previous, str) else (previous or ())):
+            if marker + prior in text:
+                if text.count(marker + prior) != 1:
+                    raise ValueError('Duplicate prior speech patch: ' + tag)
+                after[path] = text.replace(marker + prior, value, 1)
+                return
         if value in text:
             if text.count(value) != 1:
                 raise ValueError('Duplicate speech patch: ' + tag)
@@ -111,8 +114,22 @@ def main():
     visibility_after = visibility_previous.replace(
         "exposed.insert(mojom_voice->lang)",
         "exposed.insert(mojom_voice->lang.ToAsciiLower())")
-    edit('speech_synthesis.cc', visibility_before, visibility_after,
-         'voice-visibility', previous=visibility_previous)
+    visibility_stock = '''  voice_list_.clear();
+  const bool protect = MetaBrowserSurfaceProtected(GetSupplementable());
+  for (auto& mojom_voice : mojom_voices) {
+    // Stock voices keep real names; downloaded quality variants identify the
+    // user's own installs and are not listed for protected pages.
+    if (protect && (mojom_voice->name.contains("(Enhanced)") ||
+                    mojom_voice->name.contains("(Premium)"))) {
+      continue;
+    }
+    voice_list_.push_back(
+        MakeGarbageCollected<SpeechSynthesisVoice>(std::move(mojom_voice)));
+  }'''
+    # The first v20n staging used String::Contains, which this WTF lacks.
+    visibility_stock_contains = visibility_stock.replace('.contains(', '.Contains(')
+    edit('speech_synthesis.cc', visibility_before, visibility_stock,
+         'voice-visibility', previous=(visibility_after, visibility_stock_contains))
     edit('speech_synthesis_utterance.cc',
          '  mojom_utterance_->voice = voice_ ? voice_->name() : String();',
          '  mojom_utterance_->voice = voice_ ? voice_->NativeName() : String();', 'native-routing')

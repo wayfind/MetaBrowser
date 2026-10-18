@@ -78,7 +78,9 @@ def validate(state, directory, require_webgl=False, require_mac=False, require_r
         assert report['fonts']['localLoaded'] is False and report['fonts']['worker']['localLoaded'] is False
         for info in (gpu['info'], gpu['deviceInfo']):
             assert info['vendor'] == baseline['gpu']['info']['vendor']
-            assert all(info[key] == '' for key in ('architecture', 'device', 'description', 'driver', 'backend'))
+            # v20n: Apple Silicon keeps its family architecture ("metal-3"); model identifiers stay empty.
+            assert info['architecture'] == (baseline['gpu']['info']['architecture'] if info['vendor'] == 'apple' else '')
+            assert all(info[key] == '' for key in ('device', 'description', 'driver', 'backend'))
             assert info['memoryHeaps'] == 0
         for index, value in enumerate(hdr['sample']):
             original = baseline['hdr']['sample'][index]

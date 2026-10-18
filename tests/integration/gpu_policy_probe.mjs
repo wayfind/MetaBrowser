@@ -3,19 +3,23 @@ export async function gpuPolicyProbe({software=false}={}){
  const checks={},details={};
  const demand=(value,message)=>{if(!value)throw Error(message)};
  async function test(name,fn){await fetch('/progress',{method:'POST',body:JSON.stringify({name,phase:'start',checks}),signal:AbortSignal.timeout(2000)});try{details[name]=await fn();checks[name]=true}catch(error){details[name]={error:String(error)};checks[name]=false}}
- const blocked=['timestamp-query','subgroups','chromium-experimental-timestamp-query-inside-passes','chromium-experimental-subgroup-matrix'];
+ // v20n: official Apple Silicon Chrome exposes timestamp-query and subgroups; only
+ // developer-flag features stay hidden in protected contexts.
+ const blocked=['chromium-experimental-timestamp-query-inside-passes','chromium-experimental-subgroup-matrix'];
  await test('gpu_optional_privacy',async()=>{
   const adapter=await navigator.gpu.requestAdapter();demand(adapter,'No adapter');
   const features=[...adapter.features],visible=blocked.filter(f=>features.includes(f)||adapter.features.has(f));
-  demand(!visible.length,'Privacy-sensitive optional features visible: '+visible.join(','));
-  demand(adapter.info.subgroupMinSize===0&&adapter.info.subgroupMaxSize===0,'Subgroup widths disclosed');
+  demand(!visible.length,'Developer-flag features visible: '+visible.join(','));
+  demand(software||(features.includes('timestamp-query')&&features.includes('subgroups')),'Standard optional features hidden');
+  const widths=[adapter.info.subgroupMinSize,adapter.info.subgroupMaxSize];
+  demand(features.includes('subgroups')?widths[0]>0&&widths[1]>=widths[0]:widths.every(w=>w===0),'Subgroup widths disagree with the subgroups feature');
   for(const feature of blocked){const fresh=await navigator.gpu.requestAdapter();let rejected=false;try{const device=await fresh.requestDevice({requiredFeatures:[feature]});device.destroy()}catch(error){rejected=error.name==='TypeError'}demand(rejected,'Hidden feature request succeeded: '+feature)}
   const fresh=await navigator.gpu.requestAdapter(),device=await fresh.requestDevice();
-  try{demand(device.adapterInfo.subgroupMinSize===0&&device.adapterInfo.subgroupMaxSize===0,'Device reopened subgroup info');demand(blocked.every(f=>!device.features.has(f)),'Device reopened features');device.pushErrorScope('validation');let rejected=false;try{device.createQuerySet({type:'timestamp',count:2})}catch(error){rejected=error.name==='TypeError'}const validation=await device.popErrorScope();demand(rejected||validation,'Timestamp query worked without feature')}finally{device.destroy()}
+  try{demand(device.adapterInfo.subgroupMinSize===fresh.info.subgroupMinSize&&device.adapterInfo.subgroupMaxSize===fresh.info.subgroupMaxSize,'Device subgroup info disagrees with adapter');demand(blocked.every(f=>!device.features.has(f)),'Device reopened features');device.pushErrorScope('validation');let rejected=false;try{device.createQuerySet({type:'timestamp',count:2})}catch(error){rejected=error.name==='TypeError'}const validation=await device.popErrorScope();demand(rejected||validation,'Timestamp query worked without requesting the feature')}finally{device.destroy()}
   const code=`onmessage=async()=>{try{const a=await navigator.gpu.requestAdapter();postMessage({features:[...a.features],min:a.info.subgroupMinSize,max:a.info.subgroupMaxSize})}catch(e){postMessage({error:String(e)})}}`;
   const url=URL.createObjectURL(new Blob([code],{type:'text/javascript'})),worker=new Worker(url);let timer;
-  try{const value=await new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(Error('GPU Worker timeout')),10000);worker.onmessage=e=>resolve(e.data);worker.onerror=e=>reject(Error(e.message));worker.postMessage(0)});demand(!value.error&&blocked.every(f=>!value.features.includes(f))&&value.min===0&&value.max===0,'Worker reopened optional features/info')}finally{clearTimeout(timer);worker.terminate();URL.revokeObjectURL(url)}
-  return {adapterAndDevice:true,worker:true,requiredFeaturesRejected:true,timestampQueryValidation:true,subgroupWidthsHidden:true,blocked};
+  try{const value=await new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(Error('GPU Worker timeout')),10000);worker.onmessage=e=>resolve(e.data);worker.onerror=e=>reject(Error(e.message));worker.postMessage(0)});demand(!value.error&&blocked.every(f=>!value.features.includes(f))&&value.min===widths[0]&&value.max===widths[1],'Worker disagrees with the window adapter policy')}finally{clearTimeout(timer);worker.terminate();URL.revokeObjectURL(url)}
+  return {adapterAndDevice:true,worker:true,requiredFeaturesRejected:true,timestampQueryValidation:true,subgroupWidthsConsistent:true,blocked};
  });
  await test('gpu_limit_negotiation',async()=>{
   const adapter=await navigator.gpu.requestAdapter();demand(adapter,'No adapter');

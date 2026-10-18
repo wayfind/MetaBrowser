@@ -61,7 +61,9 @@ try{
  const voiceCount=await evaluate(`(async()=>{for(let i=0;i<100;i++){window.__voices=speechSynthesis.getVoices();if(__voices.length)return __voices.length;await new Promise(r=>setTimeout(r,50))}return 0})()`);
  let speech='native-voices-unavailable';
  if(voiceCount){
-  assert(voiceCount<=2);assert(await evaluate(`__voices.every(v=>v.name==='System voice ('+v.lang+')'&&v.voiceURI==='urn:metabrowser:voice:'+v.lang&&typeof v.NativeName==='undefined')`));
+  // v20n: stock voices keep real names/URIs like official Chrome; downloaded
+  // quality variants stay hidden and no generic alias or private accessor leaks.
+  assert(await evaluate(`__voices.every(v=>v.name&&!/\\((Enhanced|Premium)\\)/.test(v.name)&&!v.name.startsWith('System voice (')&&!v.voiceURI.startsWith('urn:metabrowser:voice:')&&typeof v.NativeName==='undefined')`));
   const spoken=await evaluate(`new Promise(resolve=>{const u=new SpeechSynthesisUtterance('test');u.volume=0;u.voice=__voices[0];u.onend=()=>resolve({ended:true,same:u.voice===__voices[0]});u.onerror=e=>resolve({error:e.error});speechSynthesis.speak(u)})`,true);
   assert(spoken.ended&&spoken.same,'Silent native speech routing failed');speech='passed-native-silent-utterance';
  }

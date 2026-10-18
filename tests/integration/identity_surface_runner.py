@@ -127,7 +127,7 @@ def validate_passive(data, protected):
         if type(obj['effectiveType']) is not str or type(obj['rtt']) not in (int,float) or type(obj['downlink']) not in (int,float):return None
         return [obj[k] for k in ['effectiveType','rtt','downlink']]
     if protected:
-        checks['network_policy_window_worker_retained']=all(values(x[k])==['4g',0,10] for x in observations for k in ['window','worker','retained'])
+        checks['network_policy_window_worker_retained']=all(values(x[k])==['4g',50,10] for x in observations for k in ['window','worker','retained'])
         checks['network_event_policy']=all(type(x['events']) is int and x['events']==0 for x in observations)
         canonical={'charging':True,'level':1,'chargingTime':0,'dischargingTime':'Infinity'}
         def battery_valid(b):

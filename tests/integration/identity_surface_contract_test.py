@@ -5,7 +5,7 @@ from identity_surface_runner import validate, validate_passive, validate_version
 
 
 def protected_trace():
-    link={'effectiveType':'4g','rtt':0,'downlink':10,'saveData':False}
+    link={'effectiveType':'4g','rtt':50,'downlink':10,'saveData':False}
     battery={'charging':True,'level':1,'chargingTime':0,'dischargingTime':'Infinity'}
     return {'passiveSignalTrace':[{'phase':name,'observed':{'window':copy.deepcopy(link),'worker':copy.deepcopy(link),'retained':copy.deepcopy(link),'battery':copy.deepcopy(battery),'retainedBattery':copy.deepcopy(battery),'events':0,'batteryEvents':0,'batteryPromiseIdentity':True,'online':name!='offline'}} for name in ['before','slow','fast','offline']]}
 
@@ -22,6 +22,12 @@ class EvidenceContract(unittest.TestCase):
     def test_retained_owner_cannot_reopen_network(self):
         data=protected_trace();data['passiveSignalTrace'][2]['observed']['retained']['rtt']=750
         self.assertFalse(validate_passive(data,True)['passed'])
+
+    def test_legacy_or_physical_network_values_rejected(self):
+        # rtt 0 was the pre-v20n constant; JS must match the Client Hints cohort.
+        for value in (0, 100):
+            data=protected_trace();data['passiveSignalTrace'][1]['observed']['window']['rtt']=value
+            self.assertFalse(validate_passive(data,True)['passed'],value)
 
     def test_hidden_change_events_are_not_protection(self):
         data=protected_trace();data['passiveSignalTrace'][3]['observed']['events']=1

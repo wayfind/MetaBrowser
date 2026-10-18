@@ -2,7 +2,8 @@
 
 Each configuration runs headed on fresh profiles, twice, against one owned loopback origin.
 Surfaces come from baseline_surface_probe.js in five realms plus raw request headers,
-including high-entropy Client Hints requested with Accept-CH. Differences are classified as
+including high-entropy Client Hints requested with Accept-CH on a subresource (renderer)
+and on a second navigation (browser). Differences are classified as
 dynamic, version skew, intended privacy change, build/product residual, privacy masking a
 build difference, or mixed. Classification is mechanical; residual review is separate.
 """
@@ -57,7 +58,8 @@ await collect('service',async()=>{const r=await navigator.serviceWorker.register
  return new Promise((ok,no)=>{const c=new MessageChannel();c.port1.onmessage=reply(ok,no);r.active.postMessage(0,[c.port2])})});
 await fetch('/echo?run='+run);
 await fetch('/report?run='+run,{method:'POST',body:JSON.stringify({realms,errors})});
-document.title='done';})();'''),
+// A second navigation carries the browser-added (navigation) Client Hints.
+location.replace('/nav?run='+run);})();'''),
 }
 
 
@@ -105,6 +107,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif path == '/echo':
             self.record('subresource_after_accept_ch')
             self.reply('application/json', '{}')
+        elif path == '/nav':
+            self.record('navigation_after_accept_ch')
+            self.reply('text/html', '<!doctype html><title>done</title>')
         elif path in PAGES:
             self.reply(*PAGES[path])
         else:
@@ -123,7 +128,8 @@ def observe(fixture, executable, flags, log):
         started = time.monotonic()
         process = subprocess.Popen([str(executable), '--user-data-dir=' + profile, *flags, fixture.origin + '/?run=' + run],
                                    stdout=log, stderr=log, start_new_session=True)
-        while time.monotonic() - started < 120 and run not in fixture.reports and process.poll() is None:
+        while (time.monotonic() - started < 120 and process.poll() is None and not (
+                run in fixture.reports and 'navigation_after_accept_ch' in fixture.headers.get(run, {}))):
             time.sleep(.25)
         process.terminate()
         try:
@@ -237,7 +243,8 @@ def main():
     finally:
         fixture.shutdown()
         log.close()
-    complete = all(o['reported'] and len(o['realms']) == 5 for observations in runs.values() for o in observations)
+    complete = all(o['reported'] and len(o['realms']) == 5 and 'navigation_after_accept_ch' in o['headers']
+                   for observations in runs.values() for o in observations)
     counts, rows = classify(runs) if complete else ({}, [])
     frameworks = {'official': next((official / 'Contents/Frameworks').glob('*.framework')),
                   'candidate': candidate / 'Contents/Frameworks/Chromium Framework.framework'}

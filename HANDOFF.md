@@ -181,6 +181,11 @@ Zig 插件上次用独立前缀 `out/privacy-v20m-sdk-plugin` 构建。旧 `zig-
 本机跑原生 UI 验收前，须给 Claude Code 的 `claude` 进程开启辅助功能权限。
 2026-10-18 同版本官方基线对比见 `docs/privacy-baseline-diff.md`：列出了下一轮引擎要修的
 5 项身份残差 R1–R5（deviceMemory、网络信息 JS/HTTP、语音、WebGL 调试扩展、WebGPU）。
+同日 v20n 候选已修复这 5 项（framework `4523e8bc…`，未安装）：Mac 候选在
+`out/mac-privacy-v20n-sdk-candidate`，审查记录是 `out/evidence/privacy-v20n-review.json`。
+H200 上的 v20m 构建现场备份在 `/data/metabrowser/backups/v20m-pre-v20n`；v20n 脚本在
+`/data/metabrowser/staging-v20n/project`，原 `/data/metabrowser/project` 未动，H200 构建目录现在是 v20n。
+基线对比、身份表面五模式、GPU/媒体 109 项和隔离验收都已通过；100 次冷启动和字体 fixture 五模式尚未重跑。
 
 TinyKG（若新机器已配置）：项目 13068，主范围 13125，分支 13147，当前任务 13161，
 最新开发验证 13185。使用 canonical TinyKG，不创建项目级 `.kg`，不要仅依赖旧记忆
