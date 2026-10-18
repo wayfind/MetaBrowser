@@ -19,9 +19,11 @@
       "id": "SRC-0.5",
       "requirement": "前置关卡：自编译内核 ≠ 官方 Chrome（编译产物差异对齐）",
       "source_section": "0.5",
-      "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "status": "partial",
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): all ~17.6k surfaces classified against official CfT; build differences limited to UI viewport (native sidebar) and the intended default-major platformVersion; five identity residuals R1-R5 listed. CfT is not branded Google Chrome; .97 vs .92 both official Stable."
     },
     {
       "id": "SRC-1",
@@ -111,16 +113,20 @@
       "requirement": "WebGL 指纹 【L2】",
       "source_section": "2.2",
       "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4 open: identity removes WEBGL_debug_renderer_info, which official Chrome always exposes."
     },
     {
       "id": "SRC-2.3",
       "requirement": "WebGL2 【L2】⚠",
       "source_section": "2.3",
       "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4 open: WebGL2 also lacks WEBGL_debug_renderer_info in identity mode."
     },
     {
       "id": "SRC-3",
@@ -212,9 +218,10 @@
         "out/evidence/identity-surfaces-v16.private.json",
         "out/evidence/cpu-template-v19c-inconsistency.json",
         "out/evidence/privacy-v19d-candidate-review.json",
-        "out/evidence/language-baseline-v20m-cft154.private.json"
+        "out/evidence/language-baseline-v20m-cft154.private.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete. 2026-10-18 language baseline: v20m and official Chrome for Testing 154.0.8037.92 (headless, fresh profiles, four accept-lang cases incl. persona template) match exactly: HTTP Accept-Language keeps primary+base (e.g. ja-JP,ja;q=0.9) and navigator.languages exposes only the primary language. Stock 154 behaviour, not a privacy residual; headed mode, other templates and platforms still open."
+      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete. 2026-10-18 language baseline: v20m and official Chrome for Testing 154.0.8037.92 (headless, fresh profiles, four accept-lang cases incl. persona template) match exactly: HTTP Accept-Language keeps primary+base (e.g. ja-JP,ja;q=0.9) and navigator.languages exposes only the primary language. Stock 154 behaviour, not a privacy residual; headed mode, other templates and platforms still open. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R1 open: identity keeps real deviceMemory 32 (JS and Device-Memory hints) while the template reports 8 cores; no 8-core Apple chip ships 32 GB."
     },
     {
       "id": "SRC-4.5",
@@ -222,9 +229,10 @@
       "source_section": "4.5",
       "status": "partial",
       "evidence": [
-        "out/evidence/identity-surfaces-v16.private.json"
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "Plugin/MIME inventory collected; official-version comparison absent"
+      "notes": "Plugin/MIME inventory collected; official-version comparison absent 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): plugins and MIME types identical to official CfT 154 in off and identity modes."
     },
     {
       "id": "SRC-4.6",
@@ -248,9 +256,11 @@
       "id": "SRC-6",
       "requirement": "DOM API 存在性矩阵 【L0 天然免费】",
       "source_section": "6",
-      "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "status": "partial",
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): global property names and ~60 interface member lists identical to official CfT 154 in all five realms; other templates/platforms not compared."
     },
     {
       "id": "SRC-6.1",
@@ -258,9 +268,10 @@
       "source_section": "6.1",
       "status": "partial",
       "evidence": [
-        "out/evidence/identity-surfaces-v16.private.json"
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "API inventory observed, platform/official comparison pending"
+      "notes": "API inventory observed, platform/official comparison pending 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): API existence matrix identical to official CfT 154 in five realms."
     },
     {
       "id": "SRC-6.2",
@@ -268,9 +279,10 @@
       "source_section": "6.2",
       "status": "partial",
       "evidence": [
-        "out/evidence/identity-surfaces-v16.private.json"
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "Global key inventory observed, differences not classified"
+      "notes": "Global key inventory observed, differences not classified 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): globalThis own property names identical to official CfT 154 in five realms."
     },
     {
       "id": "SRC-7",
@@ -285,16 +297,20 @@
       "requirement": "字体度量指纹 【L2】⚠",
       "source_section": "7.1",
       "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): native template exposes the same 34 stock macOS families as official; masking of user-installed fonts untested (no extra fonts on this host)."
     },
     {
       "id": "SRC-7.2",
       "requirement": "JS 引擎特征 【L0 天然免费】",
       "source_section": "7.2",
-      "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "status": "partial",
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): JS builtin inventories, 22 Math results, Intl options/supported values, error text and native toString identical to official CfT 154 in five realms; cross-architecture/other templates not compared."
     },
     {
       "id": "SRC-7.3",
@@ -447,27 +463,30 @@
       "source_section": "13",
       "status": "partial",
       "evidence": [
-        "out/evidence/identity-surfaces-v16.private.json"
+        "out/evidence/identity-surfaces-v16.private.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "Battery and network values observed; source confirms native passthrough"
+      "notes": "Battery and network values observed; source confirms native passthrough 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R2 open: identity fixes JS NetworkInformation to rtt 0/downlink 10 while ECT/RTT/Downlink client hints carry real estimates, so JS and HTTP disagree."
     },
     {
       "id": "BUILD",
       "requirement": "Build/product/official-version baseline",
       "status": "partial",
       "evidence": [
-        "out/evidence/hardware-privacy-v16-review-result.json"
+        "out/evidence/hardware-privacy-v16-review-result.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "Official Chrome155 vs engine154 not same-version parity"
+      "notes": "Official Chrome155 vs engine154 not same-version parity 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): versions .92/.97 are both official Mac Stable releases; brands, plugins, codecs/MSE/RTP and DOM inventories match CfT. Branded Google Chrome (brand, Widevine) still not compared."
     },
     {
       "id": "GPU",
       "requirement": "WebGPU canonical features, limits and actual rendering",
       "status": "partial",
       "evidence": [
-        "out/evidence/hardware-privacy-v16-review-result.json"
+        "out/evidence/hardware-privacy-v16-review-result.json",
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
       ],
-      "notes": "v16 109 checks partial coverage; arbitrary models missing"
+      "notes": "v16 109 checks partial coverage; arbitrary models missing 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4/R5 open: identity removes WEBGL_debug_renderer_info and strips WebGPU subgroups/timestamp-query, blank architecture and zero subgroup sizes, unlike any real Apple Silicon Chrome 154."
     },
     {
       "id": "MEDIA",
@@ -564,8 +583,10 @@
       "id": "FINGERPRINT-RESIDUALS",
       "requirement": "Evaluate rounding/normalization/chosen-content recovery and residual alpha/font/rendering entropy",
       "status": "unverified",
-      "evidence": [],
-      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed."
+      "evidence": [
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+      ],
+      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R3 open: identity exposes 1 speechSynthesis voice versus ~180 on official macOS Chrome."
     }
   ],
   "required_probe_ids": [
