@@ -211,9 +211,10 @@
       "evidence": [
         "out/evidence/identity-surfaces-v16.private.json",
         "out/evidence/cpu-template-v19c-inconsistency.json",
-        "out/evidence/privacy-v19d-candidate-review.json"
+        "out/evidence/privacy-v19d-candidate-review.json",
+        "out/evidence/language-baseline-v20m-cft154.private.json"
       ],
-      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete."
+      "notes": "v19c fixed Mid tier contradicted the selected Apple M-series template; source audit and controlled 8/4/1/8 native inspector test reject it. v19d derives from public template/core facts and passes15checks; other platform/architecture/CPU templates, touch and whole identity scope remain incomplete. 2026-10-18 language baseline: v20m and official Chrome for Testing 154.0.8037.92 (headless, fresh profiles, four accept-lang cases incl. persona template) match exactly: HTTP Accept-Language keeps primary+base (e.g. ja-JP,ja;q=0.9) and navigator.languages exposes only the primary language. Stock 154 behaviour, not a privacy residual; headed mode, other templates and platforms still open."
     },
     {
       "id": "SRC-4.5",

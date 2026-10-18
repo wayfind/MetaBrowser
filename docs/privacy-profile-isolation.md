@@ -32,8 +32,10 @@ SharedWorker 还检查 B 没有加入 A 的内存状态，重启后的 A 也必�
 
 语言按引擎既有行为分层断言：每次导航的 HTTP `Accept-Language` 必须是完整的
 `en-US,en;q=0.9`（由 fixture 记录并写入原始报告），JS `navigator.languages` 只暴露主语言
-`['en-US']`。这与 v20m 冷启动证据一致；HTTP 与 JS 列表长度不同是否构成指纹异常，
-仍须对照官方 Chrome 基线另行判断，本入口不代证。
+`['en-US']`。这与 v20m 冷启动证据一致。2026-10-18 用
+`tests/integration/language_baseline_probe.py` 对照官方 Chrome for Testing 154.0.8037.92：
+四组语言设置下 HTTP 与 JS 取值和 v20m 完全相同，列表长度不同是官方 154 的既有行为，
+不是隐私残差（证据 `out/evidence/language-baseline-v20m-cft154.private.json`，仅 headless）。
 
 身份正常退出后重开会恢复上次的标签页。每个 run 上报后，fixture 不再提供该页面
 （返回 410），并在 `refused_replays` 中记录，避免旧页面重跑 probe、在重启观测前改写
