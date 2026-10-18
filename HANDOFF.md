@@ -7,12 +7,13 @@
 
 仓库：`https://github.com/wayfind/MetaBrowser.git`
 
-**使用 `native-agent-browser` 分支。** 这是独立原生项目的首个提交，父历史为空。
-`main` 仍是旧项目，本次没有改写 main 或其他工作树。
+**使用 `main` 分支。** 2026-10-18 起 `main` 只包含原生项目：原生历史经无关历史合并并入，
+CloakBrowser 叠加方案已放弃并从 `main` 删除，最后状态见 tag `overlay-final`。
+`native-agent-browser` 分支保留原生项目的独立早期历史，不再作为开发入口。
 
 ```sh
-git clone --branch native-agent-browser https://github.com/wayfind/MetaBrowser.git MetaBrowser-native
-cd MetaBrowser-native
+git clone https://github.com/wayfind/MetaBrowser.git MetaBrowser
+cd MetaBrowser
 git log -1 --oneline
 ```
 

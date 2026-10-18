@@ -1,5 +1,0 @@
-# upstream .gitignore ignores every docs/ directory; the fork keeps its own docs
-!docs/
-tests/e2e/out/
-native/.zig-cache/
-native/zig-out/

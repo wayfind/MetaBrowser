@@ -1,3 +1,0 @@
-#!/bin/bash
-# Run CloakBrowser stealth test suite
-exec python -u /app/examples/stealth_test.py --no-screenshots "$@"
