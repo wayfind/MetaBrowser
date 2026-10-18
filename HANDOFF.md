@@ -185,7 +185,8 @@ Zig 插件上次用独立前缀 `out/privacy-v20m-sdk-plugin` 构建。旧 `zig-
 `out/mac-privacy-v20n-sdk-candidate`，审查记录是 `out/evidence/privacy-v20n-review.json`。
 H200 上的 v20m 构建现场备份在 `/data/metabrowser/backups/v20m-pre-v20n`；v20n 脚本在
 `/data/metabrowser/staging-v20n/project`，原 `/data/metabrowser/project` 未动，H200 构建目录现在是 v20n。
-基线对比、身份表面五模式、GPU/媒体 109 项和隔离验收都已通过；100 次冷启动和字体 fixture 五模式尚未重跑。
+基线对比、身份表面五模式、GPU/媒体 109 项、隔离验收和 100 次冷启动（含独立重验）都已通过；
+字体 fixture 五模式和显示授权 fixture 尚未重跑。
 
 TinyKG（若新机器已配置）：项目 13068，主范围 13125，分支 13147，当前任务 13161，
 最新开发验证 13185。使用 canonical TinyKG，不创建项目级 `.kg`，不要仅依赖旧记忆

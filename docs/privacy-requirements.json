@@ -569,9 +569,11 @@
         "out/evidence/cold-stability-v17c-acceptance.json",
         "out/evidence/cold-stability-v18b-acceptance.json",
         "out/evidence/cold-stability-v18b-source-snapshot.json",
-        "out/evidence/cold-stability-v20m-sdk-acceptance.json"
+        "out/evidence/cold-stability-v20m-sdk-acceptance.json",
+        "out/evidence/cold-stability-v20n-sdk.private.json",
+        "out/evidence/cold-stability-v20n-sdk-acceptance.json"
       ],
-      "notes": "v20m complete SDK candidate actual100 native cold starts, clean exits, persistent key and declared stable Canvas/audio/WebGL fields independently replayed. Native profile only; all templates/combinations and seven days remain open."
+      "notes": "v20m complete SDK candidate actual100 native cold starts, clean exits, persistent key and declared stable Canvas/audio/WebGL fields independently replayed. Native profile only; all templates/combinations and seven days remain open. 2026-10-18 v20n complete SDK candidate (framework 4523e8bc): 100 real cold starts with clean native exits, one persistent root secret and one stable signature (now including deviceMemory 16 and network 4g/50/10), deny-only provider with zero model POSTs; independent replay of all 100 raw records passes. Native template only; other templates, real sessions and seven days remain open."
     },
     {
       "id": "SOAK7D",
@@ -1058,7 +1060,7 @@
     "gpu_media_checks_passed": 109,
     "profile_isolation_independent_passed": true,
     "language_baseline_equal_official": true,
-    "restart100_rerun": false,
+    "restart100_rerun": true,
     "mac_privacy_five_mode_fixture_rerun": false,
     "same_patch_linux_reference": false,
     "evidence": [
@@ -1066,9 +1068,13 @@
       "out/evidence/identity-surfaces-v20n.private.json",
       "out/evidence/gpu-media-v20n.private.json",
       "out/evidence/identity-isolation-v20n-first.private.json",
-      "out/evidence/language-baseline-v20n-cft154.private.json"
+      "out/evidence/language-baseline-v20n-cft154.private.json",
+      "out/evidence/cold-stability-v20n-sdk.private.json",
+      "out/evidence/cold-stability-v20n-sdk-acceptance.json"
     ],
-    "full_scope_complete": false
+    "full_scope_complete": false,
+    "restart100_sdk_clean_cold_starts": 100,
+    "restart100_independent_raw_replay_passed": true
   },
   "previous_public_audio_stream_increment": {
     "engine": "v20i",
