@@ -161,7 +161,7 @@ ExecutionContext* NavigatorBase::GetUAExecutionContext() const {''',
          '#include "metabrowser/privacy_context.h"', 'webrtc-policy-includes')
     anchor = '''  prefs->webrtc_ip_handling_policy = blink::ToWebRTCIPHandlingPolicy(
       pref_service->GetString(prefs::kWebRTCIPHandlingPolicy));'''
-    edit(path, anchor, anchor + '''
+    old_allocator = '''
   // Native allocator policy: this controls actual ICE gathering, not just the
   // candidate strings delivered to JS. Respect managed/explicit upstream prefs.
   const auto* command = base::CommandLine::ForCurrentProcess();
@@ -174,7 +174,79 @@ ExecutionContext* NavigatorBase::GetUAExecutionContext() const {''',
         policy == "disable_non_proxied_udp") {
       prefs->webrtc_ip_handling_policy = blink::ToWebRTCIPHandlingPolicy(policy);
     }
-  }''', 'webrtc-allocator-policy')
+  }'''
+    # mdns_local_addresses (default) keeps Chromium's default allocator so host
+    # candidates are mDNS names like official Chrome; the renderer keeps them
+    # behind mDNS for protected frames even after media grants (see below).
+    # The earlier default (public interface only) produced no host candidate.
+    edit(path, anchor, anchor + '''
+  // Native allocator policy: this controls actual ICE gathering, not just the
+  // candidate strings delivered to JS. Respect managed/explicit upstream prefs.
+  const auto* command = base::CommandLine::ForCurrentProcess();
+  if (pref_service->GetBoolean(metabrowser::kPrivacyEnabledPref) &&
+      command->GetSwitchValueASCII("metabrowser-privacy") != "off" &&
+      pref_service->FindPreference(prefs::kWebRTCIPHandlingPolicy)->IsDefaultValue()) {
+    auto policy = command->GetSwitchValueASCII("metabrowser-webrtc-policy");
+    if (policy.empty()) policy = "mdns_local_addresses";
+    if (policy == "mdns_local_addresses") policy = "default";
+    if (policy == "default" || policy == "default_public_interface_only" ||
+        policy == "disable_non_proxied_udp") {
+      prefs->webrtc_ip_handling_policy = blink::ToWebRTCIPHandlingPolicy(policy);
+    }
+  }''', 'webrtc-allocator-policy', previous=anchor + old_allocator)
+
+    # A camera/microphone grant normally lets the allocator reveal raw host
+    # addresses. Protected frames keep the mDNS names official Chrome shows
+    # before any grant; site exceptions and privacy-off keep upstream checks.
+    path = MODULES + 'peerconnection/peer_connection_dependency_factory.cc'
+    edit(path, '#include "media/base/media_permission.h"',
+         '#include "media/base/media_permission.h"\n'
+         '#include "base/no_destructor.h"\n'
+         '#include "build/build_config.h"\n'
+         '#include "third_party/blink/renderer/core/frame/local_dom_window.h"\n'
+         '#include "third_party/blink/renderer/core/frame/web_local_frame_impl.h"',
+         'webrtc-mdns-includes')
+    edit(path, '''std::unique_ptr<webrtc::PortAllocator>
+PeerConnectionDependencyFactory::CreatePortAllocator(''', '''namespace {
+// Reports camera and microphone as not granted to the host-address filter only.
+// Capture permissions themselves are untouched.
+class MetaBrowserLocalAddressPermission final : public media::MediaPermission {
+ public:
+  void HasPermission(Type, PermissionStatusCB callback) override {
+    std::move(callback).Run(false);
+  }
+  void RequestPermission(Type, PermissionStatusCB callback) override {
+    std::move(callback).Run(false);
+  }
+  bool IsEncryptedMediaEnabled() override { return false; }
+#if BUILDFLAG(IS_WIN)
+  void IsHardwareSecureDecryptionAllowed(
+      IsHardwareSecureDecryptionAllowedCB callback) override {
+    std::move(callback).Run(false);
+  }
+#endif
+};
+
+media::MediaPermission* MetaBrowserLocalAddressFilter(WebLocalFrame* web_frame) {
+  auto* frame = web_frame ? To<WebLocalFrameImpl>(web_frame)->GetFrame() : nullptr;
+  if (!frame || !frame->DomWindow() ||
+      !frame->DomWindow()->CanvasNoiseToken().has_value()) {
+    return nullptr;
+  }
+  static base::NoDestructor<MetaBrowserLocalAddressPermission> permission;
+  return permission.get();
+}
+}  // namespace
+
+std::unique_ptr<webrtc::PortAllocator>
+PeerConnectionDependencyFactory::CreatePortAllocator(''', 'webrtc-mdns-permission')
+    edit(path, '''  std::unique_ptr<webrtc::NetworkManager> network_manager;
+  if (port_config.enable_multiple_routes) {''', '''  if (port_config.enable_multiple_routes) {
+    if (auto* filter = MetaBrowserLocalAddressFilter(web_frame))
+      media_permission = filter;
+  }
+  std::unique_ptr<webrtc::NetworkManager> network_manager;
+  if (port_config.enable_multiple_routes) {''', 'webrtc-mdns-after-grant')
 
     # Keep downloaded/ArrayBuffer web fonts usable. Restrict only the implicit
     # system-family lookup after the web-font cache has been consulted.

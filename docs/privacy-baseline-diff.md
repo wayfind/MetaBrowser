@@ -1,7 +1,7 @@
 # 同版本官方基线全表面对比（v20m vs CfT 154）
 
 状态：2026-10-18 首次完成采集与逐项分类，找出 5 项需要改引擎的残差（R1–R5）。
-**同日 v20n 候选修复了这 5 项，基线对比复测通过；v20n 尚未安装或交付**（见文末「v20n 修复」）。
+**同日 v20n 候选修复了这 5 项，基线对比复测通过；2026-10-19 的 v20o 又修复了 WebRTC 零候选的问题（R6）。v20o 尚未安装或交付**（见文末「v20n 修复」和「R6」两节）。
 这次对比只证明「和同版本官方 Chrome 的差异已列全并分类」；57 项总账、P1–P14、A–L 仍未完成。
 
 ## 方法
@@ -110,3 +110,20 @@ v20n 是在 v20m 源码上增量编译的候选：framework 从 `d18a79b5…` �
 - 关闭隐私时两版都照常发真实值。
 - renderer 为 `ANGLE (Apple, ANGLE Metal Renderer: Apple M3, Unspecified Version)`，真实设备是 M4 Max。
 - 其余差异与修复前相同，均已分类为无害。
+
+## R6：WebRTC 主机候选（v20o）
+
+`tests/integration/webrtc_baseline_runner.py` 不配置 ICE 服务器，比较两种条件：没有媒体权限，以及用假设备授予 getUserMedia 权限之后。证据里只记录候选的类型和地址类别，不记录真实地址。
+
+| 条件 | 官方 CfT | v20m/v20n 身份 | v20o 身份 |
+| --- | --- | --- | --- |
+| 无媒体权限 | 1 个 mDNS 主机候选 | 0 个候选 | 1 个 mDNS，与官方一致 |
+| 已授予媒体权限 | 2 个内网 IPv4 | 0 个候选 | 1 个 mDNS，不暴露内网地址 |
+
+旧的默认策略「仅公共接口」根本不产生主机候选，「零候选」本身就是 WebRTC 被拦截的特征。v20o 改为默认 `mdns_local_addresses`：
+
+- 浏览器侧沿用 Chromium 的默认分配器（`renderer_preferences_util.cc`）。
+- 受保护的帧在端口分配器里使用一个永远返回「未授权」的权限对象（`peer_connection_dependency_factory.cc`），所以主机候选始终是 mDNS 名称，授予摄像头/麦克风权限后也不会拿到真实地址。站点例外和关闭隐私时保持官方行为。
+- 身份设置新增默认选项「隐藏本机地址 · mDNS」，原来的「仅公共接口」「严格代理」「沿用浏览器策略」都保留，已保存的配置继续有效。
+
+证据：`out/evidence/webrtc-baseline-v20o-cft154.private.json`，对照是 `-v20n-cft154`。Mac 五模式里，受控 STUN 下的主机候选全部为 mDNS，srflx 的 related address 被抹为 `0.0.0.0`，严格模式没有 UDP。

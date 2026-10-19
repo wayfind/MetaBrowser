@@ -193,7 +193,7 @@ H200 使用真实 GN/Ninja 依赖图交叉构建 macOS ARM64 引擎及完整 app
 | WebGPU | adapter/device 高熵型号、驱动、架构与 heap 元数据收敛；真实 compute 测试通过。vendor、能力和实际运算保留，并不等于 GPU 模拟。 |
 | 显示 | 常用 Mac 虚拟尺寸、可用区域、位置、色深、方向与 CSS 查询一致；真实 viewport/DPR/渲染不改。原生 Window Management 授权后尊重真实详细信息，撤销后恢复保护，CSS 事件同步。 |
 | 语音 | 最多暴露当前语言与 en-US 的实际 voice，每语言一个，公开通用名称；原生私有名称仅用于底层路由，不向 JS 暴露。实际静音 utterance 正常完成。 |
-| WebRTC | 默认仅公共接口，额外提供禁止 UDP 直连的严格代理模式及沿用浏览器策略的兼容模式。受控 STUN 验证普通模式可连接、严格模式无 UDP；不承诺隐藏网站直接连接的出口 IP。 |
+| WebRTC | v20o 起默认「隐藏本机地址 · mDNS」：主机候选与官方 Chrome 无权限时相同（mDNS 名称），授予媒体权限后也不暴露内网地址；另有仅公共接口、禁止 UDP 直连的严格代理、沿用浏览器策略三种选项。受控 STUN 验证普通模式可连接、严格模式无 UDP；不承诺隐藏网站直接连接的出口 IP。见 `docs/privacy-baseline-diff.md` R6。 |
 | 全局身份 | 账户设置独立窗口提供语言、IANA 时区、窗口、显示区域和 WebRTC 策略；独立目录/进程，复制配置不复制账户或浏览数据。Kolkata/Kathmandu 七上下文和非法配置拒绝测试通过。 |
 
 主要运行证据：`out/evidence/mac-privacy-acceptance-v10.json`、`display-permission-acceptance-v10.json`、原生身份 UI 验收文件。测试均使用隔离本地配置、受控 HTTP/STUN 与真实 Mac 图形后端，付费模型调用为零；保留基线、身份 A/B、A 冷重启和严格模式的独立原始报告。元数据断言不能替代业务验收。

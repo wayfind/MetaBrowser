@@ -89,6 +89,11 @@ def validate(state, directory, require_webgl=False, require_mac=False, require_r
         for value, original in zip(audio['timeSample'], baseline['audio']['timeSample']):
             assert abs(value - original) <= 1.0e-7
         assert not any(c['hasRelatedAddress'] for c in report['ice']), 'Private related address exposed'
+        if name in ('a', 'b', 'a_restart'):
+            # v20o: host candidates stay mDNS names, as official Chrome shows them
+            # before any media grant; zero host candidates is itself a WebRTC tell.
+            hosts = [c for c in report['ice'] if c['type'] == 'host']
+            assert hosts and all(c['mdns'] for c in hosts), (name, 'host candidates must be mDNS only')
     for key, paths in (('hdr', ('hash',)), ('audio', ('timeHash', 'freqHash'))):
         for path in paths:
             for protected in ('a','b','a_restart','strict'):
@@ -167,12 +172,15 @@ def validate(state, directory, require_webgl=False, require_mac=False, require_r
                 assert all(d[k] is False for k in ('p3','hdr','extended'))
             voice = report['speech']
             assert voice['available'] is True
-            assert type(voice['count']) is int and 0 <= voice['count'] <= 2
+            # v20n: stock voices keep real names and URIs like official Chrome; only
+            # downloaded quality variants (Enhanced/Premium) are hidden.
+            assert type(voice['count']) is int and voice['count'] > 0
             assert isinstance(voice['languages'], list) and len(voice['languages']) == voice['count']
             assert all(isinstance(v, str) and v for v in voice['languages'])
-            assert all(voice[k] is True for k in ('publicIdentityValid','uniqueLocales','nativeRoutingNotExposed'))
-            assert len({v.lower() for v in voice['languages']}) == voice['count']
-            assert all(lang.lower() in (voice['language'].lower(), 'en-us') for lang in voice['languages'])
+            assert voice['downloadedQualityCount'] == 0, (name, 'downloaded voice exposed')
+            digest(voice['namesSha256'])
+            assert voice['namesSha256'] == baseline['speech']['stockNamesSha256'], (name, 'stock voice list changed')
+            assert all(voice[k] is True for k in ('noGenericAliases', 'nativeRoutingNotExposed'))
             for realm, context in report['webgl'].items():
                 formats = context['webgl2']['formats']
                 expected_formats = baseline['webgl'][realm]['webgl2']['formats']

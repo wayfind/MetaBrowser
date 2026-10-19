@@ -313,9 +313,18 @@
       "source_section": "7.1",
       "status": "unverified",
       "evidence": [
-        "out/evidence/baseline-surface-v20m-cft154-r2.private.json"
+        "out/evidence/baseline-surface-v20m-cft154-r2.private.json",
+        "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+        "out/evidence/baseline-surface-v20o-cft154.private.json",
+        "out/evidence/identity-surfaces-v20o.private.json",
+        "out/evidence/gpu-media-v20o.private.json",
+        "out/evidence/mac-privacy-v20o/acceptance.json",
+        "out/evidence/display-permission-v20o.private.json",
+        "out/evidence/identity-isolation-v20o-first.private.json",
+        "out/evidence/cold-stability-v20o-sdk.private.json",
+        "out/evidence/cold-stability-v20o-sdk-acceptance.json"
       ],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): native template exposes the same 34 stock macOS families as official; masking of user-installed fonts untested (no extra fonts on this host)."
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): native template exposes the same 34 stock macOS families as official; masking of user-installed fonts untested (no extra fonts on this host). 2026-10-19 v20o candidate (framework 54cf8f09, not installed): synthetic canary font installed in ~/Library/Fonts is invisible to protected pages (local() and system lookup) while web fonts load; stock multilingual metrics unchanged (five-mode fixture)."
     },
     {
       "id": "SRC-7.2",
@@ -468,9 +477,19 @@
       "id": "SRC-12",
       "requirement": "WebRTC 本地 IP 泄露 【L1】⚠",
       "source_section": "12",
-      "status": "unverified",
-      "evidence": [],
-      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance."
+      "status": "partial",
+      "evidence": [
+        "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+        "out/evidence/baseline-surface-v20o-cft154.private.json",
+        "out/evidence/identity-surfaces-v20o.private.json",
+        "out/evidence/gpu-media-v20o.private.json",
+        "out/evidence/mac-privacy-v20o/acceptance.json",
+        "out/evidence/display-permission-v20o.private.json",
+        "out/evidence/identity-isolation-v20o-first.private.json",
+        "out/evidence/cold-stability-v20o-sdk.private.json",
+        "out/evidence/cold-stability-v20o-sdk-acceptance.json"
+      ],
+      "notes": "Existing partial implementations must be mapped to exact assertions before status can advance. 2026-10-19 v20o candidate (framework 54cf8f09, not installed): R6 fixed: default identity policy mdns_local_addresses gives the same single mDNS host candidate as official CfT 154 without media permission, and still only mDNS after a camera/microphone grant (official exposes 2 private IPv4). Controlled STUN: srflx raddr redacted, strict mode sends no UDP. Public egress IP is out of scope."
     },
     {
       "id": "SRC-13",
@@ -509,9 +528,18 @@
         "out/evidence/identity-surfaces-v20n.private.json",
         "out/evidence/gpu-media-v20n.private.json",
         "out/evidence/identity-isolation-v20n-first.private.json",
-        "out/evidence/language-baseline-v20n-cft154.private.json"
+        "out/evidence/language-baseline-v20n-cft154.private.json",
+        "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+        "out/evidence/baseline-surface-v20o-cft154.private.json",
+        "out/evidence/identity-surfaces-v20o.private.json",
+        "out/evidence/gpu-media-v20o.private.json",
+        "out/evidence/mac-privacy-v20o/acceptance.json",
+        "out/evidence/display-permission-v20o.private.json",
+        "out/evidence/identity-isolation-v20o-first.private.json",
+        "out/evidence/cold-stability-v20o-sdk.private.json",
+        "out/evidence/cold-stability-v20o-sdk-acceptance.json"
       ],
-      "notes": "v16 109 checks partial coverage; arbitrary models missing 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4/R5 open: identity removes WEBGL_debug_renderer_info and strips WebGPU subgroups/timestamp-query, blank architecture and zero subgroup sizes, unlike any real Apple Silicon Chrome 154. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R4/R5 fixed: debug renderer cohort, WebGPU timestamp-query/subgroups, subgroup widths and metal-3 match official CfT; gpu-media 109 checks (native, SwiftShader, 10 policy controls) pass."
+      "notes": "v16 109 checks partial coverage; arbitrary models missing 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R4/R5 open: identity removes WEBGL_debug_renderer_info and strips WebGPU subgroups/timestamp-query, blank architecture and zero subgroup sizes, unlike any real Apple Silicon Chrome 154. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R4/R5 fixed: debug renderer cohort, WebGPU timestamp-query/subgroups, subgroup widths and metal-3 match official CfT; gpu-media 109 checks (native, SwiftShader, 10 policy controls) pass. 2026-10-19 v20o candidate (framework 54cf8f09, not installed): gpu-media 109 checks pass."
     },
     {
       "id": "MEDIA",
@@ -551,9 +579,18 @@
         "out/evidence/identity-surfaces-v20n.private.json",
         "out/evidence/gpu-media-v20n.private.json",
         "out/evidence/identity-isolation-v20n-first.private.json",
-        "out/evidence/language-baseline-v20n-cft154.private.json"
+        "out/evidence/language-baseline-v20n-cft154.private.json",
+        "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+        "out/evidence/baseline-surface-v20o-cft154.private.json",
+        "out/evidence/identity-surfaces-v20o.private.json",
+        "out/evidence/gpu-media-v20o.private.json",
+        "out/evidence/mac-privacy-v20o/acceptance.json",
+        "out/evidence/display-permission-v20o.private.json",
+        "out/evidence/identity-isolation-v20o-first.private.json",
+        "out/evidence/cold-stability-v20o-sdk.private.json",
+        "out/evidence/cold-stability-v20o-sdk-acceptance.json"
       ],
-      "notes": "v19d bounded ordinary and native incognito lifecycle matrix: Window/iframe plus five real worker categories read/write/delete four stores; two sites/four contexts,20 normal exits,2580 checks,32 ordinary and33 OTR negative-evidence mutations. Native OTR target ID independently differs from original profile ID; private data absent after new browser launch. Still unverified: simultaneous regular/OTR separation, quota pressure/low-capacity, permissions, concurrency, bucket expiration/durability, all value classes and full API privacy. New simultaneous regular/DevTools-OTR regression contradicts complete lifecycle coverage: v19d balanced/off native crash on OTR disposal (WorkerWatcher moved service-node ownership before client disconnection). v19e fix staged; native rerun pending, no success claim. v19e actual native rerun fixes this disposal crash: balanced/off3096checks and25negative-evidence cases pass with byte-identical failing-off probes. Only DevTools-created OTR coexistence/disposal is proved; primary native OTR window-close and in-flight concurrency remain unverified. Native2GiB APFS sparse-volume test proves low-volume leak in v19e; partialv19f fixes workers/implicit bucket but frame and legacy binder still raw. v19g frame-binding fix in build; not yet passed. Ordinary fresh-origin2MiB pressure tests pass72 controls/48negative onv19e, not real-disk-full. v19g native rerun closes bounded low-volume public quota leak: same probes as failingv19e,48estimates per mode acrossWindow/iframe/fiveWorker categories/legacy APIs/implicit buckets,8explicit bucketcap checks per mode; actualAPFS imageunmounted. Controlled2MiB-pressure72store cases pass with full payloadSHA,16lowvolume+54pressure negative-evidence cases rejected. Actualdiskfull,liveprefbinding transitions,bucketargumentclasses/mutations/expiration andfullAPIremainunverified. v19h closes metadata-count capacity channel (v19g protected61 on2GiB). Native80case matrices on2/4GiB x balanced/off pass320cases: protected512 totalincludingdefault, controls61/116; six positive quota classes toMAX_SAFE_INTEGER, existingquota immutable onopen, cleanup/recovery.19negative types,72SHA-verified pressure controls,CPU15/GPU109 pass. NewCDP page-readiness race preserved/fixed; exact collection-source snapshots replayed. All worker stress,liveprefs,permissions,expiry/durability/diskfull/fullAPI stillopen. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): profile isolation acceptance re-run on v20n passes with independent re-verification."
+      "notes": "v19d bounded ordinary and native incognito lifecycle matrix: Window/iframe plus five real worker categories read/write/delete four stores; two sites/four contexts,20 normal exits,2580 checks,32 ordinary and33 OTR negative-evidence mutations. Native OTR target ID independently differs from original profile ID; private data absent after new browser launch. Still unverified: simultaneous regular/OTR separation, quota pressure/low-capacity, permissions, concurrency, bucket expiration/durability, all value classes and full API privacy. New simultaneous regular/DevTools-OTR regression contradicts complete lifecycle coverage: v19d balanced/off native crash on OTR disposal (WorkerWatcher moved service-node ownership before client disconnection). v19e fix staged; native rerun pending, no success claim. v19e actual native rerun fixes this disposal crash: balanced/off3096checks and25negative-evidence cases pass with byte-identical failing-off probes. Only DevTools-created OTR coexistence/disposal is proved; primary native OTR window-close and in-flight concurrency remain unverified. Native2GiB APFS sparse-volume test proves low-volume leak in v19e; partialv19f fixes workers/implicit bucket but frame and legacy binder still raw. v19g frame-binding fix in build; not yet passed. Ordinary fresh-origin2MiB pressure tests pass72 controls/48negative onv19e, not real-disk-full. v19g native rerun closes bounded low-volume public quota leak: same probes as failingv19e,48estimates per mode acrossWindow/iframe/fiveWorker categories/legacy APIs/implicit buckets,8explicit bucketcap checks per mode; actualAPFS imageunmounted. Controlled2MiB-pressure72store cases pass with full payloadSHA,16lowvolume+54pressure negative-evidence cases rejected. Actualdiskfull,liveprefbinding transitions,bucketargumentclasses/mutations/expiration andfullAPIremainunverified. v19h closes metadata-count capacity channel (v19g protected61 on2GiB). Native80case matrices on2/4GiB x balanced/off pass320cases: protected512 totalincludingdefault, controls61/116; six positive quota classes toMAX_SAFE_INTEGER, existingquota immutable onopen, cleanup/recovery.19negative types,72SHA-verified pressure controls,CPU15/GPU109 pass. NewCDP page-readiness race preserved/fixed; exact collection-source snapshots replayed. All worker stress,liveprefs,permissions,expiry/durability/diskfull/fullAPI stillopen. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): profile isolation acceptance re-run on v20n passes with independent re-verification. 2026-10-19 v20o candidate (framework 54cf8f09, not installed): profile isolation and five-mode profile separation/cold restart pass."
     },
     {
       "id": "CROSSOS",
@@ -571,9 +608,18 @@
         "out/evidence/cold-stability-v18b-source-snapshot.json",
         "out/evidence/cold-stability-v20m-sdk-acceptance.json",
         "out/evidence/cold-stability-v20n-sdk.private.json",
-        "out/evidence/cold-stability-v20n-sdk-acceptance.json"
+        "out/evidence/cold-stability-v20n-sdk-acceptance.json",
+        "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+        "out/evidence/baseline-surface-v20o-cft154.private.json",
+        "out/evidence/identity-surfaces-v20o.private.json",
+        "out/evidence/gpu-media-v20o.private.json",
+        "out/evidence/mac-privacy-v20o/acceptance.json",
+        "out/evidence/display-permission-v20o.private.json",
+        "out/evidence/identity-isolation-v20o-first.private.json",
+        "out/evidence/cold-stability-v20o-sdk.private.json",
+        "out/evidence/cold-stability-v20o-sdk-acceptance.json"
       ],
-      "notes": "v20m complete SDK candidate actual100 native cold starts, clean exits, persistent key and declared stable Canvas/audio/WebGL fields independently replayed. Native profile only; all templates/combinations and seven days remain open. 2026-10-18 v20n complete SDK candidate (framework 4523e8bc): 100 real cold starts with clean native exits, one persistent root secret and one stable signature (now including deviceMemory 16 and network 4g/50/10), deny-only provider with zero model POSTs; independent replay of all 100 raw records passes. Native template only; other templates, real sessions and seven days remain open."
+      "notes": "v20m complete SDK candidate actual100 native cold starts, clean exits, persistent key and declared stable Canvas/audio/WebGL fields independently replayed. Native profile only; all templates/combinations and seven days remain open. 2026-10-18 v20n complete SDK candidate (framework 4523e8bc): 100 real cold starts with clean native exits, one persistent root secret and one stable signature (now including deviceMemory 16 and network 4g/50/10), deny-only provider with zero model POSTs; independent replay of all 100 raw records passes. Native template only; other templates, real sessions and seven days remain open. 2026-10-19 v20o candidate (framework 54cf8f09, not installed): 100 clean cold starts with independent replay re-run on v20o."
     },
     {
       "id": "SOAK7D",
@@ -621,9 +667,18 @@
         "out/evidence/identity-surfaces-v20n.private.json",
         "out/evidence/gpu-media-v20n.private.json",
         "out/evidence/identity-isolation-v20n-first.private.json",
-        "out/evidence/language-baseline-v20n-cft154.private.json"
+        "out/evidence/language-baseline-v20n-cft154.private.json",
+        "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+        "out/evidence/baseline-surface-v20o-cft154.private.json",
+        "out/evidence/identity-surfaces-v20o.private.json",
+        "out/evidence/gpu-media-v20o.private.json",
+        "out/evidence/mac-privacy-v20o/acceptance.json",
+        "out/evidence/display-permission-v20o.private.json",
+        "out/evidence/identity-isolation-v20o-first.private.json",
+        "out/evidence/cold-stability-v20o-sdk.private.json",
+        "out/evidence/cold-stability-v20o-sdk-acceptance.json"
       ],
-      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R3 open: identity exposes 1 speechSynthesis voice versus ~180 on official macOS Chrome. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R3 fixed: protected pages list the stock system voices with real names (180 here, equal to official); downloaded Enhanced/Premium voices hidden."
+      "notes": "Small bounded noise is not proof that underlying hardware/OS fingerprints cannot be reconstructed. 2026-10-18 same-version baseline (docs/privacy-baseline-diff.md; headed CfT 154.0.8037.92 vs v20m off/identity, five realms, 2 fresh profiles each): R3 open: identity exposes 1 speechSynthesis voice versus ~180 on official macOS Chrome. 2026-10-18 v20n candidate (framework 4523e8bc, not installed): R3 fixed: protected pages list the stock system voices with real names (180 here, equal to official); downloaded Enhanced/Premium voices hidden. 2026-10-19 v20o candidate (framework 54cf8f09, not installed): voice routing: stock voice list equals baseline minus downloaded variants; silent utterance routes natively (display fixture)."
     }
   ],
   "required_probe_ids": [
@@ -1037,44 +1092,38 @@
     }
   ],
   "latest_runtime_increment": {
-    "engine": "v20n",
-    "framework_sha256": "4523e8bcd13037203b48ce53e84af697e74be5a4b3e0c3bd75725cf8848151b6",
+    "engine": "v20o",
+    "framework_sha256": "54cf8f096e0e205df1033433962a0d05a771ff3ea4af3ce1669b26a3d196edc8",
     "installed": false,
-    "base_engine": "v20m",
-    "scope": "same-version baseline residuals R1-R5 (docs/privacy-baseline-diff.md)",
-    "changed_chromium_sources": 9,
+    "base_engine": "v20n",
+    "scope": "R6 WebRTC host candidates (docs/privacy-baseline-diff.md)",
+    "changed_chromium_sources": 3,
     "engine_app_entries_changed": 1,
-    "engine_app_entries": 352,
     "candidate_app_entries": 373,
-    "candidate_sdk_and_plugin_reused_from": "v20m",
-    "h200_v20m_backup": "/data/metabrowser/backups/v20m-pre-v20n",
-    "residuals_fixed": [
-      "R1 deviceMemory device class",
-      "R2 NetworkInformation and ECT/RTT/Downlink hints",
-      "R3 stock speech voices",
-      "R4 WEBGL_debug_renderer_info GPU-family cohort",
-      "R5 WebGPU features/subgroups/architecture"
-    ],
-    "navigation_client_hints_verified": true,
+    "h200_v20n_backup": "/data/metabrowser/backups/v20n-pre-v20o",
+    "webrtc_no_permission_matches_official": true,
+    "webrtc_media_grant_hides_local_addresses": true,
+    "baseline_diff_unchanged_from_v20n": true,
     "identity_surface_modes_passed": 5,
     "gpu_media_checks_passed": 109,
+    "mac_five_mode_fixture_passed": true,
+    "display_permission_fixture_passed": true,
     "profile_isolation_independent_passed": true,
-    "language_baseline_equal_official": true,
-    "restart100_rerun": true,
-    "mac_privacy_five_mode_fixture_rerun": false,
+    "restart100_sdk_clean_cold_starts": 100,
+    "restart100_independent_raw_replay_passed": true,
     "same_patch_linux_reference": false,
     "evidence": [
-      "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
-      "out/evidence/identity-surfaces-v20n.private.json",
-      "out/evidence/gpu-media-v20n.private.json",
-      "out/evidence/identity-isolation-v20n-first.private.json",
-      "out/evidence/language-baseline-v20n-cft154.private.json",
-      "out/evidence/cold-stability-v20n-sdk.private.json",
-      "out/evidence/cold-stability-v20n-sdk-acceptance.json"
+      "out/evidence/webrtc-baseline-v20o-cft154.private.json",
+      "out/evidence/baseline-surface-v20o-cft154.private.json",
+      "out/evidence/identity-surfaces-v20o.private.json",
+      "out/evidence/gpu-media-v20o.private.json",
+      "out/evidence/mac-privacy-v20o/acceptance.json",
+      "out/evidence/display-permission-v20o.private.json",
+      "out/evidence/identity-isolation-v20o-first.private.json",
+      "out/evidence/cold-stability-v20o-sdk.private.json",
+      "out/evidence/cold-stability-v20o-sdk-acceptance.json"
     ],
-    "full_scope_complete": false,
-    "restart100_sdk_clean_cold_starts": 100,
-    "restart100_independent_raw_replay_passed": true
+    "full_scope_complete": false
   },
   "previous_public_audio_stream_increment": {
     "engine": "v20i",
@@ -1209,5 +1258,45 @@
     "current_sdk_native_cold_starts_verified": true,
     "current_sdk_provider_posts_during_stability": 0,
     "current_sdk_packaged_library_origin_verified": true
+  },
+  "previous_baseline_parity_increment": {
+    "engine": "v20n",
+    "framework_sha256": "4523e8bcd13037203b48ce53e84af697e74be5a4b3e0c3bd75725cf8848151b6",
+    "installed": false,
+    "base_engine": "v20m",
+    "scope": "same-version baseline residuals R1-R5 (docs/privacy-baseline-diff.md)",
+    "changed_chromium_sources": 9,
+    "engine_app_entries_changed": 1,
+    "engine_app_entries": 352,
+    "candidate_app_entries": 373,
+    "candidate_sdk_and_plugin_reused_from": "v20m",
+    "h200_v20m_backup": "/data/metabrowser/backups/v20m-pre-v20n",
+    "residuals_fixed": [
+      "R1 deviceMemory device class",
+      "R2 NetworkInformation and ECT/RTT/Downlink hints",
+      "R3 stock speech voices",
+      "R4 WEBGL_debug_renderer_info GPU-family cohort",
+      "R5 WebGPU features/subgroups/architecture"
+    ],
+    "navigation_client_hints_verified": true,
+    "identity_surface_modes_passed": 5,
+    "gpu_media_checks_passed": 109,
+    "profile_isolation_independent_passed": true,
+    "language_baseline_equal_official": true,
+    "restart100_rerun": true,
+    "mac_privacy_five_mode_fixture_rerun": false,
+    "same_patch_linux_reference": false,
+    "evidence": [
+      "out/evidence/baseline-surface-v20n-cft154-r2.private.json",
+      "out/evidence/identity-surfaces-v20n.private.json",
+      "out/evidence/gpu-media-v20n.private.json",
+      "out/evidence/identity-isolation-v20n-first.private.json",
+      "out/evidence/language-baseline-v20n-cft154.private.json",
+      "out/evidence/cold-stability-v20n-sdk.private.json",
+      "out/evidence/cold-stability-v20n-sdk-acceptance.json"
+    ],
+    "full_scope_complete": false,
+    "restart100_sdk_clean_cold_starts": 100,
+    "restart100_independent_raw_replay_passed": true
   }
 }

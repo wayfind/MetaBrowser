@@ -27,7 +27,7 @@ COMMON = ['--no-first-run', '--no-default-browser-check', '--disable-component-u
           '--hide-crash-restore-bubble', '--window-size=1200,900', LANGUAGE]
 # Flags a native identity child receives from the parent (identity_profiles.cc), minus profile paths.
 IDENTITY = ['--metabrowser-persona-template=native-macos-arm64-v1', '--metabrowser-platform-version-policy=major',
-            '--metabrowser-webrtc-policy=default_public_interface_only']
+            '--metabrowser-webrtc-policy=mdns_local_addresses']
 ACCEPT_CH = ('Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Model, '
              'Sec-CH-UA-Platform-Version, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-Device-Memory, Device-Memory, '
              'Sec-CH-DPR, DPR, Sec-CH-Viewport-Width, Viewport-Width, ECT, RTT, Downlink, Sec-CH-Prefers-Color-Scheme, '

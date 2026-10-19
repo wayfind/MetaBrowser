@@ -31,7 +31,10 @@ async function fontsProbe(){
 async function speechProbe(){
  if(!('speechSynthesis' in window))return {available:false};
  let voices=speechSynthesis.getVoices();const end=Date.now()+8000;while(!voices.length&&Date.now()<end){await new Promise(r=>setTimeout(r,50));voices=speechSynthesis.getVoices()}
- return {available:true,count:voices.length,language:navigator.language,languages:voices.map(v=>v.lang),uniqueLocales:new Set(voices.map(v=>v.lang.toLowerCase())).size===voices.length,publicIdentityValid:voices.every(v=>v.name==='System voice ('+v.lang+')'&&v.voiceURI==='urn:metabrowser:voice:'+v.lang),nativeRoutingNotExposed:voices.every(v=>typeof v.NativeName==='undefined')};
+ // v20n: protected pages list stock voices with real names; downloaded quality variants are hidden.
+ const sha=async t=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+ const names=voices.map(v=>v.name+'|'+v.lang+'|'+v.voiceURI).sort(),downloaded=v=>/\((Enhanced|Premium)\)/.test(v);
+ return {available:true,count:voices.length,language:navigator.language,languages:voices.map(v=>v.lang),namesSha256:await sha(names.join('\n')),stockNamesSha256:await sha(names.filter(n=>!downloaded(n)).join('\n')),downloadedQualityCount:names.filter(downloaded).length,noGenericAliases:voices.every(v=>!v.name.startsWith('System voice (')&&!v.voiceURI.startsWith('urn:metabrowser:voice:')),nativeRoutingNotExposed:voices.every(v=>typeof v.NativeName==='undefined')};
 }
 async function displayProbe(){
  function snapshot(){return {width:screen.width,height:screen.height,availWidth:screen.availWidth,availHeight:screen.availHeight,availLeft:screen.availLeft,availTop:screen.availTop,colorDepth:screen.colorDepth,pixelDepth:screen.pixelDepth,extended:screen.isExtended,x:screenX,y:screenY,outerWidth,outerHeight,innerWidth,innerHeight,dpr:devicePixelRatio,orientation:screen.orientation.type,angle:screen.orientation.angle,cssDeviceWidth:matchMedia('(device-width: '+screen.width+'px)').matches,cssDeviceHeight:matchMedia('(device-height: '+screen.height+'px)').matches,color8:matchMedia('(color:8)').matches,srgb:matchMedia('(color-gamut: srgb)').matches,p3:matchMedia('(color-gamut: p3)').matches,hdr:matchMedia('(dynamic-range: high)').matches}}

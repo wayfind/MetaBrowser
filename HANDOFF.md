@@ -187,6 +187,11 @@ H200 上的 v20m 构建现场备份在 `/data/metabrowser/backups/v20m-pre-v20n`
 `/data/metabrowser/staging-v20n/project`，原 `/data/metabrowser/project` 未动，H200 构建目录现在是 v20n。
 基线对比、身份表面五模式、GPU/媒体 109 项、隔离验收和 100 次冷启动（含独立重验）都已通过；
 字体 fixture 五模式和显示授权 fixture 尚未重跑。
+2026-10-19 v20o 候选（framework `54cf8f09…`，未安装）修复了 WebRTC 零候选的问题（R6），候选在
+`out/mac-privacy-v20o-sdk-candidate`，审查记录是 `out/evidence/privacy-v20o-review.json`；v20n 构建现场备份在
+`/data/metabrowser/backups/v20n-pre-v20o`。v20o 的基线对比、WebRTC 对比、身份表面、GPU/媒体 109 项、
+Mac 五模式、显示授权、隔离验收和 100 次冷启动全部通过。五模式要用 1 em 合成金丝雀字体；显示授权用
+`tests/integration/display_permission_runner.py`（会开启 CanvasHDR）。
 
 TinyKG（若新机器已配置）：项目 13068，主范围 13125，分支 13147，当前任务 13161，
 最新开发验证 13185。使用 canonical TinyKG，不创建项目级 `.kg`，不要仅依赖旧记忆

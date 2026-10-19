@@ -54,8 +54,12 @@ constexpr std::array<const char*, 3> kWindows = {"system", "1280,900", "1440,100
 constexpr std::array<const char*, 7> kTimezones = {
     "system", "UTC", "Asia/Shanghai", "Asia/Tokyo", "Europe/London",
     "America/New_York", "America/Los_Angeles"};
-constexpr std::array<const char*, 3> kWebRTCPolicies = {
-    "default_public_interface_only", "disable_non_proxied_udp", "system"};
+// mdns_local_addresses (default) keeps Chromium's default allocator, so host
+// candidates appear as mDNS names like official Chrome before any media grant,
+// and protected frames never reveal raw local addresses even after one.
+constexpr std::array<const char*, 4> kWebRTCPolicies = {
+    "mdns_local_addresses", "default_public_interface_only",
+    "disable_non_proxied_udp", "system"};
 constexpr std::array<const char*, 5> kDisplays = {
     "1440x900", "1680x1050", "1920x1200", "2560x1600", "system"};
 constexpr std::array<const char*, 2> kGPUs = {"native", "software"};
@@ -326,7 +330,7 @@ class IdentityProfilesView final : public views::View {
     Label(u"初始窗口尺寸", 11, true);
     window_ = Choices({u"浏览器默认", u"1280 × 900", u"1440 × 1000"}, u"身份窗口尺寸");
     Label(u"WebRTC 网络隐私", 11, true);
-    webrtc_ = Choices({u"仅公共接口", u"严格代理 · 禁止 UDP 直连", u"兼容 · 沿用浏览器策略"}, u"身份 WebRTC 网络策略");
+    webrtc_ = Choices({u"隐藏本机地址 · mDNS", u"仅公共接口", u"严格代理 · 禁止 UDP 直连", u"兼容 · 沿用浏览器策略"}, u"身份 WebRTC 网络策略");
     Label(u"严格代理模式可能需要 TURN 中继才能通话；不会伪造连接成功。", 11);
     Label(u"网页可见显示区域", 11, true);
     display_ = Choices({u"1440 × 900", u"1680 × 1050", u"1920 × 1200", u"2560 × 1600", u"真实显示器 · 兼容"}, u"身份显示区域");
