@@ -729,10 +729,15 @@
     }
   ],
   "current_milestones": {
-    "engine": "v18b",
-    "framework_sha256": "4c6213f10bec9564cac68ef53c8a806251b24f82db378789c2deb8c5cc0356f2",
+    "engine": "v20o",
+    "framework_sha256": "54cf8f096e0e205df1033433962a0d05a771ff3ea4af3ce1669b26a3d196edc8",
     "installed": true,
-    "review": "out/evidence/identity-v18b-review-result.json",
+    "installed_at": "2026-10-19",
+    "install_path": "out/macos-arm64/MetaBrowser.app",
+    "app_manifest": "out/macos-arm64/metabrowser-app-manifest.json",
+    "backup": "~/Library/Application Support/MetaBrowser-backups/before-v20o-20261019-152759 (v18b app + Chromium/MetaBrowser data, hash-verified)",
+    "review": "out/evidence/privacy-v20o-review.json",
+    "smoke": "out/evidence/language-baseline-daily-v20o-install.private.json",
     "full_scope_complete": false
   },
   "candidate_milestones": {
@@ -1094,7 +1099,7 @@
   "latest_runtime_increment": {
     "engine": "v20o",
     "framework_sha256": "54cf8f096e0e205df1033433962a0d05a771ff3ea4af3ce1669b26a3d196edc8",
-    "installed": false,
+    "installed": true,
     "base_engine": "v20n",
     "scope": "R6 WebRTC host candidates (docs/privacy-baseline-diff.md)",
     "changed_chromium_sources": 3,
@@ -1298,5 +1303,12 @@
     "full_scope_complete": false,
     "restart100_sdk_clean_cold_starts": 100,
     "restart100_independent_raw_replay_passed": true
+  },
+  "previous_installed_milestone_v18b": {
+    "engine": "v18b",
+    "framework_sha256": "4c6213f10bec9564cac68ef53c8a806251b24f82db378789c2deb8c5cc0356f2",
+    "installed": true,
+    "review": "out/evidence/identity-v18b-review-result.json",
+    "full_scope_complete": false
   }
 }

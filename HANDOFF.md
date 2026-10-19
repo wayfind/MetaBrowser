@@ -192,6 +192,9 @@ H200 上的 v20m 构建现场备份在 `/data/metabrowser/backups/v20m-pre-v20n`
 `/data/metabrowser/backups/v20n-pre-v20o`。v20o 的基线对比、WebRTC 对比、身份表面、GPU/媒体 109 项、
 Mac 五模式、显示授权、隔离验收和 100 次冷启动全部通过。五模式要用 1 em 合成金丝雀字体；显示授权用
 `tests/integration/display_permission_runner.py`（会开启 CanvasHDR）。
+2026-10-19 v20o 已安装为日常版 `out/macos-arm64/MetaBrowser.app`（`scripts/run-mac.sh` 启动它，使用默认数据目录）。
+原日常版 v18b 和数据备份在 `~/Library/Application Support/MetaBrowser-backups/before-v20o-20261019-152759`，
+附逐文件哈希清单；钥匙串条目不在备份范围内（当时未发现 MetaBrowser 条目）。
 
 TinyKG（若新机器已配置）：项目 13068，主范围 13125，分支 13147，当前任务 13161，
 最新开发验证 13185。使用 canonical TinyKG，不创建项目级 `.kg`，不要仅依赖旧记忆
